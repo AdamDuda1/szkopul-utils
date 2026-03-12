@@ -1,9 +1,6 @@
-console.log('worker');
-console.log('worker');
-console.log('wo123rker');
-console.log('worker');
-console.log('work123er');
-console.log('worker');
+const manifestVersion = chrome.runtime.getManifest().version;
+console.log(`Thank you for using Szkopuł Utils (v${manifestVersion}), Dzięki! :)`);
+
 
 fix_contact_button();
 
