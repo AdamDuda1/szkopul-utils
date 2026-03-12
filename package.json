@@ -1,0 +1,16 @@
+{
+  "scripts": {
+    "build:ts": "tsc -p tsconfig.json",
+    "build:popup": "esbuild src/panel.ts --bundle --format=esm --outfile=src/panel.js",
+    "build": "npm run build:ts && npm run build:popup"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.1.37",
+    "@types/firefox-webext-browser": "^143.0.0",
+    "esbuild": "^0.27.4",
+    "webextension-polyfill": "^0.12.0"
+  },
+  "dependencies": {
+    "lit": "^3.3.2"
+  }
+}
