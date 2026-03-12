@@ -3,8 +3,9 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "ESNext",
-    "outDir": "dist",
+    "outDir": "src",
     "strict": true
   },
-  "include": ["*.ts"]
+  "include": ["src/*.ts"],
+  "exclude": ["node_modules"]
 }
