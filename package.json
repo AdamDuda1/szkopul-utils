@@ -1,8 +1,9 @@
 {
   "scripts": {
     "build:ts": "tsc -p tsconfig.json",
+    "build:worker": "esbuild src/worker.ts --bundle --format=esm --outfile=src/worker.js",
     "build:popup": "esbuild src/panel.ts --bundle --format=esm --outfile=src/panel.js",
-    "build": "npm run build:ts && npm run build:popup"
+    "build": "npm run build:ts && npm run build:worker && npm run build:popup"
   },
   "devDependencies": {
     "@types/chrome": "^0.1.37",
