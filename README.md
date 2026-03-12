@@ -11,3 +11,12 @@ Szkopuł Utils is a browser extension that provides various QOL improvements and
 ## Contributing
 
 ## Notes
+
+
+## TODO:
+
+
+Maybe useful in the future: 
+```
+"run_at": "document_start"
+```

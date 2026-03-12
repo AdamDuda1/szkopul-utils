@@ -14,11 +14,12 @@
     "default_title": "Szkopuł Utils"
   },
   "host_permissions": ["*://szkopul.edu.pl/*"],
+  "permissions": ["tabs", "scripting", "storage"],
   "content_scripts": [
     {
       "matches": ["*://szkopul.edu.pl/*"],
       "js": ["worker.js"],
-      "run_at": "document_idle"
+      "run_at": "document_start"
     }
   ],
   "icons": {

@@ -1,16 +1,25 @@
 console.log('worker');
 console.log('worker');
+console.log('wo123rker');
 console.log('worker');
-console.log('worker');
-console.log('worker');
+console.log('work123er');
 console.log('worker');
 
 fix_contact_button();
 
 
 function fix_contact_button() {
-    document.getElementById('szkopul-contact-form-open-div')!.style.position = 'absolute';
-    document.getElementById('szkopul-contact-form-open-div')!.style.left = '5px';
-    document.getElementById('szkopul-contact-form-open-div')!.style.bottom = '5px';
-    document.getElementById('szkopul-contact-form-open-div')!.style.width = 'auto';
+	const css: string = `
+        #szkopul-contact-form-open-div {
+            position: absolute !important;
+            left: 5px !important;
+            bottom: 5px !important;
+            width: auto !important;
+        }
+    `;
+
+	const styleElement: HTMLStyleElement = document.createElement('style');
+    styleElement.textContent = css;
+
+    document.documentElement.appendChild(styleElement);
 }
