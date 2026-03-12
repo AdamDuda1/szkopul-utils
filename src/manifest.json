@@ -14,7 +14,7 @@
     "default_title": "Szkopuł Utils"
   },
   "host_permissions": ["*://szkopul.edu.pl/*"],
-  "permissions": ["tabs", "scripting", "storage"],
+  "permissions": ["scripting", "storage"],
   "content_scripts": [
     {
       "matches": ["*://szkopul.edu.pl/*"],
@@ -27,5 +27,11 @@
     "32": "icons/icon-32.png",
     "48": "icons/icon-48.png",
     "128": "icons/icon-128.png"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "@szkopul-utils",
+      "strict_min_version": "58.0"
+    }
   }
 }

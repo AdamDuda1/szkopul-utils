@@ -9,8 +9,8 @@ function fix_contact_button() {
 	const css: string = `
         #szkopul-contact-form-open-div {
             position: absolute !important;
-            left: 5px !important;
-            bottom: 5px !important;
+            left: 7px !important;
+            bottom: 10px !important;
             width: auto !important;
         }
     `;
