@@ -1,5 +1,19 @@
 import { html, render } from 'lit';
 
+export function makeEnterSearchThings() {
+	const input = document.querySelector("input[type='search']");
+
+	input?.addEventListener("keydown", function(e) {
+		// @ts-ignore
+		if (e.key === "Enter") {
+			console.log('safjhasdsdfajhldsfa');
+			e.preventDefault(); // optional
+			// @ts-ignore
+			input.parentElement.parentElement!.submit();
+		}
+	});
+}
+
 export function fixContactButton() {
 	const css: string = `
         #szkopul-contact-form-open-div {

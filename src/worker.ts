@@ -1,4 +1,4 @@
-import { fixContactButton, addUtilsFeedbackButton } from './misc-fixes';
+import { fixContactButton, addUtilsFeedbackButton, makeEnterSearchThings } from './misc-fixes';
 
 const manifestVersion = chrome.runtime.getManifest().version;
 console.log(`Thank you for using Szkopuł Utils (v${manifestVersion}), Dzięki! :)`);
@@ -8,6 +8,7 @@ fixContactButton();
 const init = () => {
 	addUtilsFeedbackButton();
 	problemSetAddMenu();
+	makeEnterSearchThings();
 };
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
