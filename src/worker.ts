@@ -1,4 +1,4 @@
-import { fixContactButton } from './misc-fixes';
+import { fixContactButton, addUtilsFeedbackButton } from './misc-fixes';
 
 const manifestVersion = chrome.runtime.getManifest().version;
 console.log(`Thank you for using Szkopuł Utils (v${manifestVersion}), Dzięki! :)`);
@@ -6,11 +6,15 @@ console.log(`Thank you for using Szkopuł Utils (v${manifestVersion}), Dzięki! 
 fixContactButton();
 
 const init = () => {
+	addUtilsFeedbackButton();
 	problemSetAddMenu();
 };
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
 else init();
+
+
+
 
 
 function problemSetAddMenu() {
@@ -47,17 +51,5 @@ function problemSetAddMenu() {
         `;
 		tr.appendChild(cell);
 	});
-
-	const contactContainer = document.getElementById('szkopul-contact-form-open-div');
-	if (contactContainer) {
-		const btn = document.createElement('button');
-		btn.className = 'btn btn-info';
-		btn.id = 'szkopul-contact-form-open';
-		(btn as HTMLButtonElement).type = 'button';
-		btn.setAttribute('data-toggle', 'modal');
-		btn.setAttribute('data-target', '#szkopul-contact-form');
-		btn.textContent = 'Kontakt';
-		contactContainer.appendChild(btn);
-	}
 }
 
