@@ -1,4 +1,4 @@
-import { html, render } from 'lit';
+// Removed lit usage to avoid JSX/TSX issues in this file; we use simple innerHTML instead.
 
 const manifestVersion = chrome.runtime.getManifest().version;
 console.log(`Thank you for using Szkopuł Utils (v${manifestVersion}), Dzięki! :)`);
@@ -16,13 +16,12 @@ else init();
 
 
 function problemSetAddMenu() {
+	if (!window.location.href.includes('/problemset')) return;
 	let firstRow = true;
 	document.querySelectorAll('tr').forEach((tr: HTMLTableRowElement) => {
 		if (firstRow) {
 			const cell = document.createElement('td');
-			render(html`
-				<b>Utils</b>
-			`, cell);
+			cell.innerHTML = '<b>Utils</b>';
 			tr.appendChild(cell);
 			tr.style.borderBottom = '2px solid #dee2e6';
 			firstRow = false;
@@ -36,7 +35,7 @@ function problemSetAddMenu() {
 		const result = match?.[1];
 
 		const cell = document.createElement('td');
-		render(html`
+		cell.innerHTML = `
             <div class="btn-group">
                 <button class="btn btn-outline-secondary dropdown-toggle add-to-contest-button pl-1 pr-2" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="caret add-contest-caret"></span>
@@ -47,9 +46,21 @@ function problemSetAddMenu() {
                     <a class="dropdown-item" href="https://google.com/${result}">Oznacz jako Do Zrobienia</a>
                 </div>
             </div>
-		`, cell);
+        `;
 		tr.appendChild(cell);
 	});
+
+	const contactContainer = document.getElementById('szkopul-contact-form-open-div');
+	if (contactContainer) {
+		const btn = document.createElement('button');
+		btn.className = 'btn btn-info';
+		btn.id = 'szkopul-contact-form-open';
+		(btn as HTMLButtonElement).type = 'button';
+		btn.setAttribute('data-toggle', 'modal');
+		btn.setAttribute('data-target', '#szkopul-contact-form');
+		btn.textContent = 'Kontakt';
+		contactContainer.appendChild(btn);
+	}
 }
 
 function fixContactButton() {

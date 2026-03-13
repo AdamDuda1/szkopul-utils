@@ -24,8 +24,10 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 
 ## TODO:
 
+- Bootstrap or Shoelace?
 
-Maybe useful in the future: 
+
+- Maybe useful in the future: 
 ```
 "run_at": "document_start"
 ```
