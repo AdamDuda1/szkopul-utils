@@ -1,5 +1,4 @@
-// Removed lit usage to avoid JSX/TSX issues in this file; we use simple innerHTML instead.
-
+import { fixContactButton } from './misc-fixes';
 const manifestVersion = chrome.runtime.getManifest().version;
 console.log(`Thank you for using Szkopuł Utils (v${manifestVersion}), Dzięki! :)`);
 
@@ -63,18 +62,3 @@ function problemSetAddMenu() {
 	}
 }
 
-function fixContactButton() {
-	const css: string = `
-        #szkopul-contact-form-open-div {
-            position: absolute !important;
-            left: 7px !important;
-            bottom: 10px !important;
-            width: auto !important;
-        }
-    `;
-
-	const styleElement: HTMLStyleElement = document.createElement('style');
-    styleElement.textContent = css;
-
-    document.documentElement.appendChild(styleElement);
-}
