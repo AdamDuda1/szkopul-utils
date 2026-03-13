@@ -1,7 +1,8 @@
 import { html, render } from 'lit';
 
 export function makeEnterSearchThings() {
-	const input = document.querySelector("input[type='search']");
+	if (!(window.location.href.includes('/problemset') || window.location.href.includes('/contest'))) return;
+	const input = document.querySelector("input[type='search']"); // TODO fix doesnt work on /contest on chrome for some reason
 
 	input?.addEventListener("keydown", function(e) {
 		// @ts-ignore
