@@ -1,4 +1,3 @@
-
 export function fixContactButton() {
 	const css: string = `
         #szkopul-contact-form-open-div {

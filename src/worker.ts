@@ -1,10 +1,9 @@
 import { fixContactButton } from './misc-fixes';
+
 const manifestVersion = chrome.runtime.getManifest().version;
 console.log(`Thank you for using Szkopuł Utils (v${manifestVersion}), Dzięki! :)`);
 
-
 fixContactButton();
-
 
 const init = () => {
 	problemSetAddMenu();
