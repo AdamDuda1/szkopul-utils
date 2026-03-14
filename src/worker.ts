@@ -2,11 +2,14 @@ import { fixContactButton, addUtilsFeedbackButton, makeEnterSearchThings } from 
 import browser from "webextension-polyfill";
 import { initNotes } from './notes';
 import { appendProblemSetMenu } from './ui-elements';
+import { hideScores } from './ui-hiders';
 
 const manifestVersion = chrome.runtime.getManifest().version;
 console.log(`Thank you for using Szkopuł Utils (v${manifestVersion}), Dzięki! :)`);
 
 fixContactButton();
+
+browser.storage.local.get("hideScores").then((result) => { if (result.hideScores === true) hideScores(); });
 
 const init = () => {
 	addUtilsFeedbackButton();

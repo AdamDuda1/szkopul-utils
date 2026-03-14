@@ -2,13 +2,12 @@
     "scripts": {
         "build:ts": "tsc -p tsconfig.json",
         "build:worker": "esbuild src/worker.ts --bundle --format=iife --outfile=src/worker.js",
-        "build:misc-fiexs": "esbuild src/misc-fixes.ts --bundle --format=esm --outfile=src/worker.js",
-        "build:ui-elements": "esbuild src/ui-elements.ts --bundle --format=esm --outfile=src/worker.js",
-        "build:ui-hiders": "esbuild src/ui-elements.ts --bundle --format=esm --outfile=src/worker.js",
-        "build:notes": "esbuild src/notes.ts --bundle --format=esm --outfile=src/panel.js",
+        "build:misc-fixes": "esbuild src/misc-fixes.ts --bundle --format=esm --outfile=src/misc-fixes.js",
+        "build:ui-elements": "esbuild src/ui-elements.ts --bundle --format=esm --outfile=src/ui-elements.js",
+        "build:ui-hiders": "esbuild src/ui-hiders.ts --bundle --format=esm --outfile=src/ui-hiders.js",
+        "build:notes": "esbuild src/notes.ts --bundle --format=esm --outfile=src/notes.js",
         "build:panel": "esbuild src/popup/panel.ts --bundle --format=esm --outfile=src/popup/panel.js",
-        "build": "npm run build:ts && npm run build:ui-elements && npm run build:ui-hiders && npm run build:misc-fiexs && npm run build:worker && npm run build:panel",
-        "postinstall": "node scripts/copy-shoelace.js"
+        "build": "npm run build:ts && npm run build:ui-elements && npm run build:ui-hiders && npm run build:misc-fixes && npm run build:notes && npm run build:worker && npm run build:panel"
     },
     "devDependencies": {
         "@types/chrome": "^0.1.37",
