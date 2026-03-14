@@ -1,8 +1,13 @@
+*::selection {
+    background: transparent;
+    user-select: none;
+}
+
 html {
     background: red; /*for debugging*/
 }
 
-body, #home, #todo {
+body, #home, #todo, #options {
     width: 300px;
     overflow-y: auto;
     height: 330px;
@@ -14,7 +19,12 @@ body, #home, #todo {
     align-items: center;
 }
 
-body h2, body h3 {
+#home h2 {
+    margin-top: 7px;
+    margin-bottom: 14px;
+}
+
+body button h2, body button h3 {
     margin-top: 5px;
     text-align: center;
     color: #d1cdc7;
@@ -22,11 +32,11 @@ body h2, body h3 {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
-body h3 {
+body button h3 {
     font-size: 1.7rem;
 }
 
-body button {
+body button.b {
     width: 80%;
     margin-bottom: 7px;
 }
@@ -39,4 +49,14 @@ body button img {
 
 .back-btn {
     transform: rotate(180deg);
+}
+
+.form-check.form-switch.switch-full {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 90%;
+    margin-top: 7px;
+    position: relative;
+    left: -7px;
 }

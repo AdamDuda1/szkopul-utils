@@ -12,37 +12,41 @@
     <div id="home">
         <h2>Szkopuł Utils</h2>
 
-        <button class="btn btn-primary" id="btn-virtual">
+        <button class="btn btn-primary b" id="btn-showVirtual">
             KONKURS WIRTUALNY
             <img src="../icons/ic-arrow-right.svg" alt="">
         </button>
 
-        <button class="btn btn-primary" id="btn-showTODO">
+        <button class="btn btn-primary b" id="btn-showTODO">
             ZADANIA DO ZROBIENIA
             <img src="../icons/ic-arrow-right.svg" alt="">
         </button>
 
-        <button class="btn btn-primary" id="btn-options">
+        <button class="btn btn-primary b" id="btn-showOptions">
             OPCJE
             <img src="../icons/ic-arrow-right.svg" alt="">
         </button>
 
         <div class="form-check form-switch" style="margin-top: 10px;">
-            <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
-            <label class="form-check-label" for="flexSwitchCheckDefault">
+            <input class="form-check-input" type="checkbox" id="hideScoresQuickOption">
+            <label class="form-check-label" for="hideScoresQuickOption">
                 Ukrywaj wyniki
             </label>
         </div>
     </div>
 
     <div id="todo" style="display: none;">
-        <div>
-            <button class="btn btn-default">
+        <div style="position: absolute; top: 5px; left: 5px; display: flex; height: 50px">
+            <button class="btn btn-default" id="btn-backHome-TODO"
+                    style="width: auto; padding: 3px; color: white;     display: flex;">
                 <img src="../icons/ic-arrow-right.svg" alt="" class="back-btn">
+                <h3 style="position: relative; top: -7px; left: 7px;">Do zrobienia</h3>
             </button>
-            <h3>Zadania do zrobienia</h3>
         </div>
 
+        <br>
+        <br>
+        <br>
         <br>
 
         <button type="button" class="btn btn-info">Otwórz pełną listę</button>
@@ -50,15 +54,34 @@
 
     <div id="options" style="display: none;">
         <div>
-            <button class="btn btn-default" id="btn-backHome-options">
-                <img src="../icons/ic-arrow-right.svg" alt="" class="back-btn">
-            </button>
-            <h3>Opcje</h3>
+            <div style="position: absolute; top: 5px; left: 5px; display: flex; height: 50px">
+                <button class="btn btn-default" id="btn-backHome-options"
+                        style="width: auto; padding: 3px; color: white; display: flex;">
+                    <img src="../icons/ic-arrow-right.svg" alt="" class="back-btn">
+                    <h3 style="position: relative; top: -7px; left: 7px;">Opcje</h3>
+                </button>
+            </div>
         </div>
 
-        <br>
+        <br><br>
 
-        <button type="button" class="btn btn-info">Otwórz pełną listę</button>
+        <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between">
+            <label for="hideScoresOption" class="mb-0 form-check-label">Ukrywaj wyniki</label>
+            <div class="form-check form-switch m-0">
+                <input class="form-check-input" type="checkbox" id="hideScoresOption">
+            </div>
+        </div>
+
+        <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between">
+            <label for="hideTimerOption" class="mb-0 form-check-label">Ukrywaj czasomierze</label>
+            <div class="form-check form-switch m-0">
+                <input class="form-check-input" type="checkbox" id="hideTimerOption">
+            </div>
+        </div>
+
+
+        <button type="button" class="btn btn-warning b">Export danych</button>
+        <button type="button" class="btn btn-danger b">Usuń wszystkie dane</button>
     </div>
 </body>
 </html>
