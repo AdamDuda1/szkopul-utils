@@ -14,6 +14,7 @@ Szkopuł Utils is a browser extension that provides various QOL improvements and
 
 ## Full list of features:
 
+- Notes for tasks (saved in browser's storage);
 - Actually searches when you press enter in the search bar.
 - Hides the 'Contact' (or 'Send feedback' in english) button in the bottom left corner of the footer. It previously caused bottom part of the website's elements to be non-interactable (because of bad flex-box styling and `z-index: 999`).
 
@@ -25,6 +26,7 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 
 ## TODO:
 
+- **Add comments under tasks ?**
 - ~~Bootstrap or Shoelace?~~
 - Remove shoelace and switch to bootstrap
 - Crop bootstrap so only things that are actually used are included (???)

@@ -2,8 +2,9 @@ html {
     background: red; /*for debugging*/
 }
 
-body {
+body, #home, #todo {
     width: 300px;
+    overflow-y: auto;
     height: 330px;
     background: #181a1b !important;
     color: #d1cdc7 !important;
@@ -13,7 +14,7 @@ body {
     align-items: center;
 }
 
-body h2 {
+body h2, body h3 {
     margin-top: 5px;
     text-align: center;
     color: #d1cdc7;
@@ -21,7 +22,21 @@ body h2 {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
+body h3 {
+    font-size: 1.7rem;
+}
+
 body button {
     width: 80%;
     margin-bottom: 7px;
+}
+
+body button img {
+    width: 20px;
+    position: relative;
+    top: -2px;
+}
+
+.back-btn {
+    transform: rotate(180deg);
 }
