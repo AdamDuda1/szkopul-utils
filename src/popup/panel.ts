@@ -49,6 +49,7 @@ function optionsListeners() {
 	document.getElementById('hideScoresQuickOption')?.addEventListener('change', (event) => {
 		browser.storage.local.set({ hideScores: (event.target as HTMLInputElement).checked });
 		loadData();
+		document.getElementById('refresh-pls-home')!.style.display = 'flex';
 	});
 }
 

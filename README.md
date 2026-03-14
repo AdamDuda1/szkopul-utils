@@ -14,8 +14,9 @@ Szkopuł Utils is a browser extension that provides various QOL improvements and
 
 ## Full list of features:
 
+- Score hiding (shows only initial testing reports);
 - Notes for tasks (saved in browser's storage);
-- Actually searches when you press enter in the search bar.
+- Actually searches when you press enter in the search bar;
 - Hides the 'Contact' (or 'Send feedback' in english) button in the bottom left corner of the footer. It previously caused bottom part of the website's elements to be non-interactable (because of bad flex-box styling and `z-index: 999`).
 
 ## Contributing
@@ -26,8 +27,11 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 
 ## TODO:
 
+- translations
+- Add the same menu in the problem set to the top of the problem page
 - Remove the popups and the 'i' when the task is solved (for hideScores)
 - **Add comments under tasks ?**
+- fix: you can still select the score and copy it (problemset)
 - ts compile formats: iife vs esm
 - ~~Bootstrap or Shoelace?~~
 - Remove shoelace and switch to bootstrap
