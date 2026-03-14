@@ -25,9 +25,16 @@ export function hideScores() {
             color: ${fg} !important;
 		}
 		
-        [id*="report"] > article:first-of-type {
-            display: none !important;
+        [id*="report"] > article:first-of-type, .container-fluid.body .row > div:first-of-type {
+            display: none !important;                       /* TODO: ^ not safe probably*/
 		}
+		
+		#submission-status-table tbody tr td:last-of-type {
+			display: none !important;
+		}
+		
+		
+		
     `; // TODO find a better way of hiding the actual score text
 
 	const styleElement: HTMLStyleElement = document.createElement('style');

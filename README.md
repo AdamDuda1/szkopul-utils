@@ -26,6 +26,7 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 
 ## TODO:
 
+- Remove the popups and the 'i' when the task is solved (for hideScores)
 - **Add comments under tasks ?**
 - ts compile formats: iife vs esm
 - ~~Bootstrap or Shoelace?~~
