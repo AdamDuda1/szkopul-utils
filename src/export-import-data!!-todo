@@ -1,0 +1,58 @@
+async function exportStorage() {
+  // get all stored data
+  const data = await browser.storage.local.get(null);
+
+  // convert to JSON string
+  const json = JSON.stringify(data, null, 2);
+
+  // create a Blob and URL
+  const blob = new Blob([json], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  // create a temporary <a> to download
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "extension-data.json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  // free memory
+  URL.revokeObjectURL(url);
+}
+
+
+ // <input type="file" id="importFile" accept=".json">
+ // DELETE IT FIRST! (popup)
+async function importStorage(event: Event) {
+  const input = event.target as HTMLInputElement;
+  if (!input.files?.length) return;
+
+  const file = input.files[0];
+  const text = await file.text();
+
+  try {
+    const data = JSON.parse(text);
+    if (typeof data !== "object" || data === null) throw new Error("Invalid JSON");
+
+    // save to storage
+    await browser.storage.local.set(data);
+    console.log("Storage imported successfully!");
+  } catch (err) {
+    console.error("Failed to import storage:", err);
+  }
+
+  // reset input to allow re-importing same file if needed
+  input.value = "";
+}
+
+
+
+  // remove a single key
+  await browser.storage.local.remove("enabled");
+
+  // remove multiple keys
+  await browser.storage.local.remove(["TODO", "score"]);
+
+  // or clear everything
+  await browser.storage.local.clear(); <-------

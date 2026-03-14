@@ -1,5 +1,6 @@
 import { fixContactButton, addUtilsFeedbackButton, makeEnterSearchThings } from './misc-fixes';
 import browser from "webextension-polyfill";
+import { initNotes } from './notes';
 
 const manifestVersion = chrome.runtime.getManifest().version;
 console.log(`Thank you for using Szkopuł Utils (v${manifestVersion}), Dzięki! :)`);
@@ -10,6 +11,7 @@ const init = () => {
 	addUtilsFeedbackButton();
 	problemSetAddMenu();
 	makeEnterSearchThings();
+	initNotes();
 };
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });

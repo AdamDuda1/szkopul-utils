@@ -42,6 +42,7 @@ export function fixContactButton() {
 export function addUtilsFeedbackButton() {
 	const contactContainer = document.getElementById('szkopul-contact-form-open-div');
 	if (contactContainer) {
+		// contactContainer.children[0].classList.add('btn-sm');
 		const template = html`
 			<button
 				class="btn btn-info"

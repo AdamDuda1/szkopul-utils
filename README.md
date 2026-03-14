@@ -27,6 +27,7 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 ## TODO:
 
 - **Add comments under tasks ?**
+- ts compile formats: iife vs esm
 - ~~Bootstrap or Shoelace?~~
 - Remove shoelace and switch to bootstrap
 - Crop bootstrap so only things that are actually used are included (???)
