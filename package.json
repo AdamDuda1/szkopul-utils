@@ -6,7 +6,7 @@
         "build:ui-elements": "esbuild src/ui-elements.ts --bundle --format=esm --outfile=src/worker.js",
         "build:ui-hiders": "esbuild src/ui-elements.ts --bundle --format=esm --outfile=src/worker.js",
         "build:notes": "esbuild src/notes.ts --bundle --format=esm --outfile=src/panel.js",
-        "build:panel": "esbuild src/panel.ts --bundle --format=esm --outfile=src/panel.js",
+        "build:panel": "esbuild src/popup/panel.ts --bundle --format=esm --outfile=src/panel.js",
         "build": "npm run build:ts && npm run build:ui-elements && npm run build:ui-hiders && npm run build:misc-fiexs && npm run build:worker && npm run build:panel",
         "postinstall": "node scripts/copy-shoelace.js"
     },
