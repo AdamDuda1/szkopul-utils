@@ -37,8 +37,9 @@ function problemSetAddMenu() {
 		const match = url.match(/\/problemset\/problem\/([^/]+)\/site\//);
 		const result = match?.[1];
 
-		const cell = document.createElement('td');
-		cell.innerHTML = `
+		if (result != undefined) {
+			const cell = document.createElement('td');
+			cell.innerHTML = `
             <div class="btn-group">
                 <button class="btn btn-outline-secondary dropdown-toggle add-to-contest-button pl-1 pr-2" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="caret add-contest-caret"></span>
@@ -51,7 +52,8 @@ function problemSetAddMenu() {
                 </div>
             </div>
         `;
-		tr.appendChild(cell);
+			tr.appendChild(cell);
+		}
 	});
 }
 

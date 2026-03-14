@@ -4,26 +4,30 @@
     <meta charset="UTF-8">
     <title>Szkopuł Utils (Popup)</title>
     <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="bootstrap5min.css">
+    <link rel="stylesheet" href="bootstrap3min.css">
     <script type="module" src="../panel.js"></script>
-
-    <link rel="stylesheet" href="../shoelace/cdn/themes/light.css" />
-    <script type="module" src="../shoelace/cdn/components/switch/switch.js"></script>
-    <script type="module" src="../shoelace/cdn/components/button/button.js"></script>
-    <script type="module" src="../shoelace/cdn/components/checkbox/checkbox.js"></script>
 </head>
 <body>
     <h2>Szkopuł Utils</h2>
 
-    <sl-button id="virtual-contest" variant="primary" size="large">KONKURS WIRTUALNY ></sl-button>
-    <br>
-    <sl-button id="todo-tasks" variant="primary" size="large">ZADANIA DO ZROBIENIA ></sl-button>
-    <br>
-    <sl-button id="options" variant="primary" size="large">OPCJE ></sl-button>
-    <br>
-    <div>
-        <sl-checkbox id="enable-feature" checked>Ukrywaj wyniki</sl-checkbox>
+    <button class="btn btn-primary">
+        KONKURS WIRTUALNY >
+    </button>
+
+    <button class="btn btn-primary">
+        ZADANIA DO ZROBIENIA >
+    </button>
+
+    <button class="btn btn-primary">
+        OPCJE >
+    </button>
+
+    <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
+        <label class="form-check-label" for="flexSwitchCheckDefault">
+            Toggle feature
+        </label>
     </div>
-
-
 </body>
 </html>

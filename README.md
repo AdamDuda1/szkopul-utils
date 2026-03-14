@@ -25,7 +25,8 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 
 ## TODO:
 
-- Bootstrap or Shoelace?
+- ~~Bootstrap or Shoelace?~~
+- Remove shoelace and switch to bootstrap
 
 
 - Maybe useful in the future: 

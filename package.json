@@ -17,7 +17,6 @@
     },
     "dependencies": {
         "bootstrap": "^5.3.8",
-        "lit": "^3.3.2",
-        "@shoelace-style/shoelace": "^2.20.1"
+        "lit": "^3.3.2"
     }
 }
