@@ -40,7 +40,7 @@ function menuHTML() {
 	`
 }
 
-export function appendProblemSetMenu(addToTODOAction: (id: string, name: string, btn: HTMLAnchorElement) => Promise<boolean> = async () => false) {
+export function appendProblemSetMenu(addToTODOAction: (id: string, name: string, btn: HTMLAnchorElement) => void) {
 	if (!window.location.href.includes('/problemset')) return;
 	let validRows = false;
 

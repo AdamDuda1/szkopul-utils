@@ -3,6 +3,7 @@ import browser from "webextension-polyfill";
 import { initNotes } from './notes';
 import { appendProblemSetMenu } from './ui-elements';
 import { hideScores } from './ui-hiders';
+import { addToTODOAction } from './todo';
 
 const manifestVersion = chrome.runtime.getManifest().version;
 console.log(`Thank you for using Szkopuł Utils (v${manifestVersion}), Dzięki! :)`);
@@ -13,7 +14,7 @@ browser.storage.local.get("hideScores").then((result) => { if (result.hideScores
 
 const init = () => {
 	addUtilsFeedbackButton();
-	appendProblemSetMenu();
+	appendProblemSetMenu(addToTODOAction);
 	makeEnterSearchThings();
 	initNotes();
 };
