@@ -10,7 +10,7 @@ function menuHTML() {
                 <span class="caret add-contest-caret"></span>
                 <span class="d-none loading-spinner job-active"><i class="fa-solid fa-rotate-right spinner"></i></span>
             </button>
-            <div class="dropdown-menu dropdown-menu-right">
+            <div class="dropdown-menu dropdown-menu-right" style="min-width: 300px;">
                 <h5 class="dropdown-header">Szkopuł Utils</h5>
 				
 				<a class="dropdown-item action-todo" href="#">
