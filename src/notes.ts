@@ -47,7 +47,10 @@ export function initNotes() {
 	console.log('ID:' + id);
 
 	getNotes(id!).then(notes => {
-		area.value = notes!.toString() ?? '';
+		if (notes != undefined)	{
+			area.value = notes.toString();
+			area.rows = Math.min(Math.max(area.value.split(/\r\n|\r|\n/).length, 3), 25);
+		}
 	});
 
 	document.getElementById('notes-save')!.addEventListener('click', (event) => {
@@ -59,4 +62,22 @@ export function initNotes() {
 			setTimeout(() => btn.innerHTML = 'Zapisz', 1000);
 		});
 	});
+
+	document.getElementById('notes-area')!.addEventListener('keydown', (event) => {
+		if (event.key.toLowerCase() === 's' && (event.ctrlKey || event.metaKey)) {
+			event.preventDefault();
+			const btn = document.getElementById('notes-save') as HTMLButtonElement;
+
+			saveNotes(area.value, id!).then((r) => {
+				if (r) btn.innerHTML = 'Zapisano!';
+				else btn.innerHTML = 'Wyczyszczono!';
+				setTimeout(() => btn.innerHTML = 'Zapisz', 1000);
+			});
+		}
+	});
+
+	// document.getElementById('notes-area')?.addEventListener('input', (event) => { TODO auto-expand while typing
+	// 	const area = event.target as HTMLTextAreaElement;
+	// 	if ()
+	// });
 }
