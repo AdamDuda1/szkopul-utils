@@ -20,14 +20,18 @@ else init();
 
 function problemSetAddMenu() {
 	if (!window.location.href.includes('/problemset')) return;
-	let firstRow = true;
-	document.querySelectorAll('tr').forEach((tr: HTMLTableRowElement) => {
-		if (firstRow) {
+	let validRows = false;
+
+	const rows = document.querySelectorAll('tr');
+
+	for (let i = rows.length - 1; i >= 0; i--) {
+		const tr = rows[i];
+
+		if (i == 0 && validRows) {
 			const cell = document.createElement('td');
 			cell.innerHTML = '<b>Utils</b>';
 			tr.appendChild(cell);
 			tr.style.borderBottom = '2px solid #dee2e6';
-			firstRow = false;
 			return;
 		}
 
@@ -53,7 +57,12 @@ function problemSetAddMenu() {
             </div>
         `;
 			tr.appendChild(cell);
+			validRows = true;
 		}
+	}
+
+	document.querySelectorAll('tr').forEach((tr: HTMLTableRowElement) => {
+
 	});
 }
 
