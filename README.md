@@ -27,9 +27,9 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 
 - ~~Bootstrap or Shoelace?~~
 - Remove shoelace and switch to bootstrap
-
+- Crop bootstrap so only things that are actually used are included (???)
 
 - Maybe useful in the future: 
 ```
-"run_at": "document_start"
+"run_at": "document_//start"
 ```

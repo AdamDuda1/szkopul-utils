@@ -5,8 +5,8 @@ html {
 body {
     width: 300px;
     height: 330px;
-    background: #181a1b;
-    color: #d1cdc7;
+    background: #181a1b !important;
+    color: #d1cdc7 !important;
     margin: 0;
     display: flex;
     flex-direction: column;
@@ -14,9 +14,14 @@ body {
 }
 
 body h2 {
-    margin-top: 0;
+    margin-top: 5px;
     text-align: center;
     color: #d1cdc7;
     font-size: 2.5rem;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+body button {
+    width: 80%;
+    margin-bottom: 7px;
 }
