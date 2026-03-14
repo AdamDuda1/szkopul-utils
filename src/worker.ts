@@ -24,20 +24,6 @@ else init();
 
 export async function storageLogTODO() {
 	const result = await browser.storage.local.get("TODO");
-	const arr: string[] = Array.isArray(result.TODO) ? result.TODO : [];
+	const arr = Array.isArray(result.TODO) ? result.TODO : [];
 	console.log(arr);
 }
-
-
-async function addToTODO(id: string) {
-	const result = await browser.storage.local.get("TODO");
-	const arr: string[] = Array.isArray(result.TODO) ? result.TODO : [];
-
-	if (arr.includes(id)) return false;
-	arr.push(id);
-
-	await browser.storage.local.set({ TODO: arr });
-	return true;
-}
-
-
