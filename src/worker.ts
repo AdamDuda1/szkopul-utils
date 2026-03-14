@@ -46,7 +46,8 @@ function problemSetAddMenu() {
                 </button>
                 <div class="dropdown-menu dropdown-menu-right">
                     <h5 class="dropdown-header">Szkopuł Utils</h5>
-                    <a class="dropdown-item" href="https://google.com/${result}">Oznacz jako Do Zrobienia</a>
+                    <a class="dropdown-item" href="#" onclick="event.preventDefault(); console.log('todo: ${result}')">Oznacz jako Do Zrobienia</a>
+                    <a class="dropdown-item" href="#" onclick="event.preventDefault(); console.log('vietual: ${result}')">Dodaj do wirtualki</a>
                 </div>
             </div>
         `;
