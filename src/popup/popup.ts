@@ -1,6 +1,6 @@
 import {renderPopup} from "./popup-ui";
 import {setLang, t, type lang} from "../globals.js";
-import { getTODO, removeTODOItem, type TodoItem } from "../todo.js";
+import { getTODO, removeTODOItem, reorderTODO, type TodoItem } from "../todo.js";
 
 import browser from "webextension-polyfill";
 const browserFunctions = true; // Set this to false and comment out the import above to test UI locally
@@ -20,7 +20,6 @@ setTimeout(async () => {
 	document.getElementById('btn-backHome-options')?.addEventListener('click', backHome);
 	document.getElementById('btn-backHome-TODO')?.addEventListener('click', backHome);
 	document.getElementById('todo-table')?.addEventListener('click', onTodoTableClick);
-	document.getElementById('btn-openTodoFullList')?.addEventListener('click', openTODOFullList);
 
 	loadData();
 	optionsListeners();
@@ -138,9 +137,11 @@ async function renderTODOTable() {
 		const title = item.name || item.id;
 		const url = itemUrl(item.id);
 		return `
-			<tr>
+			<tr data-todo-id="${encodeURIComponent(item.id)}">
 				<td><a href="${url}" target="_blank" rel="noopener noreferrer">${escapeHTML(title)}</a></td>
 				<td>
+					<button type="button" class="btn btn-default btn-xs" data-todo-move="up" data-todo-id="${encodeURIComponent(item.id)}" title="Move up">▲</button>
+					<button type="button" class="btn btn-default btn-xs" data-todo-move="down" data-todo-id="${encodeURIComponent(item.id)}" title="Move down">▼</button>
 					<button type="button" class="btn btn-danger btn-xs" data-todo-remove="${encodeURIComponent(item.id)}">
 						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3"
 							 viewBox="0 0 16 16" style="position: relative; top: -2px;">
@@ -167,6 +168,30 @@ async function renderTODOTable() {
 
 async function onTodoTableClick(event: Event) {
 	const target = event.target as HTMLElement;
+
+	const moveButton = target.closest('[data-todo-move]') as HTMLElement | null;
+	if (moveButton && browserFunctions) {
+		const direction = moveButton.getAttribute('data-todo-move');
+		const encodedId = moveButton.getAttribute('data-todo-id');
+		if (!direction || !encodedId) return;
+
+		const rows = Array.from(document.querySelectorAll('#todo-table tr[data-todo-id]'));
+		const ids = rows
+			.map((row) => row.getAttribute('data-todo-id'))
+			.filter((id): id is string => Boolean(id));
+
+		const from = ids.indexOf(encodedId);
+		const to = direction === 'up' ? from - 1 : from + 1;
+		if (from < 0 || to < 0 || to >= ids.length) return;
+
+		const [current] = ids.splice(from, 1);
+		ids.splice(to, 0, current);
+
+		await reorderTODO(ids.map((id) => decodeURIComponent(id)));
+		void renderTODOTable();
+		return;
+	}
+
 	const button = target.closest('[data-todo-remove]') as HTMLElement | null;
 	if (!button || !browserFunctions) return;
 
@@ -175,11 +200,6 @@ async function onTodoTableClick(event: Event) {
 
 	await removeTODOItem(decodeURIComponent(encodedId));
 	void renderTODOTable();
-}
-
-function openTODOFullList() {
-	if (!browserFunctions) return;
-	void browser.tabs.create({ url: 'https://szkopul.edu.pl/problemset/' });
 }
 
 function escapeHTML(text: string) {

@@ -48,8 +48,6 @@ render(
         <br><br>
         
 		<div id="todo-table" style="max-height: 281px; overflow-y: auto; width: 100%;"></div>
-
-<!--		<button id="btn-openTodoFullList" type="button" class="btn btn-info">${t('popup_todo_openFullList')}</button>-->
 	`, document.getElementById('todo')!
 );
 

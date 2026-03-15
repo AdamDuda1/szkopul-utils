@@ -73,6 +73,24 @@ export function removeTODOItem(id: string) {
 	return updateTODO((todo) => todo.filter((item) => item.id !== id));
 }
 
+export function reorderTODO(orderIds: string[]) {
+	return updateTODO((todo) => {
+		const uniqueOrder = [...new Set(orderIds)];
+		const byId = new Map(todo.map((item) => [item.id, item]));
+		const ordered: TodoItem[] = [];
+
+		for (const id of uniqueOrder) {
+			const item = byId.get(id);
+			if (!item) continue;
+			ordered.push(item);
+			byId.delete(id);
+		}
+
+		ordered.push(...byId.values());
+		return ordered;
+	});
+}
+
 export function addToTODOAction(id: string, name: string, btn: HTMLAnchorElement) {
 	void (async () => {
 		try {

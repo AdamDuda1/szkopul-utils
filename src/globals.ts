@@ -33,14 +33,9 @@ export const translations = {
 		popup_data_import_pick_file: "Wybierz plik JSON do importu.",
 
 		popup_todo_title: "Do zrobienia",
-		popup_todo_openFullList: "Otwórz pełną listę",
 		popup_todo_empty: "Brak zadań na liście.",
-		popup_todo_col_pos: "#",
 		popup_todo_col_task: "Zadanie",
-		popup_todo_col_link: "Link",
 		popup_todo_col_actions: "Akcje",
-		popup_todo_open: "Otwórz",
-		popup_todo_remove: "Usuń",
 
 		menu_markAsTODO: "Oznacz jako 'Do zrobienia'",
 		menu_addToVirtual: "Dodaj do konkursu wirtualnego",
@@ -74,14 +69,9 @@ export const translations = {
 		popup_data_import_pick_file: "Choose a JSON file to import.",
 
 		popup_todo_title: "To-do",
-		popup_todo_openFullList: "Open full list",
 		popup_todo_empty: "No tasks in the list.",
-		popup_todo_col_pos: "#",
 		popup_todo_col_task: "Task",
-		popup_todo_col_link: "Link",
 		popup_todo_col_actions: "Actions",
-		popup_todo_open: "Open",
-		popup_todo_remove: "Remove",
 
 		menu_markAsTODO: "Mark as to-do",
 		menu_addToVirtual: "Add to virtual contest",
