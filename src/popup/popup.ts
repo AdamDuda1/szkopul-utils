@@ -1,7 +1,17 @@
 import browser from "webextension-polyfill";
+import {renderPopup} from "./popup-ui";
+import {setLang, type lang} from "../globals.js";
 const browserFunctions = true; // Set this to false and comment out the import above to test UI locally
 
-setTimeout(() => {
+setTimeout(async () => {
+	if (browserFunctions) {
+		const result = await browser.storage.local.get("lang");
+		const storedLang: lang = result.lang === "en" ? "en" : "pl";
+		setLang(storedLang);
+	}
+
+	renderPopup();
+
 	document.getElementById('btn-showTODO')?.addEventListener('click', showTODO);
 	document.getElementById('btn-showOptions')?.addEventListener('click', showOptions);
 
@@ -42,7 +52,9 @@ function loadData() {
 
 
 	browser.storage.local.get("lang").then((result) => {
-		if (result.lang === "en") (document.getElementById('lang') as HTMLSelectElement).value = "en";
+		const storedLang: lang = result.lang === "en" ? "en" : "pl";
+		setLang(storedLang);
+		(document.getElementById('lang') as HTMLSelectElement).value = storedLang;
 	});
 }
 
@@ -60,10 +72,10 @@ function optionsListeners() {
 	});
 
 	document.getElementById('lang')!.addEventListener('change', (event) => {
-		console.log((document.getElementById('lang') as HTMLSelectElement).value);
 		browser.storage.local.set({ lang: (document.getElementById('lang') as HTMLSelectElement).value }).then((result) => {
-			backHome();
-			document.getElementById('refresh-pls-home')!.style.display = 'flex';
+			// backHome();
+			// document.getElementById('refresh-pls-home')!.style.display = 'flex';
+			location.reload();
 		});
 	});
 }

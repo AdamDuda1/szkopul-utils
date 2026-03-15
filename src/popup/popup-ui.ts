@@ -1,6 +1,7 @@
 import { html, render } from 'lit';
-import { t } from '../globals';
+import { t } from '../globals.js';
 
+export function renderPopup() {
 render(
 	html`
         <h2>Szkopuł Utils</h2>
@@ -40,7 +41,7 @@ render(
             <button class="btn btn-default" id="btn-backHome-TODO"
                     style="width: auto; padding: 3px; color: white;     display: flex;">
                 <img src="../icons/ic-arrow-right.svg" alt="" class="back-btn">
-                <h3 style="position: relative; top: -4px; left: 5px;">Do zrobienia</h3>
+                <h3 style="position: relative; top: -4px; left: 5px;">${t('popup_todo_title')}</h3>
             </button>
         </div>
         
@@ -48,7 +49,7 @@ render(
         
         <div id="todo-table"></div>
 
-        <button type="button" class="btn btn-info">Otwórz pełną listę</button>
+        <button type="button" class="btn btn-info">${t('popup_todo_openFullList')}</button>
 	`, document.getElementById('todo')!
 );
 
@@ -59,7 +60,7 @@ render(
                 <button class="btn btn-default" id="btn-backHome-options"
                         style="width: auto; padding: 3px; color: white; display: flex;">
                     <img src="../icons/ic-arrow-right.svg" alt="" class="back-btn">
-                    <h3 style="position: relative; top: -4px; left: 5px;">Opcje</h3>
+                    <h3 style="position: relative; top: -4px; left: 5px;">${t('popup_options_title')}</h3>
                 </button>
             </div>
         </div>
@@ -67,22 +68,24 @@ render(
         <br><br>
 
         <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between">
-            <label for="hideScoresOption" class="mb-0 form-check-label">Ukrywaj wyniki</label>
+            <label for="hideScoresOption" class="mb-0 form-check-label">${t('popup_options_hideScores')}</label>
             <div class="form-check form-switch m-0">
                 <input class="form-check-input" type="checkbox" id="hideScoresOption">
             </div>
         </div>
         
         <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between">
-            <label for="hideTimerOption" class="mb-0 form-check-label">Ukrywaj czasomierze</label>
+            <label for="hideTimerOption" class="mb-0 form-check-label">${t('popup_options_hideTimers')}</label>
             <div class="form-check form-switch m-0">
                 <input class="form-check-input" type="checkbox" id="hideTimerOption">
             </div>
         </div>
 
 
-        <div style="display: flex; justify-content: space-around;">
-            <label for="lang">${t("popup_options_language")}</label>
+        <div style="display: flex; justify-content: space-around; width: 82%; margin-top: 7px;">
+            <label for="lang" style="height: 25px; font-size: 17px; padding: 2px; width: auto;">
+				${t("popup_options_language")}
+			</label>
             <select class="form-control" name="lang" id="lang">
                 <option value="pl">pl</option>
                 <option value="en">en</option>
@@ -90,8 +93,8 @@ render(
         </div>
         
 
-        <button type="button" class="btn btn-warning b">Export danych</button>
-        <button type="button" class="btn btn-danger b">Usuń wszystkie dane</button>
+        <button type="button" class="btn btn-warning b">${t('popup_options_exportData')}</button>
+        <button type="button" class="btn btn-danger b">${t('popup_options_removeAllData')}</button>
 
         <!--        <div class="form-group">-->
         <!--            <label for="exampleInputFile">Import danych</label>-->
@@ -99,3 +102,4 @@ render(
         <!--        </div>-->
 	`, document.getElementById('options')!
 );
+}
