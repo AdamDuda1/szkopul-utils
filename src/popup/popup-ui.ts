@@ -120,7 +120,7 @@ render(
 				</svg>
 			</button>
 		</div>
-		<input id="input-importDataFile" type="file" accept="application/json,.json" style="display: none;" />
+		<input id="input-importDataFile" type="file" accept="application/json,.json" style="position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0;" />
 		<button id="btn-deleteAllData" type="button" class="btn btn-danger b">
 			${t('popup_options_removeAllData')}
 			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3"
@@ -128,6 +128,16 @@ render(
 				<path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
 			</svg>
 		</button>
+
+		<div id="popup-data-notice" style="display: none; width: 80%; margin-top: 6px; padding: 6px; border-radius: 6px; font-size: 12px; text-align: center; background: #2b3035;"></div>
+
+		<div id="popup-confirm" style="display: none; width: 88%; margin-top: 6px; padding: 8px; border-radius: 8px; background: #2b3035; border: 1px solid #40464d;">
+			<div id="popup-confirm-message" style="font-size: 12px; margin-bottom: 8px;"></div>
+			<div style="display: flex; gap: 6px; justify-content: flex-end;">
+				<button id="popup-confirm-cancel" type="button" class="btn btn-secondary" style="padding: 4px 8px;">${t('popup_common_cancel')}</button>
+				<button id="popup-confirm-accept" type="button" class="btn btn-danger" style="padding: 4px 8px;">${t('popup_common_confirm')}</button>
+			</div>
+		</div>
 
 		<!--        <div class="form-group">-->
 		<!--            <label for="exampleInputFile">Import danych</label>-->

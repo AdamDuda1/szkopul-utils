@@ -85,7 +85,19 @@ function optionsListeners() {
 	});
 
 	document.getElementById('btn-importData')?.addEventListener('click', () => {
-		(document.getElementById('input-importDataFile') as HTMLInputElement | null)?.click();
+		const input = document.getElementById('input-importDataFile') as HTMLInputElement | null;
+		if (!input) return;
+		showPopupNotice(t('popup_data_import_pick_file'));
+		if (typeof input.showPicker === 'function') {
+			try {
+				input.showPicker();
+				return;
+			} catch {
+				input.click();
+				return;
+			}
+		}
+		input.click();
 	});
 
 	document.getElementById('input-importDataFile')?.addEventListener('change', (event) => {
@@ -118,7 +130,7 @@ async function importStorage(event: Event) {
 	const input = event.target as HTMLInputElement;
 	if (!input.files?.length) return;
 
-	if (!confirm(t('popup_data_confirm_import_replace'))) {
+	if (!await askPopupConfirm(t('popup_data_confirm_import_replace'))) {
 		input.value = "";
 		return;
 	}
@@ -132,21 +144,62 @@ async function importStorage(event: Event) {
 
 		await browser.storage.local.clear();
 		await browser.storage.local.set(data as Record<string, unknown>);
-		alert(t('popup_data_import_success'));
+		showPopupNotice(t('popup_data_import_success'));
 		loadData();
 	} catch {
-		alert(t('popup_data_import_invalid'));
+		showPopupNotice(t('popup_data_import_invalid'));
 	}
 
 	input.value = "";
 }
 
 async function deleteAllData() {
-	if (!confirm(t('popup_data_confirm_delete_all'))) return;
+	if (!await askPopupConfirm(t('popup_data_confirm_delete_all'))) return;
 
 	await browser.storage.local.clear();
-	alert(t('popup_data_delete_success'));
+	showPopupNotice(t('popup_data_delete_success'));
 	loadData();
+}
+
+function showPopupNotice(message: string) {
+	const notice = document.getElementById('popup-data-notice');
+	if (!notice) return;
+	notice.textContent = message;
+	notice.style.display = 'block';
+	setTimeout(() => {
+		notice.style.display = 'none';
+	}, 2500);
+}
+
+function askPopupConfirm(message: string): Promise<boolean> {
+	const box = document.getElementById('popup-confirm');
+	const msg = document.getElementById('popup-confirm-message');
+	const cancelBtn = document.getElementById('popup-confirm-cancel');
+	const acceptBtn = document.getElementById('popup-confirm-accept');
+
+	if (!box || !msg || !cancelBtn || !acceptBtn) return Promise.resolve(false);
+
+	msg.textContent = message;
+	box.style.display = 'block';
+
+	return new Promise((resolve) => {
+		const cleanup = () => {
+			box.style.display = 'none';
+			cancelBtn.removeEventListener('click', onCancel);
+			acceptBtn.removeEventListener('click', onAccept);
+		};
+		const onCancel = () => {
+			cleanup();
+			resolve(false);
+		};
+		const onAccept = () => {
+			cleanup();
+			resolve(true);
+		};
+
+		cancelBtn.addEventListener('click', onCancel);
+		acceptBtn.addEventListener('click', onAccept);
+	});
 }
 
 

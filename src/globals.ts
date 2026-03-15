@@ -28,6 +28,9 @@ export const translations = {
 		popup_data_import_success: "Dane zaimportowano.",
 		popup_data_import_invalid: "Nie udało się zaimportować danych. Sprawdź plik JSON.",
 		popup_data_delete_success: "Wszystkie dane zostały usunięte.",
+		popup_common_confirm: "Potwierdź",
+		popup_common_cancel: "Anuluj",
+		popup_data_import_pick_file: "Wybierz plik JSON do importu.",
 
 		popup_todo_title: "Do zrobienia",
 		popup_todo_openFullList: "Otwórz pełną listę",
@@ -59,6 +62,9 @@ export const translations = {
 		popup_data_import_success: "Data imported successfully.",
 		popup_data_import_invalid: "Failed to import data. Please check the JSON file.",
 		popup_data_delete_success: "All data has been deleted.",
+		popup_common_confirm: "Confirm",
+		popup_common_cancel: "Cancel",
+		popup_data_import_pick_file: "Choose a JSON file to import.",
 
 		popup_todo_title: "To-do",
 		popup_todo_openFullList: "Open full list",
