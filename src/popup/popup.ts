@@ -42,11 +42,7 @@ function loadData() {
 
 
 	browser.storage.local.get("lang").then((result) => {
-		if (result.lang === "en") {
-
-		} else {
-
-		}
+		if (result.lang === "en") (document.getElementById('lang') as HTMLSelectElement).value = "en";
 	});
 }
 
@@ -61,6 +57,14 @@ function optionsListeners() {
 		browser.storage.local.set({ hideScores: (event.target as HTMLInputElement).checked });
 		loadData();
 		document.getElementById('refresh-pls-home')!.style.display = 'flex';
+	});
+
+	document.getElementById('lang')!.addEventListener('change', (event) => {
+		console.log((document.getElementById('lang') as HTMLSelectElement).value);
+		browser.storage.local.set({ lang: (document.getElementById('lang') as HTMLSelectElement).value }).then((result) => {
+			backHome();
+			document.getElementById('refresh-pls-home')!.style.display = 'flex';
+		});
 	});
 }
 

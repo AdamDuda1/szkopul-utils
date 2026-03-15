@@ -23,6 +23,8 @@ export const translations = {
 		popup_home_refreshPls: "Odśwież stronę, aby zmiany zostały zastosowane",
 		popup_home_hideScores: "Ukrywaj wyniki",
 
+		popup_options_language: "Język:",
+
 		menu_markAsTODO: "Oznacz jako Do Zrobienia",
 		menu_addToVirtual: "Dodaj do wirtualki",
 		menu_viewNote: "Zobacz notatkę"
@@ -33,6 +35,8 @@ export const translations = {
 		popup_home_options: "OPTIONS",
 		popup_home_refreshPls: "Please refresh the page to apply changes",
 		popup_home_hideScores: "Hide scores",
+
+		popup_options_language: "Język:",
 
 		menu_markAsTODO: "Mark as TODO",
 		menu_addToVirtual: "Add to virtual contest",

@@ -46,6 +46,7 @@ render(
         
         <br><br>
         
+        <div id="todo-table"></div>
 
         <button type="button" class="btn btn-info">Otwórz pełną listę</button>
 	`, document.getElementById('todo')!
@@ -71,7 +72,7 @@ render(
                 <input class="form-check-input" type="checkbox" id="hideScoresOption">
             </div>
         </div>
-
+        
         <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between">
             <label for="hideTimerOption" class="mb-0 form-check-label">Ukrywaj czasomierze</label>
             <div class="form-check form-switch m-0">
@@ -79,6 +80,15 @@ render(
             </div>
         </div>
 
+
+        <div style="display: flex; justify-content: space-around;">
+            <label for="lang">${t("popup_options_language")}</label>
+            <select class="form-control" name="lang" id="lang">
+                <option value="pl">pl</option>
+                <option value="en">en</option>
+            </select>
+        </div>
+        
 
         <button type="button" class="btn btn-warning b">Export danych</button>
         <button type="button" class="btn btn-danger b">Usuń wszystkie dane</button>
@@ -88,4 +98,4 @@ render(
         <!--            <input type="file" id="exampleInputFile" placeholder="Wybierz plik z danymi">-->
         <!--        </div>-->
 	`, document.getElementById('options')!
-)
+);
