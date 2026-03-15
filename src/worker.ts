@@ -4,13 +4,22 @@ import { initNotes } from './notes';
 import { appendProblemSetMenu } from './ui-elements';
 import { hideScores } from './ui-hiders';
 import { addToTODOAction } from './todo';
+import { setLang } from './globals';
 
-const manifestVersion = chrome.runtime.getManifest().version;
+const manifestVersion = browser.runtime.getManifest().version;
 console.log(`Thank you for using Szkopuł Utils (v${manifestVersion}), Dzięki! :)`);
 
 fixContactButton();
 
 browser.storage.local.get("hideScores").then((result) => { if (result.hideScores === true) hideScores(); });
+
+browser.storage.local.get("lang").then((result) => {
+	if (result.lang === "en") setLang("en");
+	else {
+		setLang("pl");
+		browser.storage.local.set({ lang: "pl" });
+	}
+});
 
 const init = () => {
 	addUtilsFeedbackButton();
