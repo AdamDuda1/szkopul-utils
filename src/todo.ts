@@ -6,6 +6,13 @@ type TodoItem = {
 	id: string;
 };
 
+const TODO_ICON = `
+	<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-checklist" viewBox="0 0 16 16">
+		<path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"/>
+		<path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0M7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0"/>
+	</svg>
+`;
+
 function phraseTODO(raw: unknown): TodoItem[] {
 	if (!Array.isArray(raw)) return [];
 
@@ -38,6 +45,14 @@ async function waitForTODO(): Promise<TodoItem[]> {
 	return phraseTODO(result["TODO"]);
 }
 
+async function updateTODO(mutator: (todo: TodoItem[]) => TodoItem[]): Promise<TodoItem[]> {
+	const latest = await waitForTODO();
+	const next = mutator(latest).map((item, index) => ({ ...item, pos: index + 1 }));
+	await browser.storage.local.set({ TODO: next });
+	sessionStorage.setItem('todo', JSON.stringify(next));
+	return next;
+}
+
 export function getTODO() { // TODO unused?
 	return waitForTODO().then((todo) => {
 		sessionStorage.setItem('todo', JSON.stringify(todo));
@@ -48,30 +63,17 @@ export function getTODO() { // TODO unused?
 export function addToTODOAction(id: string, name: string, btn: HTMLAnchorElement) {
 	void (async () => {
 		try {
-			const todo = await waitForTODO();
+			let removed = false;
+			await updateTODO((todo) => {
+				if (todo.some((item) => item.id === id)) {
+					removed = true;
+					return todo.filter((item) => item.id !== id);
+				}
 
-			if (todo.some((item) => item.id === id)) {
-				btn.innerHTML = `
-					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-checklist" viewBox="0 0 16 16">
-						<path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"/>
-						<path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0M7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0"/>
-					</svg>
-					Już jest na liście!
-				`;
-				return;
-			}
+				return [...todo, { pos: todo.length + 1, name, id }];
+			});
 
-			const next = [...todo, { pos: todo.length + 1, name, id }];
-			await browser.storage.local.set({ ["TODO"]: next });
-			sessionStorage.setItem('todo', JSON.stringify(next));
-
-			btn.innerHTML = `
-				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-checklist" viewBox="0 0 16 16">
-					<path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"/>
-					<path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0M7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0"/>
-				</svg>
-				Dodano!
-			`;
+			btn.innerHTML = `${TODO_ICON}${removed ? 'Usunięto z listy!' : 'Dodano!'}`;
 		} catch (error) {
 			console.error('TODO save failed', error);
 			btn.innerHTML = `

@@ -7,7 +7,7 @@ export function hideScores() {
 
 	const css: string = `
         .result__margin {
-            background-image: linear-gradient(to right, ${bg}, #8e009d 50%, ${bg}) !important;
+            background-image: linear-gradient(to right, ${bg}, #ce61d4 50%, ${bg}) !important;
             font-size: 0 !important;
         }
         .result__margin::after {
@@ -29,7 +29,8 @@ export function hideScores() {
             display: none !important;                       /* TODO: ^ not safe probably*/
 		}
 		
-		#submission-status-table tbody tr td:last-of-type {
+		#submission-status-table tbody tr td:last-of-type, #open-form,
+			#tag-form, .modal-backdrop.fade.show {
 			display: none !important;
 		}
 		

@@ -7,7 +7,7 @@
     "typeRoots": ["./node_modules/@types", "./src/types"],
     "outDir": "src",
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
   },
   "exclude": ["node_modules/*"],
   "include": ["src/*.ts"]

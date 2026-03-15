@@ -27,9 +27,9 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 
 ## TODO:
 
-- translations
+- inline task statements in contest views
 - Add the same menu in the problem set to the top of the problem page
-- Remove the popups and the 'i' when the task is solved (for hideScores)
+- Remove the popups and the 'i' when the task is solved (for hideScores) -> 
 - **Add comments under tasks ?**
 - fix: you can still select the score and copy it (problemset)
 - ts compile formats: iife vs esm

@@ -118,6 +118,8 @@ export function problemSetMenuSeeNote(id: string, name: string) {
 
 	renderNotes(noteHost, id, name, true);
 
+	document.getElementById('notes-area')?.focus();
+
 	const onKeyDown = (event: KeyboardEvent) => {
 		if (event.key === 'Escape') _closeOverlay();
 	};

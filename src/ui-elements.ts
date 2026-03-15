@@ -42,6 +42,10 @@ function menuHTML() {
 }
 
 export function appendProblemSetMenu(addToTODOAction: (id: string, name: string, btn: HTMLAnchorElement) => void) {
+	// render(menuHTML(), ( as HTMLDivElement)!);
+	document.querySelector('.problem-title.text-center.content-row > h1')?.insertAdjacentHTML('afterend', menuHTML());
+
+
 	if (!window.location.href.includes('/problemset')) return;
 	let validRows = false;
 
