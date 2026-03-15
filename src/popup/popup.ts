@@ -1,6 +1,7 @@
-import browser from "webextension-polyfill";
 import {renderPopup} from "./popup-ui";
-import {setLang, type lang} from "../globals.js";
+import {setLang, t, type lang} from "../globals.js";
+
+import browser from "webextension-polyfill";
 const browserFunctions = true; // Set this to false and comment out the import above to test UI locally
 
 setTimeout(async () => {
@@ -71,13 +72,81 @@ function optionsListeners() {
 		document.getElementById('refresh-pls-home')!.style.display = 'flex';
 	});
 
-	document.getElementById('lang')!.addEventListener('change', (event) => {
-		browser.storage.local.set({ lang: (document.getElementById('lang') as HTMLSelectElement).value }).then((result) => {
+	document.getElementById('lang')!.addEventListener('change', () => {
+		browser.storage.local.set({ lang: (document.getElementById('lang') as HTMLSelectElement).value }).then(() => {
 			// backHome();
 			// document.getElementById('refresh-pls-home')!.style.display = 'flex';
 			location.reload();
 		});
 	});
+
+	document.getElementById('btn-exportData')?.addEventListener('click', () => {
+		void exportStorage();
+	});
+
+	document.getElementById('btn-importData')?.addEventListener('click', () => {
+		(document.getElementById('input-importDataFile') as HTMLInputElement | null)?.click();
+	});
+
+	document.getElementById('input-importDataFile')?.addEventListener('change', (event) => {
+		void importStorage(event);
+	});
+
+	document.getElementById('btn-deleteAllData')?.addEventListener('click', () => {
+		void deleteAllData();
+	});
+}
+
+async function exportStorage() {
+	const data = await browser.storage.local.get(null);
+	const json = JSON.stringify(data, null, 2);
+
+	const blob = new Blob([json], { type: "application/json" });
+	const url = URL.createObjectURL(blob);
+
+	const a = document.createElement("a");
+	a.href = url;
+	a.download = "szkopul-utils-data.json";
+	document.body.appendChild(a);
+	a.click();
+	document.body.removeChild(a);
+
+	URL.revokeObjectURL(url);
+}
+
+async function importStorage(event: Event) {
+	const input = event.target as HTMLInputElement;
+	if (!input.files?.length) return;
+
+	if (!confirm(t('popup_data_confirm_import_replace'))) {
+		input.value = "";
+		return;
+	}
+
+	const file = input.files[0];
+	const text = await file.text();
+
+	try {
+		const data = JSON.parse(text);
+		if (typeof data !== "object" || data === null || Array.isArray(data)) throw new Error("Invalid JSON");
+
+		await browser.storage.local.clear();
+		await browser.storage.local.set(data as Record<string, unknown>);
+		alert(t('popup_data_import_success'));
+		loadData();
+	} catch {
+		alert(t('popup_data_import_invalid'));
+	}
+
+	input.value = "";
+}
+
+async function deleteAllData() {
+	if (!confirm(t('popup_data_confirm_delete_all'))) return;
+
+	await browser.storage.local.clear();
+	alert(t('popup_data_delete_success'));
+	loadData();
 }
 
 
