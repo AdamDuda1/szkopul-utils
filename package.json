@@ -11,6 +11,7 @@
         "build": "npm run build:ts && npm run build:ui-elements && npm run build:ui-hiders && npm run build:misc-fixes && npm run build:todo && npm run build:notes && npm run build:worker && npm run build:panel"
     },
     "devDependencies": {
+        "@types/cal-heatmap": "^4.0.0",
         "@types/chrome": "^0.1.37",
         "@types/firefox-webext-browser": "^143.0.0",
         "@types/webextension-polyfill": "^0.12.5",
@@ -19,6 +20,8 @@
     },
     "dependencies": {
         "bootstrap": "^5.3.8",
+        "cal-heatmap": "^4.2.4",
+        "d3": "^7.9.0",
         "lit": "^3.3.2"
     }
 }

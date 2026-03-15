@@ -1,4 +1,4 @@
-import { fixContactButton, addUtilsFeedbackButton, makeEnterSearchThings } from './misc-fixes';
+import { fixContactButton, addUtilsFeedbackButton, makeEnterSearchThings, appendHomePageStats } from './misc-fixes';
 import browser from "webextension-polyfill";
 import { initNotes } from './notes';
 import { appendProblemSetMenu } from './ui-elements';
@@ -16,6 +16,7 @@ const init = () => {
 	addUtilsFeedbackButton();
 	appendProblemSetMenu(addToTODOAction);
 	makeEnterSearchThings();
+	appendHomePageStats();
 	initNotes();
 };
 

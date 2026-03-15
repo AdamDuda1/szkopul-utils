@@ -4,6 +4,7 @@
     "target": "ES2020",
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "typeRoots": ["./node_modules/@types", "./src/types"],
     "outDir": "src",
     "strict": true,
     "skipLibCheck": true

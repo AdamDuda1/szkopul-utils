@@ -1,4 +1,5 @@
 import { html, render } from 'lit';
+import CalHeatmap from "cal-heatmap";
 
 export function makeEnterSearchThings() {
 	if (!(window.location.href.includes('/problemset') || window.location.href.includes('/contest'))) return;
@@ -58,4 +59,41 @@ export function addUtilsFeedbackButton() {
 		`;
 		render(template, contactContainer);
 	}
+}
+
+export function appendHomePageStats() {
+	if (!(window.location.href.endsWith('.pl') || window.location.href.endsWith('.pl/'))) return;
+
+	const calHeatmapCss = document.createElement('link');
+	calHeatmapCss.rel = 'stylesheet';
+	calHeatmapCss.href = 'https://unpkg.com/cal-heatmap/dist/cal-heatmap.css';
+
+	const d3Script = document.createElement('script');
+	d3Script.src = 'https://d3js.org/d3.v7.min.js';
+	d3Script.type = 'module';
+	const calHeatmapScript = document.createElement('script');
+	calHeatmapScript.src = 'https://unpkg.com/cal-heatmap/dist/cal-heatmap.min.js';
+
+	// document.head.append(d3Script, calHeatmapScript, calHeatmapCss);
+
+	const host = document.querySelector('.szkopul-dashboard__container,body > div > p') as HTMLElement;
+
+		console.log(host);
+
+	render(html`
+        <div id="calendar"></div>
+	`, host);
+
+	const cal = new CalHeatmap();
+
+	cal.paint({
+		itemSelector: "#calendar",
+		range: 12,
+		domain: { type: "month" },
+		subDomain: { type: "day" },
+		data: {
+			"2026-03-12": 3,
+			"2026-03-13": 6
+		}
+	});
 }
