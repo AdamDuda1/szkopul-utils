@@ -1,6 +1,6 @@
 import browser from 'webextension-polyfill';
 
-type TodoItem = {
+export type TodoItem = {
 	pos: number;
 	name: string;
 	id: string;
@@ -37,7 +37,16 @@ function phraseTODO(raw: unknown): TodoItem[] {
 		})
 		.filter((item): item is TodoItem => item !== null);
 
-	return mapped.map((item, index) => ({ ...item, pos: index + 1 }));
+	const seenIds = new Set<string>();
+	const unique: TodoItem[] = [];
+
+	for (const item of mapped) {
+		if (seenIds.has(item.id)) continue;
+		seenIds.add(item.id);
+		unique.push({ ...item, pos: unique.length + 1 });
+	}
+
+	return unique;
 }
 
 async function waitForTODO(): Promise<TodoItem[]> {
@@ -58,6 +67,10 @@ export function getTODO() { // TODO unused?
 		sessionStorage.setItem('todo', JSON.stringify(todo));
 		return todo;
 	});
+}
+
+export function removeTODOItem(id: string) {
+	return updateTODO((todo) => todo.filter((item) => item.id !== id));
 }
 
 export function addToTODOAction(id: string, name: string, btn: HTMLAnchorElement) {

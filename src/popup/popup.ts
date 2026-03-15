@@ -1,5 +1,6 @@
 import {renderPopup} from "./popup-ui";
 import {setLang, t, type lang} from "../globals.js";
+import { getTODO, removeTODOItem, type TodoItem } from "../todo.js";
 
 import browser from "webextension-polyfill";
 const browserFunctions = true; // Set this to false and comment out the import above to test UI locally
@@ -18,9 +19,12 @@ setTimeout(async () => {
 
 	document.getElementById('btn-backHome-options')?.addEventListener('click', backHome);
 	document.getElementById('btn-backHome-TODO')?.addEventListener('click', backHome);
+	document.getElementById('todo-table')?.addEventListener('click', onTodoTableClick);
+	document.getElementById('btn-openTodoFullList')?.addEventListener('click', openTODOFullList);
 
 	loadData();
 	optionsListeners();
+	void renderTODOTable();
 }, 50);
 
 export function backHome() {
@@ -33,6 +37,7 @@ export function showTODO() {
 	document.getElementById('home')!.style.display = 'none';
 	document.getElementById('todo')!.style.display = 'flex';
 	document.getElementById('options')!.style.display = 'none';
+	void renderTODOTable();
 }
 
 export function showOptions() {
@@ -107,6 +112,86 @@ function optionsListeners() {
 	document.getElementById('btn-deleteAllData')?.addEventListener('click', () => {
 		void deleteAllData();
 	});
+}
+
+function itemUrl(id: string) {
+	return `https://szkopul.edu.pl/problemset/problem/${encodeURIComponent(id)}/site/`;
+}
+
+function renderTODOEmpty() {
+	const container = document.getElementById('todo-table');
+	if (!container) return;
+	container.innerHTML = `<div style="opacity: .8; font-size: 12px; margin-top: 6px;">${t('popup_todo_empty')}</div>`;
+}
+
+async function renderTODOTable() {
+	const container = document.getElementById('todo-table');
+	if (!container) return;
+
+	const todo = browserFunctions ? await getTODO() : [];
+	if (todo.length === 0) {
+		renderTODOEmpty();
+		return;
+	}
+
+	const rows = todo.map((item: TodoItem) => {
+		const title = item.name || item.id;
+		const url = itemUrl(item.id);
+		return `
+			<tr>
+				<td><a href="${url}" target="_blank" rel="noopener noreferrer">${escapeHTML(title)}</a></td>
+				<td>
+					<button type="button" class="btn btn-danger btn-xs" data-todo-remove="${encodeURIComponent(item.id)}">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3"
+							 viewBox="0 0 16 16" style="position: relative; top: -2px;">
+							<path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+						</svg>
+					</button>
+				</td>
+			</tr>
+		`;
+	}).join('');
+
+	container.innerHTML = `
+		<table class="table table-striped table-condensed" style="font-size: 12px; margin-top: 6px; margin-bottom: 0; width: 100%;">
+			<thead>
+				<tr>
+					<th>${t('popup_todo_col_task')}</th>
+					<th>${t('popup_todo_col_actions')}</th>
+				</tr>
+			</thead>
+			<tbody>${rows}</tbody>
+		</table>
+	`;
+}
+
+async function onTodoTableClick(event: Event) {
+	const target = event.target as HTMLElement;
+	const button = target.closest('[data-todo-remove]') as HTMLElement | null;
+	if (!button || !browserFunctions) return;
+
+	const encodedId = button.getAttribute('data-todo-remove');
+	if (!encodedId) return;
+
+	await removeTODOItem(decodeURIComponent(encodedId));
+	void renderTODOTable();
+}
+
+function openTODOFullList() {
+	if (!browserFunctions) return;
+	void browser.tabs.create({ url: 'https://szkopul.edu.pl/problemset/' });
+}
+
+function escapeHTML(text: string) {
+	const map: Record<string, string> = {
+		'&': '&amp;',
+		'<': '&lt;',
+		'>': '&gt;',
+		'"': '&quot;',
+		"'": '&#39;'
+	};
+
+	return text.replace(/[&<>"']/g, (char) => map[char]);
 }
 
 async function exportStorage() {

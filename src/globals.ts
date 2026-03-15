@@ -25,7 +25,7 @@ export const translations = {
 
 		popup_data_confirm_import_replace: "Import nadpisze obecne dane. Kontynuować?",
 		popup_data_confirm_delete_all: "Usunąć wszystkie dane rozszerzenia?",
-		popup_data_import_success: "Dane zaimportowano.",
+		popup_data_import_success: "Zaimportowano dane.",
 		popup_data_import_invalid: "Nie udało się zaimportować danych. Sprawdź plik JSON.",
 		popup_data_delete_success: "Wszystkie dane zostały usunięte.",
 		popup_common_confirm: "Potwierdź",
@@ -34,6 +34,13 @@ export const translations = {
 
 		popup_todo_title: "Do zrobienia",
 		popup_todo_openFullList: "Otwórz pełną listę",
+		popup_todo_empty: "Brak zadań na liście.",
+		popup_todo_col_pos: "#",
+		popup_todo_col_task: "Zadanie",
+		popup_todo_col_link: "Link",
+		popup_todo_col_actions: "Akcje",
+		popup_todo_open: "Otwórz",
+		popup_todo_remove: "Usuń",
 
 		menu_markAsTODO: "Oznacz jako 'Do zrobienia'",
 		menu_addToVirtual: "Dodaj do konkursu wirtualnego",
@@ -68,6 +75,13 @@ export const translations = {
 
 		popup_todo_title: "To-do",
 		popup_todo_openFullList: "Open full list",
+		popup_todo_empty: "No tasks in the list.",
+		popup_todo_col_pos: "#",
+		popup_todo_col_task: "Task",
+		popup_todo_col_link: "Link",
+		popup_todo_col_actions: "Actions",
+		popup_todo_open: "Open",
+		popup_todo_remove: "Remove",
 
 		menu_markAsTODO: "Mark as to-do",
 		menu_addToVirtual: "Add to virtual contest",
