@@ -1,14 +1,16 @@
 import browser from "webextension-polyfill";
 const browserFunctions = true; // Set this to false and comment out the import above to test UI locally
 
-document.getElementById('btn-showTODO')?.addEventListener('click', showTODO);
-document.getElementById('btn-showOptions')?.addEventListener('click', showOptions);
+setTimeout(() => {
+	document.getElementById('btn-showTODO')?.addEventListener('click', showTODO);
+	document.getElementById('btn-showOptions')?.addEventListener('click', showOptions);
 
-document.getElementById('btn-backHome-options')?.addEventListener('click', backHome);
-document.getElementById('btn-backHome-TODO')?.addEventListener('click', backHome);
+	document.getElementById('btn-backHome-options')?.addEventListener('click', backHome);
+	document.getElementById('btn-backHome-TODO')?.addEventListener('click', backHome);
 
-loadData();
-optionsListeners();
+	loadData();
+	optionsListeners();
+}, 50);
 
 export function backHome() {
 	document.getElementById('home')!.style.display = 'flex';
@@ -36,6 +38,15 @@ function loadData() {
 		if (checkbox) checkbox.checked = hideScores;
 		checkbox = document.getElementById('hideScoresQuickOption') as HTMLInputElement | null;
 		if (checkbox) checkbox.checked = hideScores;
+	});
+
+
+	browser.storage.local.get("lang").then((result) => {
+		if (result.lang === "en") {
+
+		} else {
+
+		}
 	});
 }
 

@@ -9,7 +9,6 @@ import { setLang } from './globals';
 const manifestVersion = browser.runtime.getManifest().version;
 console.log(`Thank you for using Szkopuł Utils (v${manifestVersion}), Dzięki! :)`);
 
-fixContactButton();
 
 browser.storage.local.get("hideScores").then((result) => { if (result.hideScores === true) hideScores(); });
 
@@ -20,6 +19,8 @@ browser.storage.local.get("lang").then((result) => {
 		browser.storage.local.set({ lang: "pl" });
 	}
 });
+
+fixContactButton();
 
 const init = () => {
 	addUtilsFeedbackButton();
