@@ -7,7 +7,7 @@ html {
     background: red; /*for debugging*/
 }
 
-body, #home, #todo, #options {
+body, #home, #virtual, #todo, #options {
     width: 300px;
     overflow-y: auto;
     height: 330px;
@@ -64,4 +64,22 @@ body button img {
 .categ {
     font-size: 12px;
     color: gray;
+}
+
+th {
+    border-bottom: 2px solid #383d3f !important;
+    border-top: 1px solid #383d3f !important;
+    background: #181a1b !important;
+    color: #d1cdc7 !important;
+}
+
+td {
+    border-top: 1px solid #383d3f !important;
+    background: #181a1b !important;
+    color: #d1cdc7 !important;
+    border-bottom-width: 0 !important;
+}
+
+td > a {
+    color: #33a2ff !important;
 }
