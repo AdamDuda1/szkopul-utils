@@ -88,7 +88,7 @@ render(
 
 		<br><br>
 		
-		<details style="width: 100%" open>
+		<details style="width: 100%">
 			<summary style="margin: 5px">${t("popup_virtual_category_tasks")}</summary>
 			<div class="table-responsive-md" style="background: #181a1b; color: #d1cdc7">
 				<table class="table button-flat">
@@ -105,7 +105,42 @@ render(
 			<span class="categ" id="noVirtualTasks">${t("popup_virtual_noVirtualTasks")}</span>
 		</details>
 
-		<button type="button" class="btn btn-outline-success"> START </button>
+
+        <details style="width: 100%">
+            <summary style="margin: 5px">${t("popup_virtual_category_optionsOverride")}</summary>
+            <span class="categ">${t("popup_virtual_optionsNotice")}</span>
+	        
+	        <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+                <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between">
+                    <label for="hideScoresOption" class="mb-0 form-check-label">${t('popup_options_hideScores')}</label>
+                    <div class="form-check form-switch m-0">
+                        <input class="form-check-input" type="checkbox" id="hideScoresOption">
+                    </div>
+                </div>
+	        </div>
+
+
+            <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+                <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between">
+                    <label for="hideScoresOption" class="mb-0 form-check-label">Blokuj inne podstrony</label>
+                    <div class="form-check form-switch m-0">
+                        <input class="form-check-input" type="checkbox" id="hideScoresOption">
+                    </div>
+                </div>
+            </div>
+
+
+            <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+                <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between">
+                    <label for="hideScoresOption" class="mb-0 form-check-label">Blokuj inne podstrony</label>
+                    <div class="form-check form-switch m-0">
+                        <input class="form-check-input" type="checkbox" id="hideScoresOption">
+                    </div>
+                </div>
+            </div>
+        </details>
+
+		<button type="button" style="margin: 10px;" class="btn btn-outline-success"> START </button>
 
 	`, document.getElementById('virtual')!
 );
