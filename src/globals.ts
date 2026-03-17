@@ -12,6 +12,12 @@ export const translations = {
 		popup_home_refreshPls: "Odśwież stronę, aby zmiany zostały zastosowane",
 		popup_home_hideScores: "Ukryj wyniki",
 
+		popup_virtual_title: "Konkurs wirtualny",
+		popup_virtual_category_tasks: "Zadania",
+		popup_virtual_table_tr_task: "Zadanie",
+		popup_virtual_table_tr_actions: "Czynności",
+		popup_virtual_noVirtualTasks: "Brak zadań! Dodaj je przez bazę zadań lub z archiwum.",
+
 		popup_options_language: "Język:",
 		popup_options_title: "Opcje",
 		popup_options_hideScores: "Ukrywaj wyniki",
@@ -47,6 +53,12 @@ export const translations = {
 		popup_home_options: "Options",
 		popup_home_refreshPls: "Please refresh the page to apply changes",
 		popup_home_hideScores: "Hide scores",
+
+		popup_virtual_title: "Virtual contest",
+		popup_virtual_category_tasks: "Tasks",
+		popup_virtual_table_tr_task: "Task",
+		popup_virtual_table_tr_actions: "Actions",
+		popup_virtual_noVirtualTasks: "No tasks! Add them through the task database or from the archive.",
 
 		popup_options_language: "Language:",
 		popup_options_title: "Options",
