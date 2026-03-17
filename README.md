@@ -25,6 +25,7 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 
 ## TODO:
 
+- **build the menu html on click so it loads faster and is up to date**
 - make a better popup for deleting and importing data!
 - inline task statements in contest views
 - Add the same menu in the problem set to the top of the problem page

@@ -1,11 +1,11 @@
-import { storageLogTODO } from './worker';
-import { html, render, mathml } from 'lit';
 import { problemSetMenuSeeNote } from './notes';
 import { t } from './globals';
-import { addVirtualTask, getVirtualTasks } from './virtual';
-// TODO TRY matml!! ^
+import { addVirtualTask, getVirtualTasks, removeVirtualTask } from './virtual';
+import browser from 'webextension-polyfill';
 
-function menuHTML() {
+let virtualTasks: {id: string, name: string}[] = [];
+
+function buildMenu(id: string, name: string, problemSet: boolean = true) {
 	return `
 		<div class="btn-group">
             <button class="btn btn-outline-secondary dropdown-toggle add-to-contest-button pl-1 pr-2" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -28,7 +28,7 @@ function menuHTML() {
 						<path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71z"/>
 						<path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0"/>
 					</svg>
-					<span>${t('menu_addToVirtual')}</span>
+					<span>${virtualTasks.some((t) => t.id === id) ? t('menu_removeFromVirtual') : t('menu_addToVirtual')}</span>
 				</a>
 				
 				<a class="dropdown-item action-notes" href="#">
@@ -47,12 +47,15 @@ function menuHTML() {
 				</a>
             </div>
         </div>
-	`
+	`;
 }
 
-export function appendProblemSetMenu(addToTODOAction: (id: string, name: string, btn: HTMLAnchorElement) => void) {
+export async function appendProblemSetMenu(addToTODOAction: (id: string, name: string, btn: HTMLAnchorElement) => void) {
+	virtualTasks = await getVirtualTasks();
+
+
 	// render(menuHTML(), ( as HTMLDivElement)!);
-	document.querySelector('.problem-title.text-center.content-row > h1')?.insertAdjacentHTML('afterend', menuHTML());
+	// document.querySelector('.problem-title.text-center.content-row > h1')?.insertAdjacentHTML('afterend', menuHTML());
 
 
 	if (!window.location.href.includes('/problemset')) return;
@@ -80,30 +83,38 @@ export function appendProblemSetMenu(addToTODOAction: (id: string, name: string,
 
 		if (id != undefined) {
 			const cell = document.createElement('td');
-			cell.innerHTML = menuHTML();
 
-			cell.querySelector<HTMLAnchorElement>('.action-todo')?.addEventListener('click', (event) => {
-				event.preventDefault();
-				event.stopPropagation();
-				addToTODOAction(id, name!, event.currentTarget as HTMLAnchorElement);
-			});
+			const renderCell = () => {
+				cell.innerHTML = buildMenu(id, name!, true);
+				attachHandlers();
+			};
 
-			cell.querySelector<HTMLAnchorElement>('.action-virtual')?.addEventListener('click', (event) => {
-				event.preventDefault();
-				// event.stopPropagation();
-				// console.log('VIRTUAL', id, name);
-				addVirtualTask(id, name!).then(() => {
-					getVirtualTasks().then((tasks) => {
-						console.log(tasks);
-					});
+			const attachHandlers = () => {
+				cell.querySelector<HTMLAnchorElement>('.action-todo')?.addEventListener('click', (event) => {
+					event.preventDefault();
+					addToTODOAction(id, name!, event.currentTarget as HTMLAnchorElement);
+					renderCell();
 				});
-			});
 
-			cell.querySelector<HTMLAnchorElement>('.action-notes')?.addEventListener('click', (event) => {
-				event.preventDefault();
-				// event.stopPropagation();
-				problemSetMenuSeeNote(id, name!);
-			});
+				cell.querySelector<HTMLAnchorElement>('.action-virtual')?.addEventListener('click', async (event) => {
+					event.preventDefault();
+					// toggle: remove if present, otherwise add
+					if (virtualTasks.some((t) => t.id === id)) {
+						await removeVirtualTask(id);
+					} else {
+						await addVirtualTask(id, name!);
+					}
+					virtualTasks = await getVirtualTasks();
+					renderCell();
+				});
+
+				cell.querySelector<HTMLAnchorElement>('.action-notes')?.addEventListener('click', (event) => {
+					event.preventDefault();
+					problemSetMenuSeeNote(id, name!);
+				});
+			};
+
+			renderCell();
 
 			tr.appendChild(cell);
 			validRows = true;

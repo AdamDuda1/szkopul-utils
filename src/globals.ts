@@ -45,6 +45,7 @@ export const translations = {
 
 		menu_markAsTODO: "Oznacz jako 'Do zrobienia'",
 		menu_addToVirtual: "Dodaj do konkursu wirtualnego",
+		menu_removeFromVirtual: "Usuń z konkursu wirtualnego",
 		menu_viewNote: "Zobacz notatkę"
 	},
 	en: {
@@ -87,6 +88,7 @@ export const translations = {
 
 		menu_markAsTODO: "Mark as to-do",
 		menu_addToVirtual: "Add to virtual contest",
+		menu_removeFromVirtual: "Remove from virtual contest",
 		menu_viewNote: "View note"
 	}
 }
