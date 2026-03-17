@@ -16,14 +16,6 @@ setTimeout(async () => {
 
 	renderPopup();
 
-	document.getElementById('btn-showVirtual')?.addEventListener('click', showVirtual);
-	document.getElementById('btn-showTODO')?.addEventListener('click', showTODO);
-	document.getElementById('btn-showOptions')?.addEventListener('click', showOptions);
-
-	document.getElementById('btn-backHome-virtual')?.addEventListener('click', backHome);
-	document.getElementById('btn-backHome-TODO')?.addEventListener('click', backHome);
-	document.getElementById('btn-backHome-options')?.addEventListener('click', backHome);
-
 	document.getElementById('todo-table')?.addEventListener('click', onTodoTableClick);
 
 	loadData();
@@ -31,36 +23,6 @@ setTimeout(async () => {
 	void renderTODOTable();
 }, 50);
 
-export function backHome() {
-	document.getElementById('home')!.style.display = 'flex';
-	document.getElementById('todo')!.style.display = 'none';
-	document.getElementById('virtual')!.style.display = 'none';
-	document.getElementById('options')!.style.display = 'none';
-	document.getElementById('virtual')!.style.display = 'none';
-}
-
-export function showVirtual() {
-	document.getElementById('home')!.style.display = 'none';
-	document.getElementById('todo')!.style.display = 'none';
-	document.getElementById('virtual')!.style.display = 'flex';
-	document.getElementById('options')!.style.display = 'none';
-	void renderTODOTable();
-}
-
-export function showTODO() {
-	document.getElementById('home')!.style.display = 'none';
-	document.getElementById('todo')!.style.display = 'flex';
-	document.getElementById('options')!.style.display = 'none';
-	document.getElementById('virtual')!.style.display = 'none';
-	void renderTODOTable();
-}
-
-export function showOptions() {
-	document.getElementById('options')!.style.display = 'flex';
-	document.getElementById('virtual')!.style.display = 'none';
-	document.getElementById('home')!.style.display = 'none';
-	document.getElementById('todo')!.style.display = 'none';
-}
 
 function loadData() {
 	if (!browserFunctions) return;

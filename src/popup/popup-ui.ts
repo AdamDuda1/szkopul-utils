@@ -1,6 +1,36 @@
 import { html, render } from 'lit';
 import { t } from '../globals.js';
 
+export function backHome() {
+	document.getElementById('home')!.style.display = 'flex';
+	document.getElementById('todo')!.style.display = 'none';
+	document.getElementById('virtual')!.style.display = 'none';
+	document.getElementById('options')!.style.display = 'none';
+	document.getElementById('virtual')!.style.display = 'none';
+}
+
+export function showVirtual() {
+	document.getElementById('home')!.style.display = 'none';
+	document.getElementById('todo')!.style.display = 'none';
+	document.getElementById('virtual')!.style.display = 'flex';
+	document.getElementById('options')!.style.display = 'none';
+}
+
+export function showTODO() {
+	document.getElementById('home')!.style.display = 'none';
+	document.getElementById('todo')!.style.display = 'flex';
+	document.getElementById('options')!.style.display = 'none';
+	document.getElementById('virtual')!.style.display = 'none';
+	// void renderTODOTable();
+}
+
+export function showOptions() {
+	document.getElementById('options')!.style.display = 'flex';
+	document.getElementById('virtual')!.style.display = 'none';
+	document.getElementById('home')!.style.display = 'none';
+	document.getElementById('todo')!.style.display = 'none';
+}
+
 export function renderPopup() {
 render(
 	html`
@@ -39,7 +69,7 @@ render(
 	html`
 		<div style="position: absolute; top: 5px; left: 5px; display: flex; height: 50px">
 			<button class="btn btn-default" id="btn-backHome-TODO"
-					style="width: auto; padding: 3px; color: white;     display: flex;">
+					style="width: auto; padding: 3px; color: white; display: flex;">
 				<img src="../icons/ic-arrow-right.svg" alt="" class="back-btn">
 				<h3 style="position: relative; top: -4px; left: 5px;">
 <!--					${t('popup_todo_title')}-->
@@ -50,72 +80,77 @@ render(
 
 		<br><br>
 
-		<span class="categ">
-			Zadania
-		</span>
+<!--		<span class="categ">-->
+<!--			Zadania-->
+<!--		</span>-->
 		
-		<div class="table-responsive-md" style="background: #181a1b; color: #d1cdc7">
-			<table class="table button-flat">
-				<thead>
-				<tr style="border-bottom: 2px solid rgb(222, 226, 230); 383d3f;">
-					<th class="col-md-auto">
-						Zadanie
-					</th>
+		<details style="width: 100%" open>
+			<summary style="margin: 5px">Zadania</summary>
+			<div class="table-responsive-md" style="background: #181a1b; color: #d1cdc7">
+				<table class="table button-flat">
+					<thead>
+					<tr style="border-bottom: 2px solid rgb(222, 226, 230); 383d3f;">
+						<th class="col-md-auto">
+							Zadanie
+						</th>
 
-					<th class="col-sm-4">
-						Akcje
-					</th>
-				</tr>
-				</thead>
-				<tbody>
-
-
-				<tr>
-					<td><a href="asd">Nazwa zadania</a></td>
-
-					<td class="text-center">
-						<button type="button" class="btn btn-danger btn-xs">
-							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3"
-								 viewBox="0 0 16 16" style="position: relative; top: -2px;">
-								<path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
-							</svg>
-						</button>
-					</td>
-
-				</tr>
+						<th class="col-sm-4">
+							Akcje
+						</th>
+					</tr>
+					</thead>
+					<tbody>
 
 
-				<tr>
-					<td><a href="asd">Nazwa zadania</a></td>
+					<tr>
+						<td><a href="asd">Nazwa zadania</a></td>
 
-					<td class="text-center">
-						<button type="button" class="btn btn-danger btn-xs">
-							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3"
-								 viewBox="0 0 16 16" style="position: relative; top: -2px;">
-								<path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
-							</svg>
-						</button>
-					</td>
+						<td class="text-center">
+							<button type="button" class="btn btn-danger btn-xs">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3"
+									 viewBox="0 0 16 16" style="position: relative; top: -2px;">
+									<path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+								</svg>
+							</button>
+						</td>
 
-				</tr>
+					</tr>
 
 
-				<tr>
-					<td><a href="asd">Nazwa zadania</a></td>
+					<tr>
+						<td><a href="asd">Nazwa zadania</a></td>
 
-					<td class="text-center">
-						<button type="button" class="btn btn-danger btn-xs">
-							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3"
-								 viewBox="0 0 16 16" style="position: relative; top: -2px;">
-								<path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
-							</svg>
-						</button>
-					</td>
+						<td class="text-center">
+							<button type="button" class="btn btn-outline-danger btn-xs">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3"
+									 viewBox="0 0 16 16" style="position: relative; top: -2px;">
+									<path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+								</svg>
+							</button>
+						</td>
 
-				</tr>
-				</tbody>
-			</table>
-		</div>
+					</tr>
+
+
+					<tr>
+						<td><a href="asd">Nazwa zadania</a></td>
+
+						<td class="text-center">
+							<button type="button" class="btn btn-outline-danger btn-xs">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3"
+									 viewBox="0 0 16 16" style="position: relative; top: -2px;">
+									<path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+								</svg>
+							</button>
+						</td>
+
+					</tr>
+					</tbody>
+				</table>
+			</div>
+		</details>
+
+		<button type="button" class="btn btn-outline-success"> START </button>
 
 	`, document.getElementById('virtual')!
 );
@@ -124,7 +159,7 @@ render(
 	html`
         <div style="position: absolute; top: 5px; left: 5px; display: flex; height: 50px">
             <button class="btn btn-default" id="btn-backHome-TODO"
-                    style="width: auto; padding: 3px; color: white;     display: flex;">
+                    style="width: auto; padding: 3px; color: white; display: flex;">
                 <img src="../icons/ic-arrow-right.svg" alt="" class="back-btn">
                 <h3 style="position: relative; top: -4px; left: 5px;">${t('popup_todo_title')}</h3>
             </button>
@@ -171,6 +206,26 @@ render(
 		<span class="categ">
 			${t('popup_options_c_meta')}
 		</span>
+		
+		
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
 		
 		<div style="display: flex; justify-content: space-between; width: 82%; margin-top: 7px;">
 			<label for="lang">
@@ -228,4 +283,12 @@ render(
 		<!--        </div>-->
 	`, document.getElementById('options')!
 );
+
+document.getElementById('btn-showVirtual')?.addEventListener('click', showVirtual);
+document.getElementById('btn-showTODO')?.addEventListener('click', showTODO);
+document.getElementById('btn-showOptions')?.addEventListener('click', showOptions);
+
+document.getElementById('btn-backHome-virtual')?.addEventListener('click', backHome);
+document.getElementById('btn-backHome-TODO')?.addEventListener('click', backHome);
+document.getElementById('btn-backHome-options')?.addEventListener('click', backHome);
 }

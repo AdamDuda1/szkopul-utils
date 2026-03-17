@@ -42,3 +42,8 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 ```
 "run_at": "document_//start"
 ```
+
+// małę todo:
+
+- zrobić todo i wirtualkę jako array w storage
+- wczyteć te dwie arrayki przy renderowaniu rzeczy i wyświetlać odpowiednie przyciski
