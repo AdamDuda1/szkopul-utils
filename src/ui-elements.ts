@@ -92,20 +92,28 @@ export async function appendProblemSetMenu(addToTODOAction: (id: string, name: s
 			const attachHandlers = () => {
 				cell.querySelector<HTMLAnchorElement>('.action-todo')?.addEventListener('click', (event) => {
 					event.preventDefault();
+					event.stopPropagation();
+
 					addToTODOAction(id, name!, event.currentTarget as HTMLAnchorElement);
-					renderCell();
+
+					setTimeout(() => {
+						tr.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, composed: true }));
+						cell.innerHTML = buildMenu(id, name!, true);
+					}, 1000);
 				});
 
 				cell.querySelector<HTMLAnchorElement>('.action-virtual')?.addEventListener('click', async (event) => {
 					event.preventDefault();
-					// toggle: remove if present, otherwise add
-					if (virtualTasks.some((t) => t.id === id)) {
-						await removeVirtualTask(id);
-					} else {
-						await addVirtualTask(id, name!);
-					}
+					event.stopPropagation();
+
+					if (virtualTasks.some((t) => t.id === id)) await removeVirtualTask(id);
+					else await addVirtualTask(id, name!);
 					virtualTasks = await getVirtualTasks();
-					renderCell();
+
+					setTimeout(() => {
+						tr.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, composed: true }));
+						cell.innerHTML = buildMenu(id, name!, true);
+					}, 1000);
 				});
 
 				cell.querySelector<HTMLAnchorElement>('.action-notes')?.addEventListener('click', (event) => {

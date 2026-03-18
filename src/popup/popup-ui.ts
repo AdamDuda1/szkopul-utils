@@ -1,13 +1,13 @@
 import { html, render } from 'lit';
 import { type lang, t } from '../globals.js';
-import { init, initLang } from './popup';
+// import { init, initLang } from './popup';
 
 const browserFunctions = true; // Set this to false to test UI locally
 
 setTimeout(async () => {
-	if (browserFunctions) await initLang();
+	// if (browserFunctions) await initLang();
 	renderPopup();
-	if (browserFunctions) await init();
+	// if (browserFunctions) await init();
 }, 10);
 
 export function backHome() {
@@ -15,7 +15,6 @@ export function backHome() {
 	document.getElementById('todo')!.style.display = 'none';
 	document.getElementById('virtual')!.style.display = 'none';
 	document.getElementById('options')!.style.display = 'none';
-	document.getElementById('virtual')!.style.display = 'none';
 }
 
 export function showVirtual() {
@@ -106,8 +105,18 @@ render(
 		</details>
 
 
-        <details style="width: 100%">
+        <details style="width: 100%; display: flex; flex-direction: column;">
             <summary style="margin: 5px">${t("popup_virtual_category_optionsOverride")}</summary>
+	        
+            <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+                <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between">
+                    <label for="hideScoresOption" class="mb-0 form-check-label">Blokuj inne podstrony</label>
+                    <div class="form-check form-switch m-0">
+                        <input class="form-check-input" type="checkbox" id="hideScoresOption">
+                    </div>
+                </div>
+            </div>
+	        
             <span class="categ">${t("popup_virtual_optionsNotice")}</span>
 	        
 	        <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
@@ -128,17 +137,20 @@ render(
                     </div>
                 </div>
             </div>
-
-
-            <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-                <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between">
-                    <label for="hideScoresOption" class="mb-0 form-check-label">Blokuj inne podstrony</label>
-                    <div class="form-check form-switch m-0">
-                        <input class="form-check-input" type="checkbox" id="hideScoresOption">
-                    </div>
-                </div>
-            </div>
         </details>
+
+
+        <div class="d-flex gap-2" style="width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 5px;">
+            <div class="input-group input-group-sm" style="width: 80px;">
+                <input type="number" class="form-control" min="0" placeholder="0" id="virtualSetupHours">
+                <span class="input-group-text">h</span>
+            </div>
+
+            <div class="input-group input-group-sm" style="width: 80px;">
+                <input type="number" class="form-control" min="0" max="59" placeholder="0" id="virtualSetupMinutes">
+                <span class="input-group-text">m</span>
+            </div>
+        </div>
 
 		<button type="button" style="margin: 10px;" class="btn btn-outline-success"> START </button>
 
@@ -148,7 +160,7 @@ render(
 render(
 	html`
         <div style="position: absolute; top: 5px; left: 5px; display: flex; height: 50px">
-            <button class="btn btn-default" id="btn-backHome-TODO"
+            <button class="btn btn-default" id="btn-backHomeTODO"
                     style="width: auto; padding: 3px; color: white; display: flex;">
                 <img src="../icons/ic-arrow-right.svg" alt="" class="back-btn">
                 <h3 style="position: relative; top: -4px; left: 5px;">${t('popup_todo_title')}</h3>
