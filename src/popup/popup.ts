@@ -237,6 +237,8 @@ async function initVirtual() {
 	let options = await getVirtualOptions();
 	(document.getElementById('virtualSetupHours') as HTMLInputElement).value = options.durationInputHours.toString();
 	(document.getElementById('virtualSetupMinutes') as HTMLInputElement).value = options.durationInputMinutes.toString();
+	(document.getElementById('hideScoresOption') as HTMLInputElement).checked = Boolean(options.hideScores);
+	(document.getElementById('blockOtherSubpagesOption') as HTMLInputElement).checked = Boolean(options.blockOtherSubpages);
 
 	document.getElementById('virtualSetupHours')!.addEventListener('input', e => {
 		getVirtualOptions().then(options => {
@@ -248,6 +250,20 @@ async function initVirtual() {
 	document.getElementById('virtualSetupMinutes')!.addEventListener('input', e => {
 		getVirtualOptions().then(options => {
 			options.durationInputMinutes = Number((e.target as HTMLInputElement).value);
+			saveVirtualOptions(options);
+		});
+	});
+
+	document.getElementById('hideScoresOption')!.addEventListener('input', e => {
+		getVirtualOptions().then(options => {
+			options.hideScores = Boolean((e.target as HTMLInputElement).checked);
+			saveVirtualOptions(options);
+		});
+	});
+
+	document.getElementById('blockOtherSubpagesOption')!.addEventListener('input', e => {
+		getVirtualOptions().then(options => {
+			options.blockOtherSubpages = Boolean((e.target as HTMLInputElement).checked);
 			saveVirtualOptions(options);
 		});
 	});

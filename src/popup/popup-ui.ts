@@ -120,9 +120,9 @@ render(
 
             <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
                 <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between">
-                    <label for="hideScoresOption" class="mb-0 form-check-label">${t("popup_virtual_blockOtherSubpages")}</label>
+                    <label for="blockOtherSubpagesOption" class="mb-0 form-check-label">${t("popup_virtual_blockOtherSubpages")}</label>
                     <div class="form-check form-switch m-0">
-                        <input class="form-check-input" type="checkbox" id="hideScoresOption">
+                        <input class="form-check-input" type="checkbox" id="blockOtherSubpagesOption">
                     </div>
                 </div>
             </div>
@@ -135,16 +135,6 @@ render(
                     </div>
                 </div>
 	        </div>
-
-
-            <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-                <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between">
-                    <label for="hideScoresOption" class="mb-0 form-check-label">Blokuj inne podstrony</label>
-                    <div class="form-check form-switch m-0">
-                        <input class="form-check-input" type="checkbox" id="hideScoresOption">
-                    </div>
-                </div>
-            </div>
         </details>
 
 
