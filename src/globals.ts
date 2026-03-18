@@ -10,6 +10,11 @@ export const translations = {
 		popup_home_todo: "Zadania do zrobienia",
 		popup_home_options: "Opcje",
 		popup_home_refreshPls: "Odśwież stronę, aby zmiany zostały zastosowane",
+
+		popup_home_szkopulStatusUpFor: "Szkopuł działa już od",
+		popup_home_szkopulStatusRecordUptime: "Rekordowy uptime to",
+		popup_home_szkopulStatusMore: "z czywyjebalohomika.xyz, @lcd.101",
+
 		popup_home_hideScores: "Ukryj wyniki",
 
 		popup_virtual_title: "Konkurs wirtualny",
@@ -19,6 +24,7 @@ export const translations = {
 		popup_virtual_noVirtualTasks: "Brak zadań! Dodaj je przez bazę zadań lub z archiwum.",
 		popup_virtual_category_optionsOverride: "Opcje konkursu",
 		popup_virtual_optionsNotice: "Te ustawienia będą działać w trakcie konkursu i nie wpłyną na pozostałe:",
+		popup_virtual_blockOtherSubpages: "Blokuj niepowiązane podstrony",
 
 		popup_options_language: "Język:",
 		popup_options_title: "Opcje",
@@ -48,13 +54,21 @@ export const translations = {
 		menu_markAsTODO: "Oznacz jako 'Do zrobienia'",
 		menu_addToVirtual: "Dodaj do konkursu wirtualnego",
 		menu_removeFromVirtual: "Usuń z konkursu wirtualnego",
-		menu_viewNote: "Zobacz notatkę"
+		menu_viewNote: "Zobacz notatkę",
+
+		menu_added: "Dodano!",
+		menu_removed: "Usunięto!"
 	},
 	en: {
 		popup_home_virtual: "Virtual contest",
 		popup_home_todo: "To-do tasks",
 		popup_home_options: "Options",
 		popup_home_refreshPls: "Please refresh the page to apply changes",
+
+		popup_home_szkopulStatusUpFor: "Szkopul has been up for",
+		popup_home_szkopulStatusRecordUptime: "Record uptime is",
+		popup_home_szkopulStatusMore: "from czywyjebalohomika.xyz, @lcd.101",
+
 		popup_home_hideScores: "Hide scores",
 
 		popup_virtual_title: "Virtual contest",
@@ -64,6 +78,7 @@ export const translations = {
 		popup_virtual_noVirtualTasks: "No tasks! Add them through the task database or from the archive.",
 		popup_virtual_category_optionsOverride: "Contest options",
 		popup_virtual_optionsNotice: "These settings will work during the contest and won't affect others:",
+		popup_virtual_blockOtherSubpages: "Block unrelated subpages",
 
 		popup_options_language: "Language:",
 		popup_options_title: "Options",
@@ -93,6 +108,9 @@ export const translations = {
 		menu_markAsTODO: "Mark as to-do",
 		menu_addToVirtual: "Add to virtual contest",
 		menu_removeFromVirtual: "Remove from virtual contest",
-		menu_viewNote: "View note"
+		menu_viewNote: "View note",
+
+		menu_added: "Added!",
+		menu_removed: "Removed!"
 	}
 }

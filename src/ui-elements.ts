@@ -53,10 +53,8 @@ function buildMenu(id: string, name: string, problemSet: boolean = true) {
 export async function appendProblemSetMenu(addToTODOAction: (id: string, name: string, btn: HTMLAnchorElement) => void) {
 	virtualTasks = await getVirtualTasks();
 
-
 	// render(menuHTML(), ( as HTMLDivElement)!);
 	// document.querySelector('.problem-title.text-center.content-row > h1')?.insertAdjacentHTML('afterend', menuHTML());
-
 
 	if (!window.location.href.includes('/problemset')) return;
 	let validRows = false;
@@ -90,6 +88,8 @@ export async function appendProblemSetMenu(addToTODOAction: (id: string, name: s
 			};
 
 			const attachHandlers = () => {
+				let virtualActionInProgress = false;
+
 				cell.querySelector<HTMLAnchorElement>('.action-todo')?.addEventListener('click', (event) => {
 					event.preventDefault();
 					event.stopPropagation();
@@ -105,15 +105,34 @@ export async function appendProblemSetMenu(addToTODOAction: (id: string, name: s
 				cell.querySelector<HTMLAnchorElement>('.action-virtual')?.addEventListener('click', async (event) => {
 					event.preventDefault();
 					event.stopPropagation();
+					if (virtualActionInProgress) return;
 
-					if (virtualTasks.some((t) => t.id === id)) await removeVirtualTask(id);
-					else await addVirtualTask(id, name!);
-					virtualTasks = await getVirtualTasks();
+					virtualActionInProgress = true;
 
-					setTimeout(() => {
-						tr.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, composed: true }));
-						cell.innerHTML = buildMenu(id, name!, true);
-					}, 1000);
+					const anchorEl = event.currentTarget as HTMLElement | null;
+					const setLabel = (text: string) => {
+						try {
+							const span = anchorEl?.querySelector('span');
+							if (span) span.textContent = text;
+							else if (anchorEl) anchorEl.textContent = text;
+						} catch (e) {
+							if (anchorEl) anchorEl.innerHTML = text;
+						}
+					};
+
+					try {
+						if (virtualTasks.some((t) => t.id === id)) {
+							await removeVirtualTask(id);
+							setLabel(t("menu_removed"));
+						} else {
+							await addVirtualTask(id, name!);
+							setLabel(t("menu_added"));
+						}
+						virtualTasks = await getVirtualTasks();
+						renderCell();
+					} finally {
+						virtualActionInProgress = false;
+					}
 				});
 
 				cell.querySelector<HTMLAnchorElement>('.action-notes')?.addEventListener('click', (event) => {

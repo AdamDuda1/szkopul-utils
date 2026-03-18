@@ -2,7 +2,7 @@ import {setLang, t, type lang} from "../globals.js";
 import { getTODO, removeTODOItem, reorderTODO, type TodoItem } from "../todo.js";
 
 import browser from "webextension-polyfill";
-import { getVirtualTasks, removeVirtualTask } from '../virtual';
+import { getVirtualOptions, getVirtualTasks, removeVirtualTask, saveVirtualOptions, virtualOptions } from '../virtual';
 
 export async function initLang() {
 	const result = await browser.storage.local.get("lang");
@@ -211,7 +211,9 @@ async function initVirtual() {
 		_tr.id = id;
 		_tr.innerHTML = `
 			<td style="padding: 8px;">
-				<a href="https://szkopul.edu.pl/problemset/problem/${task.id}/site/?key=statement">${task.name}</a>
+				<a href="https://szkopul.edu.pl/problemset/problem/${task.id}/site/?key=statement" target="_blank">
+					${task.name}
+				</a>
 			</td>
 
 			<td class="text-center" style="padding: 8px;">
@@ -232,6 +234,23 @@ async function initVirtual() {
 		});
 	}
 
+	let options = await getVirtualOptions();
+	(document.getElementById('virtualSetupHours') as HTMLInputElement).value = options.durationInputHours.toString();
+	(document.getElementById('virtualSetupMinutes') as HTMLInputElement).value = options.durationInputMinutes.toString();
+
+	document.getElementById('virtualSetupHours')!.addEventListener('input', e => {
+		getVirtualOptions().then(options => {
+			options.durationInputHours = Number((e.target as HTMLInputElement).value);
+			saveVirtualOptions(options);
+		});
+	});
+
+	document.getElementById('virtualSetupMinutes')!.addEventListener('input', e => {
+		getVirtualOptions().then(options => {
+			options.durationInputMinutes = Number((e.target as HTMLInputElement).value);
+			saveVirtualOptions(options);
+		});
+	});
 }
 
 

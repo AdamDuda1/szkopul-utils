@@ -1,10 +1,32 @@
 import browser from "webextension-polyfill";
 
+const KEY_VIRTUAL_TASKS = "virtualTasks";
+const KEY_VIRTUAL_OPTIONS = "virtualOptions";
 export type task = { id: string; name: string };
-const KEY = "virtualTasks";
+export type virtualOptions = {
+	hideScores: boolean,
+	blockOtherSubpages: boolean,
+	duration: number,
+	durationInputHours: number,
+	durationInputMinutes: number,
+	startTime: number,
+	isRunning: boolean,
+	showMenu: boolean,
+}
+
+const DEFAULT_VIRTUAL_OPTIONS: virtualOptions = {
+	hideScores: false,
+	blockOtherSubpages: false,
+	duration: 0,
+	durationInputHours: 2,
+	durationInputMinutes: 30,
+	startTime: 0,
+	isRunning: false,
+	showMenu: true,
+};
 
 export async function getVirtualTasks(): Promise<task[]> {
-	const { [KEY]: tasks = [] } = await browser.storage.local.get(KEY);
+	const { [KEY_VIRTUAL_TASKS]: tasks = [] } = await browser.storage.local.get(KEY_VIRTUAL_TASKS);
 	return tasks as task[];
 }
 
@@ -12,10 +34,20 @@ export async function addVirtualTask(id: string, name: string): Promise<void> {
 	const tasks = await getVirtualTasks();
 
 	tasks.push({ id, name });
-	await browser.storage.local.set({ [KEY]: tasks });
+	await browser.storage.local.set({ [KEY_VIRTUAL_TASKS]: tasks });
 }
 
 export async function removeVirtualTask(id: string): Promise<void> {
 	const tasks = await getVirtualTasks();
-	await browser.storage.local.set({ [KEY]: tasks.filter((t) => t.id !== id) });
+	await browser.storage.local.set({ [KEY_VIRTUAL_TASKS]: tasks.filter((t) => t.id !== id) });
+}
+
+export async function getVirtualOptions(): Promise<virtualOptions> {
+	const { [KEY_VIRTUAL_OPTIONS]: options } = await browser.storage.local.get(KEY_VIRTUAL_OPTIONS);
+	if (!options || Array.isArray(options) || typeof options !== "object") return { ...DEFAULT_VIRTUAL_OPTIONS };
+	return { ...DEFAULT_VIRTUAL_OPTIONS, ...(options as Partial<virtualOptions>) };
+}
+
+export async function saveVirtualOptions(newOptions: virtualOptions): Promise<void> {
+	await browser.storage.local.set({ [KEY_VIRTUAL_OPTIONS]: newOptions });
 }

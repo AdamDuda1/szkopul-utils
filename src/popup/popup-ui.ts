@@ -1,13 +1,13 @@
 import { html, render } from 'lit';
 import { type lang, t } from '../globals.js';
-// import { init, initLang } from './popup';
+import { init, initLang } from './popup';
 
 const browserFunctions = true; // Set this to false to test UI locally
 
 setTimeout(async () => {
-	// if (browserFunctions) await initLang();
+	if (browserFunctions) await initLang();
 	renderPopup();
-	// if (browserFunctions) await init();
+	if (browserFunctions) await init();
 }, 10);
 
 export function backHome() {
@@ -64,11 +64,19 @@ render(
             ${t('popup_home_refreshPls')}
         </p>
 
-        <div class="form-check form-switch" style="margin-top: 10px;">
-            <input class="form-check-input" type="checkbox" id="hideScoresQuickOption">
-            <label class="form-check-label" for="hideScoresQuickOption">
-                ${t('popup_home_hideScores')}
-            </label>
+        <!--        <div class="form-check form-switch" style="margin-top: 10px;">-->
+        <!--            <input class="form-check-input" type="checkbox" id="hideScoresQuickOption">-->
+        <!--            <label class="form-check-label" for="hideScoresQuickOption">-->
+        <!--                ${t('popup_home_hideScores')}-->
+        <!--            </label>-->
+        <!--        </div>-->
+
+        <div style="position: absolute; bottom: 20px; text-align: center;"> // TODO zrobic zeby faktycznie dzialalo lol
+            <h6 style="margin: 3px;">${t("popup_home_szkopulStatusUpFor")}</h6>
+            <h5 style="margin: 3px;" id="szkopulStatusUpFor">29d 8h 213min</h5>
+            <h6 style="margin: 3px 3px 0;">${t("popup_home_szkopulStatusRecordUptime")} <span id="szkopulStatusRecordUptime">100.0000%</span></h6>
+            <a style="margin: 3px; font-size: small; color: #0069d9 !important" href="https://czywyjebalohomika.xyz/"
+               target="_blank">${t("popup_home_szkopulStatusMore")}</a>
         </div>
 	`, document.getElementById('home')!
 );
@@ -108,16 +116,16 @@ render(
         <details style="width: 100%; display: flex; flex-direction: column;">
             <summary style="margin: 5px">${t("popup_virtual_category_optionsOverride")}</summary>
 	        
+            <span class="categ">${t("popup_virtual_optionsNotice")}</span>
+
             <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
                 <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between">
-                    <label for="hideScoresOption" class="mb-0 form-check-label">Blokuj inne podstrony</label>
+                    <label for="hideScoresOption" class="mb-0 form-check-label">${t("popup_virtual_blockOtherSubpages")}</label>
                     <div class="form-check form-switch m-0">
                         <input class="form-check-input" type="checkbox" id="hideScoresOption">
                     </div>
                 </div>
             </div>
-	        
-            <span class="categ">${t("popup_virtual_optionsNotice")}</span>
 	        
 	        <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
                 <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between">

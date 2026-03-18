@@ -25,6 +25,7 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 
 ## TODO:
 
+- make the user be able to choose what is displayed on the home page of the popup (szkopul stats/quick score hiding setting)
 - **build the menu html on click so it loads faster and is up to date**
 - make a better popup for deleting and importing data!
 - inline task statements in contest views
