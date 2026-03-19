@@ -1,3 +1,4 @@
+import {t} from "./globals";
 
 export function hideScores() {
 	console.log('HIDE!!!')
@@ -42,4 +43,57 @@ export function hideScores() {
 	styleElement.textContent = css;
 
 	document.documentElement.appendChild(styleElement);
+}
+
+export function hidePageContents() {
+	const color = localStorage.getItem("dark-mode") === "enabled" ? '#d1cdc7' : '#212529';
+
+	const css: string = `
+		.body {
+			height: 80vh !important;
+			display: flex !important;
+			flex-direction: column !important;
+			justify-content: center !important;
+		}
+		
+		.body > *:not(.pageHiddenMessage) {
+			display: none !important;
+		}
+
+		.body .pageHiddenMessage {
+			display: block !important;
+			margin-bottom: 10px;
+			color: ${color};
+			text-align: center;
+			font-size: 20px;
+		}
+    `;
+
+	const styleElement: HTMLStyleElement = document.createElement('style');
+	styleElement.textContent = css;
+
+	document.documentElement.appendChild(styleElement);
+
+	const tryToAttach = () => {
+		const bodyEl = document.querySelector('.body');
+		if (bodyEl) {
+			const createMsg = (text: string) => {
+				const el = document.createElement('div');
+				el.classList.add('pageHiddenMessage');
+				el.textContent = text;
+				bodyEl.appendChild(el);
+			};
+			createMsg(t("pageBlockedMessage1"));
+			createMsg(t("pageBlockedMessage2"));
+			return true;
+		}
+		return false;
+	};
+
+	if (!tryToAttach()) {
+		const observer = new MutationObserver((_, obs) => {
+			if (tryToAttach()) obs.disconnect();
+		});
+		observer.observe(document.documentElement, { childList: true, subtree: true });
+	}
 }

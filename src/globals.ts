@@ -57,7 +57,10 @@ export const translations = {
 		menu_viewNote: "Zobacz notatkę",
 
 		menu_added: "Dodano!",
-		menu_removed: "Usunięto!"
+		menu_removed: "Usunięto!",
+
+		pageBlockedMessage1: "Hej! Piszesz konkurs wirtualny a to jest niezwiązana podstrona.",
+		pageBlockedMessage2: "Wybierz jedno z zadań z panelu po lewej lub wcześnie zakończ konkurs w panelu rozszerzenia.",
 	},
 	en: {
 		popup_home_virtual: "Virtual contest",
@@ -111,6 +114,9 @@ export const translations = {
 		menu_viewNote: "View note",
 
 		menu_added: "Added!",
-		menu_removed: "Removed!"
+		menu_removed: "Removed!",
+
+		pageBlockedMessage1: "Hey! You're writing a virtual contest and this is an unrelated subpage.",
+		pageBlockedMessage2: "Please select one of the tasks from the panel on the left or finish the contest early in the extension panel.",
 	}
 }

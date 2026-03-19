@@ -135,6 +135,17 @@ render(
                     </div>
                 </div>
 	        </div>
+
+			<div style="display: flex; justify-content: space-between; width: 82%; margin-top: 7px;">
+				<label for="preferredLang">
+					Score by
+				</label>
+				<select style="height: 25px; font-size: 17px; padding: 2px; width: auto;"
+						class="form-control" name="preferredLang" id="preferredLang">
+					<option value="pl">best score</option>
+					<option value="pl">last submission</option>
+				</select>
+			</div>
         </details>
 
 
@@ -206,26 +217,27 @@ render(
 		<span class="categ">
 			${t('popup_options_c_meta')}
 		</span>
-		
-		
-		<br>
-		<br>
-		<br>
-		<br>
-		<br>
-		<br>
-		<br>
-		<br>
-		<br>
-		<br>
-		<br>
-		<br>
-		<br>
-		<br>
-		<br>
-		<br>
-		<br>
-		<br>
+
+
+		<div style="display: flex; justify-content: space-between; width: 82%; margin-top: 7px;">
+			<label for="preferredLang">
+				Preferred language
+			</label>
+			<select style="height: 25px; font-size: 17px; padding: 2px; width: auto;"
+					class="form-control" name="preferredLang" id="preferredLang">
+				<option value="pl">none</option>
+				<option value="pl">C++</option>
+				<option value="en">Python</option>
+				<option value="en">Rust</option>
+			</select>
+		</div>
+
+		<div class="form-check form-switch switch-full d-flex align-items-center justify-content-between">
+			<label for="hideTimerOption" class="mb-0 form-check-label">Automatically submit solution when pasted or uploaded code is in the preferred language</label>
+			<div class="form-check form-switch m-0">
+				<input class="form-check-input" type="checkbox" id="hideTimerOption">
+			</div>
+		</div>
 		
 		<div style="display: flex; justify-content: space-between; width: 82%; margin-top: 7px;">
 			<label for="lang">
