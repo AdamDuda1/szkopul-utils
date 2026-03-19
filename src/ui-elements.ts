@@ -1,7 +1,6 @@
 import { problemSetMenuSeeNote } from './notes';
 import { t } from './globals';
 import { addVirtualTask, getVirtualOptions, getVirtualTasks, removeVirtualTask, saveVirtualOptions } from './virtual';
-import browser from 'webextension-polyfill';
 
 let virtualTasks: {id: string, name: string}[] = [];
 
@@ -157,15 +156,36 @@ function formatRemaining(ms: number) {
 	return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
+let virtualPanelIntervalId = 0;
+
 export async function appendVirtualContestPanel() {
 	const options = await getVirtualOptions();
 	if (!options.isRunning || !options.startTime || options.duration <= 0) return;
+
+	const endsAt = options.startTime + options.duration;
+	if (endsAt <= Date.now()) {
+		await saveVirtualOptions({ ...options, isRunning: false });
+		return;
+	}
 
 	const panelId = 'szkopul-utils-virtual-panel';
 	let panel = document.getElementById(panelId);
 	if (!panel) {
 		panel = document.createElement('div');
 		panel.id = panelId;
+		// panel.style.position = 'fixed';
+		// panel.style.top = '120px';
+		// panel.style.left = '8px';
+		// panel.style.zIndex = '2147483647';
+		// panel.style.width = '250px';
+		// panel.style.maxHeight = '70vh';
+		// panel.style.overflowY = 'auto';
+		// panel.style.background = '#ffffff';
+		// panel.style.color = '#212529';
+		// panel.style.border = '1px solid #dee2e6';
+		// panel.style.borderRadius = '8px';
+		// panel.style.padding = '10px';
+		// panel.style.boxShadow = '0 4px 14px rgba(0, 0, 0, 0.16)';
 		panel.style = `
 			position: fixed;
 			top: 150px;
@@ -181,37 +201,57 @@ export async function appendVirtualContestPanel() {
 			padding: 10px;
 			box-shadow: rgba(0, 0, 0, 0.16) 0px 4px 14px;
     	`;
+		panel.innerHTML = `
+			<div style="font-weight: 600; margin-bottom: 8px;">Virtual contest</div>
+			<div id="szkopul-utils-virtual-panel-timer" style="font-size: 22px; margin-bottom: 8px;">00:00:00</div>
+			<div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">${t('popup_virtual_scoreBy')}: ${options.scoreBy === 'last' ? t('popup_virtual_scoreBy_last') : t('popup_virtual_scoreBy_best')}</div>
+			<div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">Tasks</div>
+			<ul id="szkopul-utils-virtual-panel-tasks" style="padding-left: 18px; margin: 0;"></ul>
+		`;
 		document.body.appendChild(panel);
 	}
 
 	const tasks = await getVirtualTasks();
-	const taskRows = tasks.map((task) => `
-		<li style="margin-top: 4px;">
-			<a href="https://szkopul.edu.pl/problemset/problem/${encodeURIComponent(task.id)}/site/?key=statement" target="_blank" rel="noopener noreferrer">${task.name}</a>
-		</li>
-	`).join('');
+	const timer = panel.querySelector<HTMLDivElement>('#szkopul-utils-virtual-panel-timer');
+	const tasksList = panel.querySelector<HTMLUListElement>('#szkopul-utils-virtual-panel-tasks');
+	if (!timer || !tasksList) return;
 
-	let intervalId = 0;
-	const render = async () => {
-		const remaining = options.startTime + options.duration - Date.now();
+	tasksList.innerHTML = '';
+
+	if (tasks.length === 0) {
+		const li = document.createElement('li');
+		li.textContent = 'No tasks';
+		tasksList.appendChild(li);
+	} else {
+		for (const task of tasks) {
+			const li = document.createElement('li');
+			li.style.marginTop = '4px';
+			const link = document.createElement('a');
+			link.href = `https://szkopul.edu.pl/problemset/problem/${encodeURIComponent(task.id)}/site/?key=statement`;
+			link.rel = 'noopener noreferrer';
+			link.textContent = task.name;
+			li.appendChild(link);
+			tasksList.appendChild(li);
+		}
+	}
+
+
+	const updateTimer = async () => {
+		const remaining = endsAt - Date.now();
 		if (remaining <= 0) {
-			if (intervalId) window.clearInterval(intervalId);
+			if (virtualPanelIntervalId) window.clearInterval(virtualPanelIntervalId);
+			virtualPanelIntervalId = 0;
 			panel?.remove();
 			await saveVirtualOptions({ ...options, isRunning: false });
 			return;
 		}
-
-		panel!.innerHTML = `
-			<div style="font-weight: 600; margin-bottom: 8px;">Virtual contest</div>
-			<div style="font-size: 22px; margin-bottom: 8px;">${formatRemaining(remaining)}</div>
-			<div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">Tasks</div>
-			<ul style="padding-left: 18px; margin: 0;">${taskRows || '<li>No tasks</li>'}</ul>
-		`;
+		timer.textContent = formatRemaining(remaining);
 	};
 
-	await render();
-	intervalId = window.setInterval(() => {
-		void render();
+	await updateTimer();
+	if (virtualPanelIntervalId) window.clearInterval(virtualPanelIntervalId);
+	virtualPanelIntervalId = window.setInterval(() => {
+		void updateTimer();
 	}, 1000);
 }
 

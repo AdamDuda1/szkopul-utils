@@ -195,6 +195,87 @@ function escapeHTML(text: string) {
 	return text.replace(/[&<>"']/g, (char) => map[char]);
 }
 
+let runningViewIntervalId = 0;
+
+function formatRemaining(ms: number) {
+	const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+	const hours = Math.floor(totalSeconds / 3600);
+	const minutes = Math.floor((totalSeconds % 3600) / 60);
+	const seconds = totalSeconds % 60;
+	return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+async function syncVirtualRunningPage() {
+	const options = await getVirtualOptions();
+	const now = Date.now();
+	const endsAt = options.startTime + options.duration;
+	const isRunning = options.isRunning && options.startTime > 0 && options.duration > 0 && endsAt > now;
+
+	const runningBtn = document.getElementById('btn-showVirtualRunning');
+	if (runningBtn) runningBtn.style.display = isRunning ? 'flex' : 'none';
+
+	const homePage = document.getElementById('home');
+	const todoPage = document.getElementById('todo');
+	const optionsPage = document.getElementById('options');
+	const virtualPage = document.getElementById('virtual');
+	const runningPage = document.getElementById('virtual-running');
+
+	const remainingEl = document.getElementById('virtual-running-remaining');
+	const tasksEl = document.getElementById('virtual-running-tasks');
+
+	if (!isRunning) {
+		if (runningViewIntervalId) {
+			window.clearInterval(runningViewIntervalId);
+			runningViewIntervalId = 0;
+		}
+		if (options.isRunning && endsAt <= now) {
+			await saveVirtualOptions({ ...options, isRunning: false });
+		}
+		if (remainingEl) remainingEl.textContent = '00:00:00';
+		if (tasksEl) tasksEl.innerHTML = '';
+		if (runningPage?.style.display === 'flex') {
+			if (homePage) homePage.style.display = 'flex';
+			runningPage.style.display = 'none';
+		}
+		return;
+	}
+
+	if (runningPage && runningPage.style.display !== 'flex') {
+		if (homePage) homePage.style.display = 'none';
+		if (todoPage) todoPage.style.display = 'none';
+		if (optionsPage) optionsPage.style.display = 'none';
+		if (virtualPage) virtualPage.style.display = 'none';
+		runningPage.style.display = 'flex';
+	}
+
+	const tasks = await getVirtualTasks();
+	if (tasksEl) {
+		tasksEl.innerHTML = tasks.length === 0
+			? `<div style="opacity: .8;">${t('popup_virtual_noVirtualTasks')}</div>`
+			: tasks.map((task) => `
+				<div style="margin-bottom: 5px;">
+					<a href="https://szkopul.edu.pl/problemset/problem/${encodeURIComponent(task.id)}/site/?key=statement" target="_blank" rel="noopener noreferrer">${escapeHTML(task.name)}</a>
+				</div>
+			`).join('');
+	}
+
+	const updateRemaining = () => {
+		const left = Math.max(0, endsAt - Date.now());
+		if (remainingEl) remainingEl.textContent = formatRemaining(left);
+	};
+
+	updateRemaining();
+	if (runningViewIntervalId) window.clearInterval(runningViewIntervalId);
+	runningViewIntervalId = window.setInterval(() => {
+		updateRemaining();
+		if (Date.now() >= endsAt) {
+			window.clearInterval(runningViewIntervalId);
+			runningViewIntervalId = 0;
+			void saveVirtualOptions({ ...options, isRunning: false }).then(syncVirtualRunningPage);
+		}
+	}, 1000);
+}
+
 
 
 
@@ -237,8 +318,9 @@ async function initVirtual() {
 	let options = await getVirtualOptions();
 	(document.getElementById('virtualSetupHours') as HTMLInputElement).value = options.durationInputHours.toString();
 	(document.getElementById('virtualSetupMinutes') as HTMLInputElement).value = options.durationInputMinutes.toString();
-	(document.getElementById('hideScoresOption') as HTMLInputElement).checked = Boolean(options.hideScores);
-	(document.getElementById('blockOtherSubpagesOption') as HTMLInputElement).checked = Boolean(options.blockOtherSubpages);
+	(document.getElementById('virtualHideScoresOption') as HTMLInputElement).checked = Boolean(options.hideScores);
+	(document.getElementById('virtualBlockOtherSubpagesOption') as HTMLInputElement).checked = Boolean(options.blockOtherSubpages);
+	(document.getElementById('virtualScoreByOption') as HTMLSelectElement).value = options.scoreBy;
 
 	document.getElementById('virtualSetupHours')!.addEventListener('input', e => {
 		getVirtualOptions().then(options => {
@@ -254,16 +336,24 @@ async function initVirtual() {
 		});
 	});
 
-	document.getElementById('hideScoresOption')!.addEventListener('input', e => {
+	document.getElementById('virtualHideScoresOption')!.addEventListener('input', e => {
 		getVirtualOptions().then(options => {
 			options.hideScores = Boolean((e.target as HTMLInputElement).checked);
 			saveVirtualOptions(options);
 		});
 	});
 
-	document.getElementById('blockOtherSubpagesOption')!.addEventListener('input', e => {
+	document.getElementById('virtualBlockOtherSubpagesOption')!.addEventListener('input', e => {
 		getVirtualOptions().then(options => {
 			options.blockOtherSubpages = Boolean((e.target as HTMLInputElement).checked);
+			saveVirtualOptions(options);
+		});
+	});
+
+	document.getElementById('virtualScoreByOption')!.addEventListener('change', e => {
+		getVirtualOptions().then(options => {
+			const value = (e.target as HTMLSelectElement).value;
+			options.scoreBy = value === 'last' ? 'last' : 'best';
 			saveVirtualOptions(options);
 		});
 	});
@@ -274,7 +364,7 @@ async function initVirtual() {
 		const durationMs = Math.max(0, (hours * 60 + minutes) * 60 * 1000);
 
 		if (durationMs <= 0) {
-			showPopupNotice('Set contest time first');
+			showPopupNotice(t('popup_virtual_setTimeFirst'));
 			return;
 		}
 
@@ -288,8 +378,20 @@ async function initVirtual() {
 			isRunning: true,
 		});
 
-		showPopupNotice('Virtual contest started');
+		showPopupNotice(t('popup_virtual_started'));
+		void syncVirtualRunningPage();
 	});
+
+	document.getElementById('btn-stopVirtual')?.addEventListener('click', async () => {
+		const currentOptions = await getVirtualOptions();
+		await saveVirtualOptions({ ...currentOptions, isRunning: false });
+		showPopupNotice(t('popup_virtual_running_stopped'));
+		document.getElementById('virtual-running')!.style.display = 'none';
+		document.getElementById('home')!.style.display = 'flex';
+		void syncVirtualRunningPage();
+	});
+
+	void syncVirtualRunningPage();
 }
 
 

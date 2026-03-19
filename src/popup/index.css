@@ -7,7 +7,7 @@ html {
     background: red; /*for debugging*/
 }
 
-body, #home, #virtual, #todo, #options {
+body, #home, #virtual, #virtual-running, #todo, #options {
     width: 300px;
     overflow-y: auto;
     height: 330px;

@@ -6,6 +6,7 @@ export type task = { id: string; name: string };
 export type virtualOptions = {
 	hideScores: boolean,
 	blockOtherSubpages: boolean,
+	scoreBy: 'best' | 'last',
 	duration: number,
 	durationInputHours: number,
 	durationInputMinutes: number,
@@ -17,6 +18,7 @@ export type virtualOptions = {
 const DEFAULT_VIRTUAL_OPTIONS: virtualOptions = {
 	hideScores: false,
 	blockOtherSubpages: false,
+	scoreBy: 'best',
 	duration: 0,
 	durationInputHours: 2,
 	durationInputMinutes: 30,
@@ -45,7 +47,9 @@ export async function removeVirtualTask(id: string): Promise<void> {
 export async function getVirtualOptions(): Promise<virtualOptions> {
 	const { [KEY_VIRTUAL_OPTIONS]: options } = await browser.storage.local.get(KEY_VIRTUAL_OPTIONS);
 	if (!options || Array.isArray(options) || typeof options !== "object") return { ...DEFAULT_VIRTUAL_OPTIONS };
-	return { ...DEFAULT_VIRTUAL_OPTIONS, ...(options as Partial<virtualOptions>) };
+	const merged = { ...DEFAULT_VIRTUAL_OPTIONS, ...(options as Partial<virtualOptions>) };
+	if (merged.scoreBy !== 'best' && merged.scoreBy !== 'last') merged.scoreBy = 'best';
+	return merged;
 }
 
 export async function saveVirtualOptions(newOptions: virtualOptions): Promise<void> {

@@ -14,6 +14,7 @@ export function backHome() {
 	document.getElementById('home')!.style.display = 'flex';
 	document.getElementById('todo')!.style.display = 'none';
 	document.getElementById('virtual')!.style.display = 'none';
+	document.getElementById('virtual-running')!.style.display = 'none';
 	document.getElementById('options')!.style.display = 'none';
 }
 
@@ -21,6 +22,18 @@ export function showVirtual() {
 	document.getElementById('home')!.style.display = 'none';
 	document.getElementById('todo')!.style.display = 'none';
 	document.getElementById('virtual')!.style.display = 'flex';
+	document.getElementById('virtual-running')!.style.display = 'none';
+	document.getElementById('options')!.style.display = 'none';
+}
+
+export function showVirtualRunning() {
+	const runningBtn = document.getElementById('btn-showVirtualRunning');
+	if (!runningBtn || runningBtn.style.display === 'none') return;
+
+	document.getElementById('home')!.style.display = 'none';
+	document.getElementById('todo')!.style.display = 'none';
+	document.getElementById('virtual')!.style.display = 'none';
+	document.getElementById('virtual-running')!.style.display = 'flex';
 	document.getElementById('options')!.style.display = 'none';
 }
 
@@ -29,12 +42,14 @@ export function showTODO() {
 	document.getElementById('todo')!.style.display = 'flex';
 	document.getElementById('options')!.style.display = 'none';
 	document.getElementById('virtual')!.style.display = 'none';
+	document.getElementById('virtual-running')!.style.display = 'none';
 	// void renderTODOTable();
 }
 
 export function showOptions() {
 	document.getElementById('options')!.style.display = 'flex';
 	document.getElementById('virtual')!.style.display = 'none';
+	document.getElementById('virtual-running')!.style.display = 'none';
 	document.getElementById('home')!.style.display = 'none';
 	document.getElementById('todo')!.style.display = 'none';
 }
@@ -48,6 +63,11 @@ render(
             ${t('popup_home_virtual')}
             <img src="../icons/ic-arrow-right.svg" alt="">
         </button>
+
+		<button class="btn btn-success b" id="btn-showVirtualRunning" style="display: none;">
+			${t('popup_virtual_running')}
+			<img src="../icons/ic-arrow-right.svg" alt="">
+		</button>
 
         <button class="btn btn-primary b" id="btn-showTODO">
             ${t('popup_home_todo')}
@@ -84,7 +104,7 @@ render(
 render(
 	html`
 		<div style="position: absolute; top: 5px; left: 5px; display: flex; height: 50px">
-			<button class="btn btn-default" id="btn-backHome-TODO"
+			<button class="btn btn-default" id="btn-backHome-virtual"
 					style="width: auto; padding: 3px; color: white; display: flex;">
 				<img src="../icons/ic-arrow-right.svg" alt="" class="back-btn">
 				<h3 style="position: relative; top: -4px; left: 5px;">
@@ -118,30 +138,30 @@ render(
 
             <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
                 <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between">
-                    <label for="blockOtherSubpagesOption" class="mb-0 form-check-label">${t("popup_virtual_blockOtherSubpages")}</label>
+                    <label for="virtualBlockOtherSubpagesOption" class="mb-0 form-check-label">${t("popup_virtual_blockOtherSubpages")}</label>
                     <div class="form-check form-switch m-0">
-                        <input class="form-check-input" type="checkbox" id="blockOtherSubpagesOption">
+                        <input class="form-check-input" type="checkbox" id="virtualBlockOtherSubpagesOption">
                     </div>
                 </div>
             </div>
 	        
 	        <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
                 <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between">
-                    <label for="hideScoresOption" class="mb-0 form-check-label">${t('popup_options_hideScores')}</label>
+	                    <label for="virtualHideScoresOption" class="mb-0 form-check-label">${t('popup_options_hideScores')}</label>
                     <div class="form-check form-switch m-0">
-                        <input class="form-check-input" type="checkbox" id="hideScoresOption">
+	                        <input class="form-check-input" type="checkbox" id="virtualHideScoresOption">
                     </div>
                 </div>
 	        </div>
 
 			<div style="display: flex; justify-content: space-between; width: 82%; margin-top: 7px; margin-left: auto; margin-right: auto;">
-				<label for="preferredLang">
-					Score by
+				<label for="virtualScoreByOption">
+					${t('popup_virtual_scoreBy')}
 				</label>
 				<select style="height: 25px; font-size: 17px; padding: 2px; width: auto;"
-						class="form-control" name="preferredLang" id="preferredLang">
-					<option value="pl">best score</option>
-					<option value="pl">last submission</option>
+						class="form-control" name="virtualScoreByOption" id="virtualScoreByOption">
+					<option value="best">${t('popup_virtual_scoreBy_best')}</option>
+					<option value="last">${t('popup_virtual_scoreBy_last')}</option>
 				</select>
 			</div>
         </details>
@@ -162,6 +182,28 @@ render(
 		<button type="button" style="margin: 10px;" class="btn btn-outline-success" id="btn-startVirtual"> START </button>
 
 	`, document.getElementById('virtual')!
+);
+
+render(
+	html`
+		<div style="position: absolute; top: 5px; left: 5px; display: flex; height: 50px">
+			<button class="btn btn-default" id="btn-backHome-running"
+					style="width: auto; padding: 3px; color: white; display: flex;">
+				<img src="../icons/ic-arrow-right.svg" alt="" class="back-btn">
+				<h3 style="position: relative; top: -4px; left: 5px;">${t('popup_virtual_running')}</h3>
+			</button>
+		</div>
+
+		<br><br>
+
+		<div style="width: 88%; margin-top: 8px; font-size: 12px; opacity: .8;">${t('popup_virtual_running_left')}</div>
+		<div id="virtual-running-remaining" style="font-size: 26px; margin-bottom: 10px;">00:00:00</div>
+
+		<div style="width: 88%; font-size: 12px; opacity: .8; margin-bottom: 4px;">${t('popup_virtual_running_tasks')}</div>
+		<div id="virtual-running-tasks" style="width: 88%; max-height: 165px; overflow-y: auto; font-size: 13px;"></div>
+
+		<button id="btn-stopVirtual" type="button" class="btn btn-danger b" style="margin-top: 10px;">${t('popup_virtual_running_stop')}</button>
+	`, document.getElementById('virtual-running')!
 );
 
 render(
@@ -295,10 +337,12 @@ render(
 );
 
 document.getElementById('btn-showVirtual')?.addEventListener('click', showVirtual);
+document.getElementById('btn-showVirtualRunning')?.addEventListener('click', showVirtualRunning);
 document.getElementById('btn-showTODO')?.addEventListener('click', showTODO);
 document.getElementById('btn-showOptions')?.addEventListener('click', showOptions);
 
 document.getElementById('btn-backHome-virtual')?.addEventListener('click', backHome);
-document.getElementById('btn-backHome-TODO')?.addEventListener('click', backHome);
+document.getElementById('btn-backHomeTODO')?.addEventListener('click', backHome);
+document.getElementById('btn-backHome-running')?.addEventListener('click', backHome);
 document.getElementById('btn-backHome-options')?.addEventListener('click', backHome);
 }
