@@ -115,8 +115,6 @@ render(
 
         <details style="width: 100%; display: flex; flex-direction: column;">
             <summary style="margin: 5px">${t("popup_virtual_category_optionsOverride")}</summary>
-	        
-            <span class="categ">${t("popup_virtual_optionsNotice")}</span>
 
             <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
                 <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between">
@@ -136,7 +134,7 @@ render(
                 </div>
 	        </div>
 
-			<div style="display: flex; justify-content: space-between; width: 82%; margin-top: 7px;">
+			<div style="display: flex; justify-content: space-between; width: 82%; margin-top: 7px; margin-left: auto; margin-right: auto;">
 				<label for="preferredLang">
 					Score by
 				</label>
@@ -161,7 +159,7 @@ render(
             </div>
         </div>
 
-		<button type="button" style="margin: 10px;" class="btn btn-outline-success"> START </button>
+		<button type="button" style="margin: 10px;" class="btn btn-outline-success" id="btn-startVirtual"> START </button>
 
 	`, document.getElementById('virtual')!
 );

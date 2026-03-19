@@ -23,7 +23,6 @@ export const translations = {
 		popup_virtual_table_tr_actions: "Czynności",
 		popup_virtual_noVirtualTasks: "Brak zadań! Dodaj je przez bazę zadań lub z archiwum.",
 		popup_virtual_category_optionsOverride: "Opcje konkursu",
-		popup_virtual_optionsNotice: "Te ustawienia będą działać w trakcie konkursu i nie wpłyną na pozostałe:",
 		popup_virtual_blockOtherSubpages: "Blokuj niepowiązane podstrony",
 
 		popup_options_language: "Język:",
@@ -80,7 +79,6 @@ export const translations = {
 		popup_virtual_table_tr_actions: "Actions",
 		popup_virtual_noVirtualTasks: "No tasks! Add them through the task database or from the archive.",
 		popup_virtual_category_optionsOverride: "Contest options",
-		popup_virtual_optionsNotice: "These settings will work during the contest and won't affect others:",
 		popup_virtual_blockOtherSubpages: "Block unrelated subpages",
 
 		popup_options_language: "Language:",

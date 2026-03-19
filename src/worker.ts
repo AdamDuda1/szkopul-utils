@@ -1,14 +1,28 @@
 import { fixContactButton, addUtilsFeedbackButton, makeEnterSearchThings, appendHomePageStats } from './misc-fixes';
 import browser from "webextension-polyfill";
 import { initNotes } from './notes';
-import { appendProblemSetMenu } from './ui-elements';
-import { hideScores } from './ui-hiders';
+import { appendProblemSetMenu, appendVirtualContestPanel } from './ui-elements';
+import {hidePageContents, hideScores} from './ui-hiders';
 import { addToTODOAction } from './todo';
 import { setLang } from './globals';
 
 const manifestVersion = browser.runtime.getManifest().version;
 console.log(`Thank you for using Szkopuł Utils (v${manifestVersion}), Dzięki! :)`);
 
+const onStart = () => {
+	fixContactButton();
+
+	// hidePageContents();
+};
+
+const init = () => {
+	addUtilsFeedbackButton();
+	appendProblemSetMenu(addToTODOAction);
+	appendVirtualContestPanel();
+	makeEnterSearchThings();
+	appendHomePageStats();
+	initNotes();
+};
 
 browser.storage.local.get("hideScores").then((result) => { if (result.hideScores === true) hideScores(); });
 
@@ -18,17 +32,8 @@ browser.storage.local.get("lang").then((result) => {
 		setLang("pl");
 		browser.storage.local.set({ lang: "pl" });
 	}
+	onStart();
 });
-
-fixContactButton();
-
-const init = () => {
-	addUtilsFeedbackButton();
-	appendProblemSetMenu(addToTODOAction);
-	makeEnterSearchThings();
-	appendHomePageStats();
-	initNotes();
-};
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
 else init();

@@ -90,3 +90,7 @@ td {
 td > a {
     color: #33a2ff !important;
 }
+
+.form-check-label {
+    max-width: 70%;
+}

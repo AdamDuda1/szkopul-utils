@@ -1,6 +1,6 @@
 import { problemSetMenuSeeNote } from './notes';
 import { t } from './globals';
-import { addVirtualTask, getVirtualTasks, removeVirtualTask } from './virtual';
+import { addVirtualTask, getVirtualOptions, getVirtualTasks, removeVirtualTask, saveVirtualOptions } from './virtual';
 import browser from 'webextension-polyfill';
 
 let virtualTasks: {id: string, name: string}[] = [];
@@ -147,5 +147,71 @@ export async function appendProblemSetMenu(addToTODOAction: (id: string, name: s
 			validRows = true;
 		}
 	}
+}
+
+function formatRemaining(ms: number) {
+	const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+	const hours = Math.floor(totalSeconds / 3600);
+	const minutes = Math.floor((totalSeconds % 3600) / 60);
+	const seconds = totalSeconds % 60;
+	return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+export async function appendVirtualContestPanel() {
+	const options = await getVirtualOptions();
+	if (!options.isRunning || !options.startTime || options.duration <= 0) return;
+
+	const panelId = 'szkopul-utils-virtual-panel';
+	let panel = document.getElementById(panelId);
+	if (!panel) {
+		panel = document.createElement('div');
+		panel.id = panelId;
+		panel.style = `
+			position: fixed;
+			top: 150px;
+			left: -3px;
+			border: 1px solid white;
+			z-index: 2147483647;
+			width: 250px;
+			max-height: 70vh;
+			overflow-y: auto;
+			background: rgb(255, 255, 255);
+			color: rgb(33, 37, 41);
+			border-radius: 0 8px 8px 0;
+			padding: 10px;
+			box-shadow: rgba(0, 0, 0, 0.16) 0px 4px 14px;
+    	`;
+		document.body.appendChild(panel);
+	}
+
+	const tasks = await getVirtualTasks();
+	const taskRows = tasks.map((task) => `
+		<li style="margin-top: 4px;">
+			<a href="https://szkopul.edu.pl/problemset/problem/${encodeURIComponent(task.id)}/site/?key=statement" target="_blank" rel="noopener noreferrer">${task.name}</a>
+		</li>
+	`).join('');
+
+	let intervalId = 0;
+	const render = async () => {
+		const remaining = options.startTime + options.duration - Date.now();
+		if (remaining <= 0) {
+			if (intervalId) window.clearInterval(intervalId);
+			panel?.remove();
+			await saveVirtualOptions({ ...options, isRunning: false });
+			return;
+		}
+
+		panel!.innerHTML = `
+			<div style="font-weight: 600; margin-bottom: 8px;">Virtual contest</div>
+			<div style="font-size: 22px; margin-bottom: 8px;">${formatRemaining(remaining)}</div>
+			<div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">Tasks</div>
+			<ul style="padding-left: 18px; margin: 0;">${taskRows || '<li>No tasks</li>'}</ul>
+		`;
+	};
+
+	await render();
+	intervalId = window.setInterval(() => {
+		void render();
+	}, 1000);
 }
 

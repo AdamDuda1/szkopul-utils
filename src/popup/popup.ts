@@ -2,7 +2,7 @@ import {setLang, t, type lang} from "../globals.js";
 import { getTODO, removeTODOItem, reorderTODO, type TodoItem } from "../todo.js";
 
 import browser from "webextension-polyfill";
-import { getVirtualOptions, getVirtualTasks, removeVirtualTask, saveVirtualOptions, virtualOptions } from '../virtual';
+import { getVirtualOptions, getVirtualTasks, removeVirtualTask, saveVirtualOptions } from '../virtual';
 
 export async function initLang() {
 	const result = await browser.storage.local.get("lang");
@@ -266,6 +266,29 @@ async function initVirtual() {
 			options.blockOtherSubpages = Boolean((e.target as HTMLInputElement).checked);
 			saveVirtualOptions(options);
 		});
+	});
+
+	document.getElementById('btn-startVirtual')?.addEventListener('click', async () => {
+		const hours = Number((document.getElementById('virtualSetupHours') as HTMLInputElement | null)?.value ?? 0);
+		const minutes = Number((document.getElementById('virtualSetupMinutes') as HTMLInputElement | null)?.value ?? 0);
+		const durationMs = Math.max(0, (hours * 60 + minutes) * 60 * 1000);
+
+		if (durationMs <= 0) {
+			showPopupNotice('Set contest time first');
+			return;
+		}
+
+		const currentOptions = await getVirtualOptions();
+		await saveVirtualOptions({
+			...currentOptions,
+			durationInputHours: hours,
+			durationInputMinutes: minutes,
+			duration: durationMs,
+			startTime: Date.now(),
+			isRunning: true,
+		});
+
+		showPopupNotice('Virtual contest started');
 	});
 }
 
