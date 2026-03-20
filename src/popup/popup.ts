@@ -3,7 +3,7 @@ import { getTODO, removeTODOItem, reorderTODO, type TodoItem } from "../todo.js"
 
 import browser from "webextension-polyfill";
 import { getVirtualOptions, getVirtualTasks, removeVirtualTask, saveVirtualOptions } from '../virtual';
-import {getOptions} from "../options";
+import {getOptions, saveOptions} from "../options";
 
 
 let optionsObject;
@@ -14,12 +14,33 @@ export async function init() {
 }
 
 export async function afterRender() {
-
-	// loadData();
-
-	await initVirtual();
+	void loadOptions();
 	void syncSzkopulStatus();
+	await initVirtual();
+}
 
+function loadOptions() {
+	(document.getElementById('lang') as HTMLSelectElement).value = optionsObject!.lang;
+
+	document.getElementById('lang')!.addEventListener('change', () => {
+		optionsObject!.lang = (document.getElementById('lang') as HTMLSelectElement).value as lang;
+		saveOptions(optionsObject!).then(() => window.location.reload());
+	});
+
+	document.getElementById('btn-importData')?.addEventListener('click', () => {
+		const input = document.getElementById('input-importDataFile') as HTMLInputElement | null;
+		if (!input) return;
+		void showDataActionConfirmation(t('popup_data_confirm_import_replace'), () => {
+			openImportFilePicker(input);
+		});
+	});
+
+	document.getElementById('btn-exportData')?.addEventListener('click', () => {
+		void showDataActionConfirmation(`${t('popup_options_export')}?`, () => exportStorage());
+	});
+
+	document.getElementById('input-importDataFile')?.addEventListener('change', (event) => importStorage(event));
+	document.getElementById('btn-deleteAllData')?.addEventListener('click', () => deleteAllData());
 }
 
 function loadData() {
@@ -51,41 +72,10 @@ function optionsListeners() {
 		document.getElementById('refresh-pls-home')!.style.display = 'flex';
 	});
 
-	document.getElementById('lang')!.addEventListener('change', () => {
-		browser.storage.local.set({ lang: (document.getElementById('lang') as HTMLSelectElement).value }).then(() => {
-			// backHome();
-			// document.getElementById('refresh-pls-home')!.style.display = 'flex';
-			location.reload();
-		});
-	});
-
 	document.getElementById('btn-exportData')?.addEventListener('click', () => {
 		void exportStorage();
 	});
 
-	document.getElementById('btn-importData')?.addEventListener('click', () => {
-		const input = document.getElementById('input-importDataFile') as HTMLInputElement | null;
-		if (!input) return;
-		showPopupNotice(t('popup_data_import_pick_file'));
-		if (typeof input.showPicker === 'function') {
-			try {
-				input.showPicker();
-				return;
-			} catch {
-				input.click();
-				return;
-			}
-		}
-		input.click();
-	});
-
-	document.getElementById('input-importDataFile')?.addEventListener('change', (event) => {
-		void importStorage(event);
-	});
-
-	document.getElementById('btn-deleteAllData')?.addEventListener('click', () => {
-		void deleteAllData();
-	});
 }
 
 function itemUrl(id: string) {
@@ -531,14 +521,67 @@ async function exportStorage() {
 	URL.revokeObjectURL(url);
 }
 
+function showPopupNotice(message: string) {
+	const notice = document.getElementById('popup-data-notice');
+	if (!notice) return;
+
+	notice.textContent = message;
+	notice.style.display = 'block';
+	window.setTimeout(() => {
+		notice.style.display = 'none';
+	}, 2200);
+}
+
+function openImportFilePicker(input: HTMLInputElement) {
+	if (typeof input.showPicker === 'function') {
+		try {
+			input.showPicker();
+			return;
+		} catch {
+			input.click();
+			return;
+		}
+	}
+	input.click();
+}
+
+async function showDataActionConfirmation(question: string, onConfirm: () => void | Promise<void>) {
+	const optionsPage = document.getElementById('options');
+	const confirmation = document.getElementById('confirmation');
+	const questionEl = document.getElementById('confirmationQuestion');
+	const cancelBtn = document.getElementById('confirmationOK') as HTMLButtonElement | null;
+	const confirmBtn = document.getElementById('confirmationBAD') as HTMLButtonElement | null;
+
+	if (!optionsPage || !confirmation || !questionEl || !cancelBtn || !confirmBtn) {
+		await onConfirm();
+		return;
+	}
+
+	const close = () => {
+		optionsPage.style.display = 'flex';
+		confirmation.style.display = 'none';
+		cancelBtn.onclick = null;
+		confirmBtn.onclick = null;
+	};
+
+	optionsPage.style.display = 'none';
+	confirmation.style.display = 'flex';
+	questionEl.innerText = question;
+	cancelBtn.innerText = t('popup_common_cancel');
+	confirmBtn.innerText = t('popup_common_confirm');
+
+	cancelBtn.onclick = () => {
+		close();
+	};
+
+	confirmBtn.onclick = () => {
+		void Promise.resolve(onConfirm()).finally(close);
+	};
+}
+
 async function importStorage(event: Event) {
 	const input = event.target as HTMLInputElement;
 	if (!input.files?.length) return;
-
-	if (!await askPopupConfirm(t('popup_data_confirm_import_replace'))) {
-		input.value = "";
-		return;
-	}
 
 	const file = input.files[0];
 	const text = await file.text();
@@ -559,50 +602,8 @@ async function importStorage(event: Event) {
 }
 
 async function deleteAllData() {
-	if (!await askPopupConfirm(t('popup_data_confirm_delete_all'))) return;
-
-	await browser.storage.local.clear();
-	showPopupNotice(t('popup_data_delete_success'));
-	loadData();
-}
-
-function showPopupNotice(message: string) {
-	const notice = document.getElementById('popup-data-notice');
-	if (!notice) return;
-	notice.textContent = message;
-	notice.style.display = 'block';
-	setTimeout(() => {
-		notice.style.display = 'none';
-	}, 2500);
-} // TODO CHANGE
-
-function askPopupConfirm(message: string): Promise<boolean> {
-	const box = document.getElementById('popup-confirm');
-	const msg = document.getElementById('popup-confirm-message');
-	const cancelBtn = document.getElementById('popup-confirm-cancel');
-	const acceptBtn = document.getElementById('popup-confirm-accept');
-
-	if (!box || !msg || !cancelBtn || !acceptBtn) return Promise.resolve(false);
-
-	msg.textContent = message;
-	box.style.display = 'block';
-
-	return new Promise((resolve) => {
-		const cleanup = () => {
-			box.style.display = 'none';
-			cancelBtn.removeEventListener('click', onCancel);
-			acceptBtn.removeEventListener('click', onAccept);
-		};
-		const onCancel = () => {
-			cleanup();
-			resolve(false);
-		};
-		const onAccept = () => {
-			cleanup();
-			resolve(true);
-		};
-
-		cancelBtn.addEventListener('click', onCancel);
-		acceptBtn.addEventListener('click', onAccept);
+	await showDataActionConfirmation(t("popup_data_confirm_delete_all"), async () => {
+		await browser.storage.local.clear();
+		window.location.reload();
 	});
-} // TODO CHANGE
+}
