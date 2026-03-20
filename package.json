@@ -2,6 +2,7 @@
     "scripts": {
         "build:ts": "tsc -p tsconfig.json",
         "build:worker": "esbuild src/worker.ts --bundle --format=iife --outfile=src/worker.js",
+        "build:options": "esbuild src/options.ts --bundle --format=esm --outfile=src/options.js",
         "build:misc-fixes": "esbuild src/misc-fixes.ts --bundle --format=esm --outfile=src/misc-fixes.js",
         "build:ui-elements": "esbuild src/ui-elements.ts --bundle --format=esm --outfile=src/ui-elements.js",
         "build:ui-hiders": "esbuild src/ui-hiders.ts --bundle --format=esm --outfile=src/ui-hiders.js",
@@ -10,7 +11,7 @@
         "build:notes": "esbuild src/notes.ts --bundle --format=esm --outfile=src/notes.js",
         "build:popup-ui": "esbuild src/popup/popup-ui.ts --bundle --format=esm --outfile=src/popup/popup-ui.js",
         "build:popup": "esbuild src/popup/popup.ts --bundle --format=esm --outfile=src/popup/popup.js",
-        "build": "npm run build:ts && npm run build:ui-elements && npm run build:ui-hiders && npm run build:misc-fixes && npm run build:todo && npm run build:virtual && npm run build:notes && npm run build:worker && npm run build:popup && npm run build:popup-ui"
+        "build": "npm run build:ts && npm run build:options && npm run build:ui-elements && npm run build:ui-hiders && npm run build:misc-fixes && npm run build:todo && npm run build:virtual && npm run build:notes && npm run build:worker && npm run build:popup && npm run build:popup-ui"
     },
     "devDependencies": {
         "@types/cal-heatmap": "^4.0.0",

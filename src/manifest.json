@@ -13,8 +13,8 @@
     },
     "default_title": "Szkopuł Utils"
   },
-  "host_permissions": ["*://szkopul.edu.pl/*"],
-  "permissions": ["scripting", "storage"],
+  "host_permissions": ["*://szkopul.edu.pl/*", "https://czywyjebalohomika.xyz/*"],
+  "permissions": ["storage"],
   "content_scripts": [
     {
       "matches": ["*://szkopul.edu.pl/*"],

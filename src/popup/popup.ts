@@ -3,17 +3,23 @@ import { getTODO, removeTODOItem, reorderTODO, type TodoItem } from "../todo.js"
 
 import browser from "webextension-polyfill";
 import { getVirtualOptions, getVirtualTasks, removeVirtualTask, saveVirtualOptions } from '../virtual';
+import {getOptions} from "../options";
 
-export async function initLang() {
-	const result = await browser.storage.local.get("lang");
-	const storedLang: lang = result.lang === "en" ? "en" : "pl";
-	setLang(storedLang);
-}
+
+let optionsObject;
 
 export async function init() {
-	await initVirtual();
+	optionsObject = await getOptions();
+	setLang(optionsObject.lang);
+}
+
+export async function afterRender() {
 
 	// loadData();
+
+	await initVirtual();
+	void syncSzkopulStatus();
+
 }
 
 function loadData() {
@@ -203,6 +209,115 @@ function formatRemaining(ms: number) {
 	const minutes = Math.floor((totalSeconds % 3600) / 60);
 	const seconds = totalSeconds % 60;
 	return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+type SzkopulStatusResponse = {
+	isUp: boolean;
+	lastCrashTime: string;
+	lastRecoveryTime: string;
+	downtimeCount: number;
+};
+
+let szkopulStatusIntervalId = 0;
+
+function formatStatusDuration(ms: number) {
+	const totalMinutes = Math.max(0, Math.floor(ms / 60000));
+	const days = Math.floor(totalMinutes / (24 * 60));
+	const hours = Math.floor((totalMinutes % (24 * 60)) / 60);
+	const minutes = totalMinutes % 60;
+
+	if (days > 0) return `${days}d ${hours}h ${minutes}m`;
+	if (hours > 0) return `${hours}h ${minutes}m`;
+	return `${minutes}m`;
+}
+
+function setSzkopulStatusState(state: 'online' | 'offline' | 'unknown') {
+	const dot = document.getElementById('szkopulStatusDot');
+	const stateEl = document.getElementById('szkopulStatusState');
+	if (!dot || !stateEl) return;
+
+	if (state === 'online') {
+		dot.style.background = '#1fb86a';
+		stateEl.textContent = 'ONLINE';
+		return;
+	}
+
+	if (state === 'offline') {
+		dot.style.background = '#dc3545';
+		stateEl.textContent = 'OFFLINE';
+		return;
+	}
+
+	dot.style.background = '#f0ad4e';
+	stateEl.textContent = 'UNKNOWN';
+}
+
+function stopSzkopulStatusTicker() {
+	if (!szkopulStatusIntervalId) return;
+	window.clearInterval(szkopulStatusIntervalId);
+	szkopulStatusIntervalId = 0;
+}
+
+function startSzkopulStatusTicker(fromMs: number, isUp: boolean) {
+	const upForEl = document.getElementById('szkopulStatusUpFor');
+	if (!upForEl) return;
+
+	const update = () => {
+		const duration = Date.now() - fromMs;
+		upForEl.textContent = `${formatStatusDuration(duration)}${isUp ? '' : ' (down)'}`;
+	};
+
+	update();
+	stopSzkopulStatusTicker();
+	szkopulStatusIntervalId = window.setInterval(update, 30_000);
+}
+
+async function syncSzkopulStatus() {
+	const upForEl = document.getElementById('szkopulStatusUpFor');
+	const metaEl = document.getElementById('szkopulStatusRecordUptime');
+	if (!upForEl || !metaEl) return;
+
+	const setUnavailable = () => {
+		stopSzkopulStatusTicker();
+		setSzkopulStatusState('unknown');
+		upForEl.textContent = '--';
+		metaEl.textContent = 'API unavailable';
+	};
+
+	setSzkopulStatusState('unknown');
+	upForEl.textContent = '...';
+	metaEl.textContent = 'Loading...';
+
+	try {
+		const response = await fetch('https://czywyjebalohomika.xyz/api/status', { cache: 'no-store' });
+		if (!response.ok) {
+			setUnavailable();
+			return;
+		}
+
+		const data = await response.json() as SzkopulStatusResponse;
+		if (
+			typeof data.isUp !== 'boolean'
+			|| typeof data.lastCrashTime !== 'string'
+			|| typeof data.lastRecoveryTime !== 'string'
+			|| typeof data.downtimeCount !== 'number'
+		) {
+			setUnavailable();
+			return;
+		}
+
+		const fromTime = Date.parse(data.isUp ? data.lastRecoveryTime : data.lastCrashTime);
+		if (!Number.isFinite(fromTime)) {
+			setUnavailable();
+			return;
+		}
+
+		setSzkopulStatusState(data.isUp ? 'online' : 'offline');
+		metaEl.textContent = `${Math.max(0, data.downtimeCount)} crash${data.downtimeCount === 1 ? '' : 'es'}`;
+		startSzkopulStatusTicker(fromTime, data.isUp);
+	} catch {
+		setUnavailable();
+	}
 }
 
 async function syncVirtualRunningPage() {

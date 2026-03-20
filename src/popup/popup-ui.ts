@@ -1,13 +1,13 @@
 import { html, render } from 'lit';
-import { type lang, t } from '../globals.js';
-import { init, initLang } from './popup';
+import { t } from '../globals.js';
+import {afterRender, init} from './popup';
 
 const browserFunctions = true; // Set this to false to test UI locally
 
 setTimeout(async () => {
-	if (browserFunctions) await initLang();
-	renderPopup();
 	if (browserFunctions) await init();
+	renderPopup();
+	if (browserFunctions) await afterRender();
 }, 10);
 
 export function backHome() {
@@ -91,13 +91,17 @@ render(
         <!--            </label>-->
         <!--        </div>-->
 
-        <div style="position: absolute; bottom: 20px; text-align: center;"> // TODO zrobic zeby faktycznie dzialalo lol
-            <h6 style="margin: 3px;">${t("popup_home_szkopulStatusUpFor")}</h6>
-            <h5 style="margin: 3px;" id="szkopulStatusUpFor">29d 8h 213min</h5>
-            <h6 style="margin: 3px 3px 0;">${t("popup_home_szkopulStatusRecordUptime")} <span id="szkopulStatusRecordUptime">100.0000%</span></h6>
-            <a style="margin: 3px; font-size: small; color: #0069d9 !important" href="https://czywyjebalohomika.xyz/"
-               target="_blank">${t("popup_home_szkopulStatusMore")}</a>
-        </div>
+		<div style="position: absolute; left: 10px; right: 10px; bottom: 10px; text-align: center; background: #181a1b; border: 1px solid #383d3f; border-radius: 8px; padding: 6px 8px;">
+			<div style="display: flex; justify-content: center; align-items: center; gap: 6px; margin-bottom: 2px;">
+				<span id="szkopulStatusDot" style="display: inline-block; width: 8px; height: 8px; border-radius: 999px; background: #f0ad4e;"></span>
+				<span id="szkopulStatusState" style="font-size: 11px; opacity: .9;">UNKNOWN</span>
+			</div>
+			<h6 style="margin: 2px;">${t("popup_home_szkopulStatusUpFor")}</h6>
+			<h5 style="margin: 2px;" id="szkopulStatusUpFor">...</h5>
+			<h6 style="margin: 2px 2px 0;">${t("popup_home_szkopulStatusRecordUptime")} <span id="szkopulStatusRecordUptime">...</span></h6>
+			<a style="margin: 2px; font-size: small; color: #0069d9 !important" href="https://czywyjebalohomika.xyz/"
+			   target="_blank" rel="noopener noreferrer">${t("popup_home_szkopulStatusMore")}</a>
+		</div>
 	`, document.getElementById('home')!
 );
 
@@ -240,14 +244,14 @@ render(
 			${t('popup_options_c_func')}
 		</span>
 
-		<div class="form-check form-switch switch-full d-flex align-items-center justify-content-between">
+		<div class="form-check form-switch switch-full d-flex align-items-center justify-content-between" style="min-height: auto;">
 			<label for="hideScoresOption" class="mb-0 form-check-label">${t('popup_options_hideScores')}</label>
 			<div class="form-check form-switch m-0">
 				<input class="form-check-input" type="checkbox" id="hideScoresOption">
 			</div>
 		</div>
 
-		<div class="form-check form-switch switch-full d-flex align-items-center justify-content-between">
+		<div class="form-check form-switch switch-full d-flex align-items-center justify-content-between" style="min-height: auto;">
 			<label for="hideTimerOption" class="mb-0 form-check-label">${t('popup_options_hideTimers')}</label>
 			<div class="form-check form-switch m-0">
 				<input class="form-check-input" type="checkbox" id="hideTimerOption">
@@ -259,7 +263,7 @@ render(
 		</span>
 
 
-		<div style="display: flex; justify-content: space-between; width: 82%; margin-top: 7px;">
+		<div style="display: flex; justify-content: space-between; width: 82%; margin-top: 7px; min-height: auto;">
 			<label for="preferredLang">
 				Preferred language
 			</label>
@@ -272,14 +276,18 @@ render(
 			</select>
 		</div>
 
-		<div class="form-check form-switch switch-full d-flex align-items-center justify-content-between">
-			<label for="hideTimerOption" class="mb-0 form-check-label">Automatically submit solution when pasted or uploaded code is in the preferred language</label>
+		<div class="form-check form-switch switch-full d-flex align-items-center justify-content-between" style="min-height: auto;">
+			<label for="hideTimerOption" class="mb-0 form-check-label">Automatically submit solutions when pasted or uploaded code is in the preferred language</label>
 			<div class="form-check form-switch m-0">
 				<input class="form-check-input" type="checkbox" id="hideTimerOption">
 			</div>
 		</div>
-		
-		<div style="display: flex; justify-content: space-between; width: 82%; margin-top: 7px;">
+
+		<span class="categ">
+			${t('popup_options_c_meta')}
+		</span>
+
+		<div style="display: flex; justify-content: space-between; width: 82%; margin-top: 7px; min-height: auto;">
 			<label for="lang">
 				${t("popup_options_language")}
 			</label>
@@ -289,10 +297,6 @@ render(
 				<option value="en">en</option>
 			</select>
 		</div>
-
-		<span class="categ">
-			${t('popup_options_c_data')}
-		</span>
 
 		<div style="width: 80%; display: flex; justify-content: space-between;">
 			<button id="btn-exportData" type="button" class="btn btn-warning b" style="width: 49%">

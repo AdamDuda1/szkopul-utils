@@ -5,15 +5,17 @@ Szkopuł Utils is a browser extension that provides various QOL improvements and
 ## Installation
 
 **Install from the extension store:**
-- [Chrome Web Store](https://chrome.google.com/webstore/detail/szkopu%C5%82-utils/ljhkjjkmhgbhfjhccgkggmibfbdjpf)
+- [Chrome Web Store](https://chromewebstore.google.com/detail/szkopu%C5%82-utils/obbgoakgbnjcfojfajlmndhlpnlafbfl)
 - [Firefox Add-ons](https://addons.mozilla.org/pl/firefox/addon/szkopul-utils/)
 
-**Install locally:**
+**Load locally:**
 - Compress the files in the `src` folder into a zip file (manifest.json must be directly in the zip's root). **Make sure to run `npm install` and `npm run build` to compile all the TS scripts before** (you might also need to install `esbuild` and `typescript` if you don't have that already)**!**
 - Load to Chrome with developer mode enabled or to Firefox Developer Edition (you may need to disable signed extensions in about:config (or no if mozilla is nice and approves the extension idk)).
 
 ## Full list of features:
 
+- Virtual contests! (create and participate in a local virtual contest with set tasks, score hiding and calculating options and time)
+- Task TODO list
 - Score hiding (shows only initial testing reports);
 - Notes for tasks (saved in browser's storage);
 - Actually searches when you press enter in the search bar;

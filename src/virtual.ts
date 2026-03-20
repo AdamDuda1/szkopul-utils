@@ -3,7 +3,7 @@ import browser from "webextension-polyfill";
 const KEY_VIRTUAL_TASKS = "virtualTasks";
 const KEY_VIRTUAL_OPTIONS = "virtualOptions";
 export type task = { id: string; name: string };
-export type virtualOptions = {
+export type virtualOptionsTemplate = {
 	hideScores: boolean,
 	blockOtherSubpages: boolean,
 	scoreBy: 'best' | 'last',
@@ -15,7 +15,7 @@ export type virtualOptions = {
 	showMenu: boolean,
 }
 
-const DEFAULT_VIRTUAL_OPTIONS: virtualOptions = {
+const DEFAULT_VIRTUAL_OPTIONS: virtualOptionsTemplate = {
 	hideScores: false,
 	blockOtherSubpages: false,
 	scoreBy: 'best',
@@ -44,14 +44,14 @@ export async function removeVirtualTask(id: string): Promise<void> {
 	await browser.storage.local.set({ [KEY_VIRTUAL_TASKS]: tasks.filter((t) => t.id !== id) });
 }
 
-export async function getVirtualOptions(): Promise<virtualOptions> {
+export async function getVirtualOptions(): Promise<virtualOptionsTemplate> {
 	const { [KEY_VIRTUAL_OPTIONS]: options } = await browser.storage.local.get(KEY_VIRTUAL_OPTIONS);
 	if (!options || Array.isArray(options) || typeof options !== "object") return { ...DEFAULT_VIRTUAL_OPTIONS };
-	const merged = { ...DEFAULT_VIRTUAL_OPTIONS, ...(options as Partial<virtualOptions>) };
+	const merged = { ...DEFAULT_VIRTUAL_OPTIONS, ...(options as Partial<virtualOptionsTemplate>) };
 	if (merged.scoreBy !== 'best' && merged.scoreBy !== 'last') merged.scoreBy = 'best';
 	return merged;
 }
 
-export async function saveVirtualOptions(newOptions: virtualOptions): Promise<void> {
+export async function saveVirtualOptions(newOptions: virtualOptionsTemplate): Promise<void> {
 	await browser.storage.local.set({ [KEY_VIRTUAL_OPTIONS]: newOptions });
 }
