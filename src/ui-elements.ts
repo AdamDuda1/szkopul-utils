@@ -158,6 +158,126 @@ function formatRemaining(ms: number) {
 
 let virtualPanelIntervalId = 0;
 
+function toDateKey(date: Date) {
+	return date.toISOString().slice(0, 10);
+}
+
+function parseDate(raw: string) {
+	const trimmed = raw.trim();
+	if (!trimmed) return null;
+
+	const parsed = new Date(trimmed);
+	if (!Number.isNaN(parsed.getTime())) return parsed;
+
+	const dotMatch = trimmed.match(/^(\d{2})\.(\d{2})\.(\d{4})/);
+	if (!dotMatch) return null;
+
+	const [, dd, mm, yyyy] = dotMatch;
+	const dotParsed = new Date(`${yyyy}-${mm}-${dd}T00:00:00`);
+	return Number.isNaN(dotParsed.getTime()) ? null : dotParsed;
+}
+
+function getSolvedDashboardEntries() {
+	const rows = Array.from(document.querySelectorAll<HTMLTableRowElement>('.szkopul-dashboard__container tr'));
+	const entries: { date: Date; problemId: string }[] = [];
+
+	for (const row of rows) {
+		const text = row.textContent?.toLowerCase() ?? '';
+		if (!/(\b100\b|accepted|\bok\b|zaakcept|poprawne|\bac\b)/.test(text)) continue;
+
+		const href = row.querySelector<HTMLAnchorElement>('a[href*="/problemset/problem/"]')?.href ?? '';
+		const problemId = href.match(/\/problemset\/problem\/([^/]+)/)?.[1] ?? '';
+
+		const dateRaw = row.querySelector('time')?.getAttribute('datetime')
+			?? row.querySelector('time')?.textContent
+			?? Array.from(row.querySelectorAll('td')).map((td) => td.textContent?.trim() ?? '').find((value) => value.length > 4)
+			?? '';
+
+		const parsedDate = parseDate(dateRaw);
+		if (!parsedDate) continue;
+
+		parsedDate.setHours(0, 0, 0, 0);
+		entries.push({ date: parsedDate, problemId });
+	}
+
+	return entries;
+}
+
+function getHeatColor(value: number) {
+	if (value <= 0) return '#2d333b';
+	if (value === 1) return '#0e4429';
+	if (value <= 3) return '#006d32';
+	if (value <= 6) return '#26a641';
+	return '#39d353';
+}
+
+export function appendHomeDashboardSummary() {
+	if (window.location.hostname !== 'szkopul.edu.pl') return;
+	if (window.location.pathname !== '/') return;
+
+	const anchor = document.querySelector<HTMLElement>('.szkopul-dashboard__container div');
+	if (!anchor || document.getElementById('szkopul-utils-dashboard-summary')) return;
+
+	const entries = getSolvedDashboardEntries();
+	const solvedByDay = new Map<string, number>();
+	const uniqueSolvedTasks = new Set<string>();
+
+	for (const entry of entries) {
+		const key = toDateKey(entry.date);
+		solvedByDay.set(key, (solvedByDay.get(key) ?? 0) + 1);
+		if (entry.problemId) uniqueSolvedTasks.add(entry.problemId);
+	}
+
+	const today = new Date();
+	today.setHours(0, 0, 0, 0);
+	const monthAgo = new Date(today);
+	monthAgo.setDate(monthAgo.getDate() - 29);
+
+	let solvedLastMonth = 0;
+	for (const entry of entries) {
+		if (entry.date >= monthAgo) solvedLastMonth += 1;
+	}
+
+	const solvedToday = solvedByDay.get(toDateKey(today)) ?? 0;
+	const bestDay = Math.max(0, ...Array.from(solvedByDay.values()));
+
+	const container = document.createElement('section');
+	container.id = 'szkopul-utils-dashboard-summary';
+	container.style.cssText = 'margin-top:12px;padding:12px;border:1px solid #d5d7da;border-radius:8px;background:#fff';
+
+	const stats = document.createElement('div');
+	stats.style.cssText = 'display:grid;grid-template-columns:repeat(2,minmax(120px,1fr));gap:8px;margin-bottom:10px';
+	stats.innerHTML = `
+		<div><b>${solvedLastMonth}</b> ${t('dashboard_stats_lastMonth')}</div>
+		<div><b>${solvedToday}</b> ${t('dashboard_stats_today')}</div>
+		<div><b>${uniqueSolvedTasks.size}</b> ${t('dashboard_stats_total')}</div>
+		<div><b>${bestDay}</b> ${t('dashboard_stats_bestDay')}</div>
+		<button class="btn btn-secondary">Random task</button>
+	`;
+
+	const heatmap = document.createElement('div');
+	heatmap.style.cssText = 'display:grid;grid-template-rows:repeat(7,10px);grid-auto-flow:column;grid-auto-columns:10px;gap:3px';
+
+	const totalCells = 7 * 26;
+	const start = new Date(today);
+	start.setDate(start.getDate() - (totalCells - 1));
+
+	for (let i = 0; i < totalCells; i++) {
+		const date = new Date(start);
+		date.setDate(start.getDate() + i);
+		const key = toDateKey(date);
+		const value = solvedByDay.get(key) ?? 0;
+
+		const cell = document.createElement('div');
+		cell.style.cssText = `width:10px;height:10px;border-radius:2px;background:${getHeatColor(value)}`;
+		cell.title = `${key}: ${value}`;
+		heatmap.appendChild(cell);
+	}
+
+	container.append(stats, heatmap);
+	anchor.insertAdjacentElement('afterend', container);
+}
+
 export async function appendVirtualContestPanel() {
 	const options = await getVirtualOptions();
 	if (!options.isRunning || !options.startTime || options.duration <= 0) return;
@@ -173,21 +293,7 @@ export async function appendVirtualContestPanel() {
 	if (!panel) {
 		panel = document.createElement('div');
 		panel.id = panelId;
-		panel.style = `
-			position: fixed;
-			top: 150px;
-			left: -3px;
-			border: 1px solid white;
-			z-index: 2147483647;
-			width: 250px;
-			max-height: 70vh;
-			overflow-y: auto;
-			background: rgb(255, 255, 255);
-			color: rgb(33, 37, 41);
-			border-radius: 0 8px 8px 0;
-			padding: 10px;
-			box-shadow: rgba(0, 0, 0, 0.16) 0px 4px 14px;
-    	`;
+		panel.style = `position:fixed;top:150px;left:-3px;border:1px solid white;z-index:2147483647;width:250px;max-height:70vh;overflow-y:auto;background:rgb(255,255,255);color:rgb(33,37,41);border-radius:0 8px 8px 0;padding:10px;box-shadow:rgba(0,0,0,0.16) 0px 4px 14px;`;
 		panel.innerHTML = `
 			<div style="font-weight: 600; margin-bottom: 8px;">Virtual contest</div>
 			<div id="szkopul-utils-virtual-panel-timer" style="font-size: 22px; margin-bottom: 8px;">00:00:00</div>

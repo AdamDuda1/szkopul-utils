@@ -1,10 +1,10 @@
 import {
-	fixContactButton, addUtilsFeedbackButton, makeEnterSearchThings, appendHomePageStats, languageSelectorFix,
+	fixContactButton, addUtilsFeedbackButton, makeEnterSearchThings, languageSelectorFix,
 	inlineStatements, statementsOnSamePage
 } from './misc-fixes';
 import browser from "webextension-polyfill";
 import { initNotes } from './notes';
-import { appendProblemSetMenu, appendVirtualContestPanel } from './ui-elements';
+import { appendHomeDashboardSummary, appendProblemSetMenu, appendVirtualContestPanel } from './ui-elements';
 import {hidePageContents, hideRulesTab, hideScores} from './ui-hiders';
 import { addToTODOAction } from './todo';
 import { setLang } from './globals';
@@ -31,7 +31,7 @@ const onLoad = () => {
 	void appendProblemSetMenu(addToTODOAction);
 	void appendVirtualContestPanel();
 	void makeEnterSearchThings();
-	void appendHomePageStats();
+	void appendHomeDashboardSummary();
 	void initNotes();
 
 	if (optionsObject.statementsOnSamePage) void statementsOnSamePage();

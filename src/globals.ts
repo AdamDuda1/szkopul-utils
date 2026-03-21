@@ -16,6 +16,10 @@ export const translations = {
 		popup_home_szkopulStatusMore: "z czywyjebalohomika.xyz, @lcd.101",
 
 		popup_home_hideScores: "Ukryj wyniki",
+		dashboard_stats_lastMonth: "rozwiązanych w ostatnim miesiącu",
+		dashboard_stats_today: "rozwiązanych dzisiaj",
+		dashboard_stats_total: "rozwiązanych łącznie",
+		dashboard_stats_bestDay: "najlepszy dzień",
 
 		popup_virtual_title: "Konkurs wirtualny",
 		popup_virtual_category_tasks: "Zadania",
@@ -84,6 +88,10 @@ export const translations = {
 		popup_home_szkopulStatusMore: "from czywyjebalohomika.xyz, @lcd.101",
 
 		popup_home_hideScores: "Hide scores",
+		dashboard_stats_lastMonth: "solved in the last month",
+		dashboard_stats_today: "solved today",
+		dashboard_stats_total: "solved total",
+		dashboard_stats_bestDay: "best day",
 
 		popup_virtual_title: "Virtual contest",
 		popup_virtual_category_tasks: "Tasks",

@@ -133,7 +133,7 @@ render(
 				</table>
 			</div>
 			
-			<span class="categ" id="noVirtualTasks">${t("popup_virtual_noVirtualTasks")}</span>
+			<span class="info" id="noVirtualTasks">${t("popup_virtual_noVirtualTasks")}</span>
 		</details>
 
 
