@@ -109,3 +109,28 @@ td > a {
 .form-check-label {
     max-width: 70%;
 }
+
+.todo-actions-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.todo-move-buttons {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.todo-move-buttons .btn.btn-outline-secondary.btn-xs {
+  height: 16px;
+  padding: 0;
+  color: #d1cdc7;
+  border-color: #6c757d;
+}
+
+.todo-move-buttons .btn.btn-outline-secondary.btn-xs:hover {
+  color: #ffffff;
+  border-color: #adb5bd;
+  background: rgba(255, 255, 255, 0.08);
+}

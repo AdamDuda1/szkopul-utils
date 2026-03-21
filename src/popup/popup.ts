@@ -16,6 +16,7 @@ export async function init() {
 export async function afterRender() {
 	void loadOptions();
 	void syncSzkopulStatus();
+	initTODOView();
 	await initVirtual();
 }
 
@@ -124,27 +125,28 @@ async function renderTODOTable() {
 		const url = itemUrl(item.id);
 		return `
 			<tr data-todo-id="${encodeURIComponent(item.id)}">
-				<td><a href="${url}" target="_blank" rel="noopener noreferrer">${escapeHTML(title)}</a></td>
-				<td style="display: flex; border-top: 0 !important; border-bottom: 1px solid rgb(222, 226, 230);">
-					<button type="button" class="btn btn-danger btn-xs" data-todo-remove="${encodeURIComponent(item.id)}">
-						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3"
-							 viewBox="0 0 16 16" style="position: relative; top: -2px;">
-							<path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
-						</svg>
-					</button>
-					<div style="display: flex; flex-direction: column; position: relative; top: -3px; left: 10px;">
-						<button type="button" class="btn btn-default btn-xs" data-todo-move="up" 
-							style="height: 16px; padding: 0;" data-todo-id="${encodeURIComponent(item.id)}" title="Move up">
-							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-up" viewBox="0 0 16 16">
-								<path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
+				<td style="padding: 8px;">
+					<a href="${url}" target="_blank" rel="noopener noreferrer">${escapeHTML(title)}</a>
+				</td>
+				<td class="text-center" style="padding: 8px;">
+					<div class="todo-actions-cell">
+						<button type="button" class="btn btn-outline-success btn-xs" data-todo-complete="${encodeURIComponent(item.id)}" title="Done">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2" viewBox="0 0 16 16">
+								<path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0"/>
 							</svg>
 						</button>
-						<button type="button" class="btn btn-default btn-xs" data-todo-move="down"
-							style="height: 16px; padding: 0;" data-todo-id="${encodeURIComponent(item.id)}" title="Move down">
-							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
-								<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
-							</svg>
-						</button>
+						<div class="todo-move-buttons">
+							<button type="button" class="btn btn-outline-secondary btn-xs" data-todo-move="up" data-todo-id="${encodeURIComponent(item.id)}" title="Move up" style="border: 0;">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-up" viewBox="0 0 16 16">
+									<path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
+								</svg>
+							</button>
+							<button type="button" class="btn btn-outline-secondary btn-xs" data-todo-move="down" data-todo-id="${encodeURIComponent(item.id)}" title="Move down" style="border: 0;">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
+									<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
+								</svg>
+							</button>
+						</div>
 					</div>
 				</td>
 			</tr>
@@ -152,15 +154,17 @@ async function renderTODOTable() {
 	}).join('');
 
 	container.innerHTML = `
-		<table class="table table-striped table-condensed" style="font-size: 12px; margin-top: 6px; margin-bottom: 0; width: 100%;">
-			<thead>
-				<tr>
-					<th>${t('popup_todo_col_task')}</th>
-					<th>${t('popup_todo_col_actions')}</th>
+		<div class="table-responsive-md" style="background: #181a1b; color: #d1cdc7; margin-top: 6px;">
+			<table class="table button-flat" style="font-size: 12px; margin-bottom: 0; width: 100%;">
+				<thead>
+				<tr style="border-bottom: 2px solid #383d3f;">
+					<th class="col-md-auto">${t('popup_todo_col_task')}</th>
+					<th class="col-sm-4">${t('popup_todo_col_actions')}</th>
 				</tr>
-			</thead>
-			<tbody>${rows}</tbody>
-		</table>
+				</thead>
+				<tbody>${rows}</tbody>
+			</table>
+		</div>
 	`;
 }
 
@@ -190,13 +194,33 @@ async function onTodoTableClick(event: Event) {
 		return;
 	}
 
-	const button = target.closest('[data-todo-remove]') as HTMLElement | null;
+	const button = target.closest('[data-todo-complete]') as HTMLElement | null;
 	if (!button) return;
 
-	const encodedId = button.getAttribute('data-todo-remove');
+	const encodedId = button.getAttribute('data-todo-complete');
 	if (!encodedId) return;
 
 	await removeTODOItem(decodeURIComponent(encodedId));
+	void renderTODOTable();
+}
+
+let todoViewInitialized = false;
+
+function initTODOView() {
+	if (todoViewInitialized) return;
+
+	const table = document.getElementById('todo-table');
+	if (table) {
+		table.addEventListener('click', (event) => {
+			void onTodoTableClick(event);
+		});
+	}
+
+	document.getElementById('btn-showTODO')?.addEventListener('click', () => {
+		void renderTODOTable();
+	});
+
+	todoViewInitialized = true;
 	void renderTODOTable();
 }
 

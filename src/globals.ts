@@ -66,7 +66,8 @@ export const translations = {
 		popup_todo_col_task: "Zadanie",
 		popup_todo_col_actions: "Akcje",
 
-		menu_markAsTODO: "Oznacz jako 'Do zrobienia'",
+		menu_addToTODO: "Dodaj do listy 'Do zrobienia'",
+		menu_removeFromTODO: "Usuń z listy 'Do zrobienia'",
 		menu_addToVirtual: "Dodaj do konkursu wirtualnego",
 		menu_removeFromVirtual: "Usuń z konkursu wirtualnego",
 		menu_viewNote: "Zobacz notatkę",
@@ -138,7 +139,8 @@ export const translations = {
 		popup_todo_col_task: "Task",
 		popup_todo_col_actions: "Actions",
 
-		menu_markAsTODO: "Mark as to-do",
+		menu_addToTODO: "Add to to-do",
+		menu_removeFromTODO: "Remove from to-do",
 		menu_addToVirtual: "Add to virtual contest",
 		menu_removeFromVirtual: "Remove from virtual contest",
 		menu_viewNote: "View note",

@@ -1,8 +1,10 @@
 import { problemSetMenuSeeNote } from './notes';
 import { t } from './globals';
+import { getTODO } from './todo';
 import { addVirtualTask, getVirtualOptions, getVirtualTasks, removeVirtualTask, saveVirtualOptions } from './virtual';
 
 let virtualTasks: {id: string, name: string}[] = [];
+let todoTaskIds = new Set<string>();
 
 function buildMenu(id: string, name: string, problemSet: boolean = true) {
 	return `
@@ -19,7 +21,7 @@ function buildMenu(id: string, name: string, problemSet: boolean = true) {
 					  <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"/>
 					  <path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0M7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0"/>
 					</svg>
-					<span>${t('menu_markAsTODO')}</span>
+					<span>${todoTaskIds.has(id) ? t('menu_removeFromTODO') : t('menu_addToTODO')}</span>
 				</a>
 				
 				<a class="dropdown-item action-virtual" href="#">
@@ -49,8 +51,9 @@ function buildMenu(id: string, name: string, problemSet: boolean = true) {
 	`;
 }
 
-export async function appendProblemSetMenu(addToTODOAction: (id: string, name: string, btn: HTMLAnchorElement) => void) {
+export async function appendProblemSetMenu(addToTODOAction: (id: string, name: string, btn: HTMLAnchorElement) => void | Promise<void>) {
 	virtualTasks = await getVirtualTasks();
+	todoTaskIds = new Set((await getTODO()).map((item) => item.id));
 
 	// render(menuHTML(), ( as HTMLDivElement)!);
 	// document.querySelector('.problem-title.text-center.content-row > h1')?.insertAdjacentHTML('afterend', menuHTML());
@@ -87,18 +90,23 @@ export async function appendProblemSetMenu(addToTODOAction: (id: string, name: s
 			};
 
 			const attachHandlers = () => {
+				let todoActionInProgress = false;
 				let virtualActionInProgress = false;
 
-				cell.querySelector<HTMLAnchorElement>('.action-todo')?.addEventListener('click', (event) => {
+				cell.querySelector<HTMLAnchorElement>('.action-todo')?.addEventListener('click', async (event) => {
 					event.preventDefault();
 					event.stopPropagation();
+					if (todoActionInProgress) return;
 
-					addToTODOAction(id, name!, event.currentTarget as HTMLAnchorElement);
+					todoActionInProgress = true;
 
-					setTimeout(() => {
-						tr.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, composed: true }));
-						cell.innerHTML = buildMenu(id, name!, true);
-					}, 1000);
+					try {
+						await addToTODOAction(id, name!, event.currentTarget as HTMLAnchorElement);
+						todoTaskIds = new Set((await getTODO()).map((item) => item.id));
+						renderCell();
+					} finally {
+						todoActionInProgress = false;
+					}
 				});
 
 				cell.querySelector<HTMLAnchorElement>('.action-virtual')?.addEventListener('click', async (event) => {
@@ -253,6 +261,7 @@ export function appendHomeDashboardSummary() {
 		<div><b>${uniqueSolvedTasks.size}</b> ${t('dashboard_stats_total')}</div>
 		<div><b>${bestDay}</b> ${t('dashboard_stats_bestDay')}</div>
 		<button class="btn btn-secondary">Random task</button>
+		<button class="btn btn-secondary">Random task from TODO</button>
 	`;
 
 	const heatmap = document.createElement('div');
