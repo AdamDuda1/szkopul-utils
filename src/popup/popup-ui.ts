@@ -298,6 +298,24 @@ render(
 			</div>
 		</div>
 
+		<div class="form-check form-switch switch-full d-flex align-items-center justify-content-between" style="min-height: auto;">
+			<label for="inlineProblemStatementsOption" class="mb-0 form-check-label">
+				${t("popup_options_inlineProblemStatements")}
+			</label>
+			<div class="form-check form-switch m-0">
+				<input class="form-check-input" type="checkbox" id="inlineProblemStatementsOption">
+			</div>
+		</div>
+
+		<div class="form-check form-switch switch-full d-flex align-items-center justify-content-between" style="min-height: auto;">
+			<label for="statementsOnSamePageOption" class="mb-0 form-check-label">
+				${t("popup_options_statementsOnSamePageOption")}
+			</label>
+			<div class="form-check form-switch m-0">
+				<input class="form-check-input" type="checkbox" id="statementsOnSamePageOption">
+			</div>
+		</div>
+
 		<span class="categ">
 			${t('popup_options_c_meta')}
 		</span>

@@ -1,4 +1,7 @@
-import { fixContactButton, addUtilsFeedbackButton, makeEnterSearchThings, appendHomePageStats, languageSelectorFix } from './misc-fixes';
+import {
+	fixContactButton, addUtilsFeedbackButton, makeEnterSearchThings, appendHomePageStats, languageSelectorFix,
+	inlineStatements, statementsOnSamePage
+} from './misc-fixes';
 import browser from "webextension-polyfill";
 import { initNotes } from './notes';
 import { appendProblemSetMenu, appendVirtualContestPanel } from './ui-elements';
@@ -30,6 +33,9 @@ const onLoad = () => {
 	void makeEnterSearchThings();
 	void appendHomePageStats();
 	void initNotes();
+
+	if (optionsObject.statementsOnSamePage) void statementsOnSamePage();
+	if (optionsObject.inlineProblemStatements) void inlineStatements();
 };
 
 getOptions().then((ans) => { optionsObject = ans; onStart(); });

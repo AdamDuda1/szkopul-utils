@@ -8,6 +8,8 @@ export type optionsTemplate = {
     hideScores: boolean,
     hideRulesTab: boolean,
     preferredLanguage: programmingLanguage,
+    inlineProblemStatements: boolean,
+    statementsOnSamePage: boolean,
 }
 
 const DEFAULT_OPTIONS: optionsTemplate = {
@@ -15,6 +17,8 @@ const DEFAULT_OPTIONS: optionsTemplate = {
     hideScores: false,
     hideRulesTab: false,
     preferredLanguage: "",
+    inlineProblemStatements: false,
+    statementsOnSamePage: false,
 };
 
 export async function getOptions(): Promise<optionsTemplate> {

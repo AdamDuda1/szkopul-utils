@@ -27,10 +27,10 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 
 ## TODO:
 
-- make IMPORTING data work [works on windows chrome and ff but not on linux chromium]
+- (??) hide the midified tables (like problems in contest) untill thir html is not modified (display: none on init and then flex when loaded)
+- dopracować inline statements i to drugie 
 - make the user be able to choose what is displayed on the home page of the popup (szkopul stats/quick score hiding setting)
 - **build the menu html on click so it loads faster and is up to date**
-- make a better popup for deleting and importing data!
 - inline task statements in contest views
 - Add the same menu in the problem set to the top of the problem page
 - Remove the popups and the 'i' when the task is solved (for hideScores) -> 

@@ -40,6 +40,20 @@ function loadOptions() {
 			saveOptions(optionsObject!).then(() => document.getElementById('refresh-pls-options')!.style.display = 'flex');
 		});
 
+		// TODO here autmatically submit
+
+		(document.getElementById('inlineProblemStatementsOption') as HTMLInputElement).checked = optionsObject.inlineProblemStatements;
+		(document.getElementById('inlineProblemStatementsOption') as HTMLInputElement).addEventListener('change', () => {
+			optionsObject!.inlineProblemStatements = (document.getElementById('inlineProblemStatementsOption') as HTMLInputElement).checked as boolean;
+			saveOptions(optionsObject!).then(() => document.getElementById('refresh-pls-options')!.style.display = 'flex');
+		});
+
+		(document.getElementById('statementsOnSamePageOption') as HTMLInputElement).checked = optionsObject.statementsOnSamePage;
+		(document.getElementById('statementsOnSamePageOption') as HTMLInputElement).addEventListener('change', () => {
+			optionsObject!.statementsOnSamePage = (document.getElementById('statementsOnSamePageOption') as HTMLInputElement).checked as boolean;
+			saveOptions(optionsObject!).then(() => document.getElementById('refresh-pls-options')!.style.display = 'flex');
+		});
+
 	}
 
 	// OPTIONS => META-SETTINGS AND DATA
