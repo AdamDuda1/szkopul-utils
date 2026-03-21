@@ -36,6 +36,10 @@ body button h3 {
     font-size: 1.7rem;
 }
 
+div div .btn.btn-default {
+    z-index: 99;
+}
+
 body button.b {
     width: 80%;
     margin-bottom: 7px;
@@ -67,6 +71,12 @@ body button img {
     display: flex;
     padding: 5px;
     text-align: center;
+}
+
+.info {
+    font-size: 12px;
+    color: gray;
+    display: flex;
 }
 
 td .btn.btn-outline-danger.btn-xs {

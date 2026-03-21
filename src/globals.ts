@@ -9,7 +9,7 @@ export const translations = {
 		popup_home_virtual: "Konkurs wirtualny",
 		popup_home_todo: "Zadania do zrobienia",
 		popup_home_options: "Opcje",
-		popup_home_refreshPls: "Odśwież stronę, aby zmiany zostały zastosowane",
+		popup_home_refreshPls: "Zapisano, odśwież stronę, aby zmiany zostały zastosowane",
 
 		popup_home_szkopulStatusUpFor: "Szkopuł działa już od",
 		popup_home_szkopulStatusRecordUptime: "Rekordowy uptime to",
@@ -74,7 +74,7 @@ export const translations = {
 		popup_home_virtual: "Virtual contest",
 		popup_home_todo: "To-do tasks",
 		popup_home_options: "Options",
-		popup_home_refreshPls: "Please refresh the page to apply changes",
+		popup_home_refreshPls: "Saved, please refresh the page to apply changes",
 
 		popup_home_szkopulStatusUpFor: "Szkopul has been up for",
 		popup_home_szkopulStatusRecordUptime: "Record uptime is",

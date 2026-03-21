@@ -2,18 +2,39 @@ import { fixContactButton, addUtilsFeedbackButton, makeEnterSearchThings, append
 import browser from "webextension-polyfill";
 import { initNotes } from './notes';
 import { appendProblemSetMenu, appendVirtualContestPanel } from './ui-elements';
-import {hidePageContents, hideScores} from './ui-hiders';
+import {hidePageContents, hideRulesTab, hideScores} from './ui-hiders';
 import { addToTODOAction } from './todo';
 import { setLang } from './globals';
 import { getVirtualOptions, getVirtualTasks, saveVirtualOptions } from './virtual';
+import {getOptions, optionsTemplate} from "./options";
 
 const manifestVersion = browser.runtime.getManifest().version;
 console.log(`Thank you for using Szkopuł Utils (v${manifestVersion}), Dzięki! :)`);
 
+let optionsObject: optionsTemplate;
+
 const onStart = () => {
+	setLang(optionsObject.lang);
 	void fixContactButton();
 	void applyVirtualContestPageOptions();
+	void hideRulesTab();
 };
+
+const onLoad = () => {
+	void addUtilsFeedbackButton();
+	void appendProblemSetMenu(addToTODOAction);
+	void appendVirtualContestPanel();
+	void makeEnterSearchThings();
+	void appendHomePageStats();
+	void initNotes();
+};
+
+getOptions().then((ans) => { optionsObject = ans; onStart(); });
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', onLoad, { once: true });
+else onLoad();
+
+
+
 
 async function applyVirtualContestPageOptions() {
 	const options = await getVirtualOptions();
@@ -47,28 +68,6 @@ async function applyVirtualContestPageOptions() {
 	}
 }
 
-const init = () => {
-	void addUtilsFeedbackButton();
-	void appendProblemSetMenu(addToTODOAction);
-	void appendVirtualContestPanel();
-	void makeEnterSearchThings();
-	void appendHomePageStats();
-	void initNotes();
-};
-
-browser.storage.local.get("hideScores").then((result) => { if (result.hideScores === true) hideScores(); });
-
-browser.storage.local.get("lang").then((result) => {
-	if (result.lang === "en") setLang("en");
-	else {
-		setLang("pl");
-		browser.storage.local.set({ lang: "pl" });
-	}
-	onStart();
-});
-
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
-else init();
 
 export async function storageLogTODO() {
 	const result = await browser.storage.local.get("TODO");

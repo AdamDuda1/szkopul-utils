@@ -3,10 +3,10 @@ import { getTODO, removeTODOItem, reorderTODO, type TodoItem } from "../todo.js"
 
 import browser from "webextension-polyfill";
 import { getVirtualOptions, getVirtualTasks, removeVirtualTask, saveVirtualOptions } from '../virtual';
-import {getOptions, saveOptions} from "../options";
+import {getOptions, optionsTemplate, saveOptions} from "../options";
 
 
-let optionsObject;
+let optionsObject: optionsTemplate;
 
 export async function init() {
 	optionsObject = await getOptions();
@@ -20,27 +20,30 @@ export async function afterRender() {
 }
 
 function loadOptions() {
-	(document.getElementById('lang') as HTMLSelectElement).value = optionsObject!.lang;
+	// OPTIONS => META-SETTINGS AND DATA
+	{
+		(document.getElementById('lang') as HTMLSelectElement).value = optionsObject!.lang;
 
-	document.getElementById('lang')!.addEventListener('change', () => {
-		optionsObject!.lang = (document.getElementById('lang') as HTMLSelectElement).value as lang;
-		saveOptions(optionsObject!).then(() => window.location.reload());
-	});
-
-	document.getElementById('btn-importData')?.addEventListener('click', () => {
-		const input = document.getElementById('input-importDataFile') as HTMLInputElement | null;
-		if (!input) return;
-		void showDataActionConfirmation(t('popup_data_confirm_import_replace'), () => {
-			openImportFilePicker(input);
+		document.getElementById('lang')!.addEventListener('change', () => {
+			optionsObject!.lang = (document.getElementById('lang') as HTMLSelectElement).value as lang;
+			saveOptions(optionsObject!).then(() => window.location.reload());
 		});
-	});
 
-	document.getElementById('btn-exportData')?.addEventListener('click', () => {
-		void showDataActionConfirmation(`${t('popup_options_export')}?`, () => exportStorage());
-	});
+		document.getElementById('btn-importData')?.addEventListener('click', () => {
+			const input = document.getElementById('input-importDataFile') as HTMLInputElement | null;
+			if (!input) return;
+			void showDataActionConfirmation(t('popup_data_confirm_import_replace'), () => {
+				openImportFilePicker(input);
+			});
+		});
 
-	document.getElementById('input-importDataFile')?.addEventListener('change', (event) => importStorage(event));
-	document.getElementById('btn-deleteAllData')?.addEventListener('click', () => deleteAllData());
+		document.getElementById('btn-exportData')?.addEventListener('click', () => {
+			void showDataActionConfirmation(`${t('popup_options_export')}?`, () => exportStorage());
+		});
+
+		document.getElementById('input-importDataFile')?.addEventListener('change', (event) => importStorage(event));
+		document.getElementById('btn-deleteAllData')?.addEventListener('click', () => deleteAllData());
+	}
 }
 
 function loadData() {
@@ -60,23 +63,6 @@ function loadData() {
 	});
 }
 
-function optionsListeners() {
-	document.getElementById('hideScoresOption')?.addEventListener('change', (event) => {
-		browser.storage.local.set({ hideScores: (event.target as HTMLInputElement).checked });
-		loadData();
-	});
-
-	document.getElementById('hideScoresQuickOption')?.addEventListener('change', (event) => {
-		browser.storage.local.set({ hideScores: (event.target as HTMLInputElement).checked });
-		loadData();
-		document.getElementById('refresh-pls-home')!.style.display = 'flex';
-	});
-
-	document.getElementById('btn-exportData')?.addEventListener('click', () => {
-		void exportStorage();
-	});
-
-}
 
 function itemUrl(id: string) {
 	return `https://szkopul.edu.pl/problemset/problem/${encodeURIComponent(id)}/site/`;

@@ -1,5 +1,12 @@
 import {t} from "./globals";
 
+function attachCSS(css: string) {
+	const styleElement: HTMLStyleElement = document.createElement('style');
+	styleElement.textContent = css;
+
+	document.documentElement.appendChild(styleElement);
+}
+
 export function hideScores() {
 	console.log('HIDE!!!')
 
@@ -39,10 +46,7 @@ export function hideScores() {
 		
     `; // TODO find a better way of hiding the actual score text
 
-	const styleElement: HTMLStyleElement = document.createElement('style');
-	styleElement.textContent = css;
-
-	document.documentElement.appendChild(styleElement);
+	attachCSS(css);
 }
 
 export function hidePageContents() {
@@ -69,10 +73,7 @@ export function hidePageContents() {
 		}
     `;
 
-	const styleElement: HTMLStyleElement = document.createElement('style');
-	styleElement.textContent = css;
-
-	document.documentElement.appendChild(styleElement);
+	attachCSS(css);
 
 	const tryToAttach = () => {
 		const bodyEl = document.querySelector('.body');
@@ -96,4 +97,14 @@ export function hidePageContents() {
 		});
 		observer.observe(document.documentElement, { childList: true, subtree: true });
 	}
+}
+
+export function hideRulesTab() {
+	const css: string = `
+		.list-group.list-group-flush.border-top a[href*="/rules/"] {
+		  display: none;
+		}
+    `;
+
+	attachCSS(css);
 }

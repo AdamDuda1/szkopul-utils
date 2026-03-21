@@ -3,12 +3,14 @@ import browser from "webextension-polyfill";
 const KEY_OPTIONS = "options";
 export type optionsTemplate = {
     lang: "pl" | "en",
-    hideScores: boolean
+    hideScores: boolean,
+    hideRulesTab: boolean,
 }
 
 const DEFAULT_OPTIONS: optionsTemplate = {
     lang: "pl",
-    hideScores: false
+    hideScores: false,
+    hideRulesTab: false,
 };
 
 export async function getOptions(): Promise<optionsTemplate> {

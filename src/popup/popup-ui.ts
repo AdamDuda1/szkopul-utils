@@ -239,6 +239,11 @@ render(
 		</div>
 
 		<br><br>
+
+		<p class="bg-danger" style="margin: 7px; border-radius: 7px; color: black; padding: 5px; font-size: x-small;
+			position: absolute; z-index: 9; top: 40px;" id="refresh-pls-options">
+			${t('popup_home_refreshPls')}
+		</p>
 		
 		<span class="categ">
 			${t('popup_options_c_func')}
@@ -263,9 +268,10 @@ render(
 		</span>
 
 
-		<div style="display: flex; justify-content: space-between; width: 82%; margin-top: 7px; min-height: auto;">
+		<div style="display: flex; justify-content: space-between; width: 82%; margin-top: 7px; min-height: auto; align-items: center;">
 			<label for="preferredLang">
 				Preferred language
+				<span class="info">Will be selected automatically</span>
 			</label>
 			<select style="height: 25px; font-size: 17px; padding: 2px; width: auto;"
 					class="form-control" name="preferredLang" id="preferredLang">
@@ -277,7 +283,10 @@ render(
 		</div>
 
 		<div class="form-check form-switch switch-full d-flex align-items-center justify-content-between" style="min-height: auto;">
-			<label for="hideTimerOption" class="mb-0 form-check-label">Automatically submit solutions when pasted or uploaded code is in the preferred language</label>
+			<label for="hideTimerOption" class="mb-0 form-check-label">
+				Automatically submit
+				<span class="info">solutions when pasted or uploaded code is in the preferred language</span>
+			</label>
 			<div class="form-check form-switch m-0">
 				<input class="form-check-input" type="checkbox" id="hideTimerOption">
 			</div>
