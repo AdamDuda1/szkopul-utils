@@ -3,7 +3,7 @@ import { getTODO, removeTODOItem, reorderTODO, type TodoItem } from "../todo.js"
 
 import browser from "webextension-polyfill";
 import { getVirtualOptions, getVirtualTasks, removeVirtualTask, saveVirtualOptions } from '../virtual';
-import {getOptions, optionsTemplate, saveOptions} from "../options";
+import { getOptions, optionsTemplate, programmingLanguage, saveOptions } from '../options';
 
 
 let optionsObject: optionsTemplate;
@@ -20,10 +20,31 @@ export async function afterRender() {
 }
 
 function loadOptions() {
+	// OPTIONS => FIXES AND FEATURES
+	{
+		(document.getElementById('hideScoresOption') as HTMLInputElement).checked = optionsObject.hideScores;
+		(document.getElementById('hideScoresOption') as HTMLInputElement).addEventListener('change', () => {
+			optionsObject!.hideScores = (document.getElementById('hideScoresOption') as HTMLInputElement).checked as boolean;
+			saveOptions(optionsObject!).then(() => document.getElementById('refresh-pls-options')!.style.display = 'flex');
+		});
+
+		(document.getElementById('hideRulesTabOption') as HTMLInputElement).checked = optionsObject.hideRulesTab;
+		(document.getElementById('hideRulesTabOption') as HTMLInputElement).addEventListener('change', () => {
+			optionsObject!.hideRulesTab = (document.getElementById('hideRulesTabOption') as HTMLInputElement).checked as boolean;
+			saveOptions(optionsObject!).then(() => document.getElementById('refresh-pls-options')!.style.display = 'flex');
+		});
+
+		(document.getElementById('preferredLang') as HTMLSelectElement).value = optionsObject.preferredLanguage;
+		(document.getElementById('preferredLang') as HTMLSelectElement).addEventListener('change', () => {
+			optionsObject!.preferredLanguage = (document.getElementById('preferredLang') as HTMLSelectElement).value as programmingLanguage;
+			saveOptions(optionsObject!).then(() => document.getElementById('refresh-pls-options')!.style.display = 'flex');
+		});
+
+	}
+
 	// OPTIONS => META-SETTINGS AND DATA
 	{
 		(document.getElementById('lang') as HTMLSelectElement).value = optionsObject!.lang;
-
 		document.getElementById('lang')!.addEventListener('change', () => {
 			optionsObject!.lang = (document.getElementById('lang') as HTMLSelectElement).value as lang;
 			saveOptions(optionsObject!).then(() => window.location.reload());

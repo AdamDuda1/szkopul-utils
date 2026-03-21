@@ -69,8 +69,13 @@ body button img {
     font-size: 12px;
     color: gray;
     display: flex;
-    padding: 5px;
+    margin: 8px;
+    padding: 2px;
     text-align: center;
+    border-top: 1px solid;
+    border-bottom: 1px solid;
+    width: 80%;
+    justify-content: center;
 }
 
 .info {

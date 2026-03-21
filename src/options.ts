@@ -1,16 +1,20 @@
 import browser from "webextension-polyfill";
 
+export type programmingLanguage = "" | "C" | "C++" | "Pascal" | "Python" | "Rust";
+
 const KEY_OPTIONS = "options";
 export type optionsTemplate = {
     lang: "pl" | "en",
     hideScores: boolean,
     hideRulesTab: boolean,
+    preferredLanguage: programmingLanguage,
 }
 
 const DEFAULT_OPTIONS: optionsTemplate = {
     lang: "pl",
     hideScores: false,
     hideRulesTab: false,
+    preferredLanguage: "",
 };
 
 export async function getOptions(): Promise<optionsTemplate> {

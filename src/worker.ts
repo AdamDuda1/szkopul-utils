@@ -1,4 +1,4 @@
-import { fixContactButton, addUtilsFeedbackButton, makeEnterSearchThings, appendHomePageStats } from './misc-fixes';
+import { fixContactButton, addUtilsFeedbackButton, makeEnterSearchThings, appendHomePageStats, languageSelectorFix } from './misc-fixes';
 import browser from "webextension-polyfill";
 import { initNotes } from './notes';
 import { appendProblemSetMenu, appendVirtualContestPanel } from './ui-elements';
@@ -17,11 +17,14 @@ const onStart = () => {
 	setLang(optionsObject.lang);
 	void fixContactButton();
 	void applyVirtualContestPageOptions();
-	void hideRulesTab();
+	if (optionsObject.hideScores) void hideScores();
+	if (optionsObject.hideRulesTab) void hideRulesTab();
 };
 
 const onLoad = () => {
 	void addUtilsFeedbackButton();
+	void languageSelectorFix(optionsObject.preferredLanguage);
+
 	void appendProblemSetMenu(addToTODOAction);
 	void appendVirtualContestPanel();
 	void makeEnterSearchThings();

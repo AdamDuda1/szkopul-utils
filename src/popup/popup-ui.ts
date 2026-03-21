@@ -241,7 +241,7 @@ render(
 		<br><br>
 
 		<p class="bg-danger" style="margin: 7px; border-radius: 7px; color: black; padding: 5px; font-size: x-small;
-			position: absolute; z-index: 9; top: 40px;" id="refresh-pls-options">
+			position: absolute; z-index: 9; top: 40px; display: none;" id="refresh-pls-options">
 			${t('popup_home_refreshPls')}
 		</p>
 		
@@ -257,15 +257,19 @@ render(
 		</div>
 
 		<div class="form-check form-switch switch-full d-flex align-items-center justify-content-between" style="min-height: auto;">
-			<label for="hideTimerOption" class="mb-0 form-check-label">${t('popup_options_hideTimers')}</label>
+			<label for="hideRulesTabOption" class="mb-0 form-check-label">${t('popup_options_hideRulesTab')}</label>
 			<div class="form-check form-switch m-0">
-				<input class="form-check-input" type="checkbox" id="hideTimerOption">
+				<input class="form-check-input" type="checkbox" id="hideRulesTabOption">
 			</div>
 		</div>
+		
 
-		<span class="categ">
-			${t('popup_options_c_meta')}
-		</span>
+<!--		<div class="form-check form-switch switch-full d-flex align-items-center justify-content-between" style="min-height: auto;">-->
+<!--			<label for="hideTimerOption" class="mb-0 form-check-label">${t('popup_options_hideTimers')}</label>-->
+<!--			<div class="form-check form-switch m-0">-->
+<!--				<input class="form-check-input" type="checkbox" id="hideTimerOption">-->
+<!--			</div>-->
+<!--		</div>-->
 
 
 		<div style="display: flex; justify-content: space-between; width: 82%; margin-top: 7px; min-height: auto; align-items: center;">
@@ -275,17 +279,19 @@ render(
 			</label>
 			<select style="height: 25px; font-size: 17px; padding: 2px; width: auto;"
 					class="form-control" name="preferredLang" id="preferredLang">
-				<option value="pl">none</option>
-				<option value="pl">C++</option>
-				<option value="en">Python</option>
-				<option value="en">Rust</option>
+				<option value="">none</option>
+				<option value="C">C</option>
+				<option value="C++">C++</option>
+				<option value="Pascal">Pascal</option>
+				<option value="Python">Python</option>
+				<option value="Rust">Rust</option>
 			</select>
 		</div>
 
 		<div class="form-check form-switch switch-full d-flex align-items-center justify-content-between" style="min-height: auto;">
 			<label for="hideTimerOption" class="mb-0 form-check-label">
 				Automatically submit
-				<span class="info">solutions when pasted or uploaded code is in the preferred language</span>
+				<span class="info">solutions when pasted or uploaded code is in the preferred language (works only with 'toggle editor' off)</span>
 			</label>
 			<div class="form-check form-switch m-0">
 				<input class="form-check-input" type="checkbox" id="hideTimerOption">
@@ -296,6 +302,18 @@ render(
 			${t('popup_options_c_meta')}
 		</span>
 
+
+        <div style="display: flex; justify-content: space-between; width: 82%; margin-top: 7px; min-height: auto; align-items: center;">
+            <label for="whatsOnHomeOption">
+                On home
+            </label>
+            <select style="height: 25px; font-size: 17px; padding: 2px; width: auto;"
+                    class="form-control" name="whatsOnHomeOption" id="whatsOnHomeOption">
+                <option value="ss">Szkopuł status</option>
+                <option value="qs">quick settings</option>
+            </select>
+        </div>
+		
 		<div style="display: flex; justify-content: space-between; width: 82%; margin-top: 7px; min-height: auto;">
 			<label for="lang">
 				${t("popup_options_language")}

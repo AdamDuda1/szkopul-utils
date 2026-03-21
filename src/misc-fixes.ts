@@ -1,5 +1,6 @@
 import { html, render } from 'lit';
 import CalHeatmap from "cal-heatmap";
+import { programmingLanguage } from './options';
 
 export function makeEnterSearchThings() {
 	if (!(window.location.href.includes('/problemset') || window.location.href.includes('/contest'))) return;
@@ -95,5 +96,19 @@ export function appendHomePageStats() {
 			"2026-03-12": 3,
 			"2026-03-13": 6
 		}
+	});
+}
+
+export function languageSelectorFix(preferredLanguage: programmingLanguage) {
+	let selectElements = document.querySelectorAll('select');
+
+	selectElements.forEach((element: HTMLSelectElement) => {
+		setTimeout(() => {
+			if (element.id.includes('prog_lang')) {
+				element.disabled = false;
+				element.value = preferredLanguage;
+				console.log(preferredLanguage);
+			}
+		}, 200); // TODO fix: sometimes doesnt load yet!
 	});
 }
