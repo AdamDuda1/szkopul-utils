@@ -27,6 +27,12 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 
 ## TODO:
 
+- ! emitTaskSolved('twoj-problem-id'); przy submit albo lepiej przy maxie za zadanie
+- lepszy spacing przy dashboardzie na home pagu
+- menu w problem view
+- preferred language is on home page...
+
+- hideScores unintentionally hides unrelated elements, like the whole 'teachers' tab
 - (??) hide the midified tables (like problems in contest) untill thir html is not modified (display: none on init and then flex when loaded)
 - dopracować inline statements i to drugie 
 - make the user be able to choose what is displayed on the home page of the popup (szkopul stats/quick score hiding setting)
@@ -35,16 +41,6 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 - Add the same menu in the problem set to the top of the problem page
 - Remove the popups and the 'i' when the task is solved (for hideScores) -> 
 - **Add comments under tasks ?**
-- fix: you can still select the score and copy it (problemset)
-- ts compile formats: iife vs esm
-- ~~Bootstrap or Shoelace?~~
-- Remove shoelace and switch to bootstrap
-- Crop bootstrap so only things that are actually used are included (???)
-
-- Maybe useful in the future: 
-```
-"run_at": "document_//start"
-```
 
 // małę todo:
 

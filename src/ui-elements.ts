@@ -1,12 +1,49 @@
 import { problemSetMenuSeeNote } from './notes';
 import { t } from './globals';
-import { getTODO } from './todo';
-import { addVirtualTask, getVirtualOptions, getVirtualTasks, removeVirtualTask, saveVirtualOptions } from './virtual';
+import { getRandomTODOItem, getTODO } from './todo';
+import { addVirtualTask, getVirtualOptions, getVirtualTasks, removeVirtualTask, saveVirtualOptions, task } from './virtual';
+import { getOptions, optionsTemplate } from './options';
 
-let virtualTasks: {id: string, name: string}[] = [];
+let optionsObject: optionsTemplate;
+let virtualTasks: task[] = [];
 let todoTaskIds = new Set<string>();
+const TASK_SOLVED_EVENT = 'szkopul-utils:taskSolved';
 
-function buildMenu(id: string, name: string, problemSet: boolean = true) {
+type TaskSolvedEventPayload = {
+	problemId?: string;
+	solvedAt?: string | number | Date;
+};
+
+export function emitTaskSolved(problemId = '', solvedAt = new Date()) {
+	window.dispatchEvent(new CustomEvent(TASK_SOLVED_EVENT, {
+		detail: { problemId, solvedAt: solvedAt.toISOString() }
+	}));
+}
+
+function parseTaskSolvedDate(raw: TaskSolvedEventPayload['solvedAt']) {
+	if (raw instanceof Date) return Number.isNaN(raw.getTime()) ? null : raw;
+	if (typeof raw === 'number') {
+		const date = new Date(raw);
+		return Number.isNaN(date.getTime()) ? null : date;
+	}
+	if (typeof raw === 'string') return parseDate(raw);
+	return null;
+}
+
+function onTaskSolved(handler: (problemId: string, date: Date) => void) {
+	const listener = (event: Event) => {
+		const payload = (event as CustomEvent<TaskSolvedEventPayload>)?.detail;
+		const date = parseTaskSolvedDate(payload?.solvedAt);
+		if (!date) return;
+		date.setHours(0, 0, 0, 0);
+		handler(payload?.problemId ?? '', date);
+	};
+
+	window.addEventListener(TASK_SOLVED_EVENT, listener);
+	return () => window.removeEventListener(TASK_SOLVED_EVENT, listener);
+}
+
+function buildMenu(id: string, name: string, problemSet: boolean, revealScoreButton: boolean) {
 	return `
 		<div class="btn-group">
             <button class="btn btn-outline-secondary dropdown-toggle add-to-contest-button pl-1 pr-2" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -32,13 +69,18 @@ function buildMenu(id: string, name: string, problemSet: boolean = true) {
 					<span>${virtualTasks.some((t) => t.id === id) ? t('menu_removeFromVirtual') : t('menu_addToVirtual')}</span>
 				</a>
 				
-				<a class="dropdown-item action-notes" href="#">
-					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
-						<path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
-						<path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
-					</svg>
-					<span>Ujawnik wynik/Reveal score</span>
-				</a>
+				${
+				revealScoreButton ?
+				`
+					<a class = "dropdown-item action-score" href="#">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+							<path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
+							<path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
+						</svg>
+						<span>${t("menu_revealScore")}</span>
+					</a>
+				` : ``
+				}
 				
 				<a class="dropdown-item action-notes" href="#">
 					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
@@ -52,8 +94,11 @@ function buildMenu(id: string, name: string, problemSet: boolean = true) {
 }
 
 export async function appendProblemSetMenu(addToTODOAction: (id: string, name: string, btn: HTMLAnchorElement) => void | Promise<void>) {
+	optionsObject = await getOptions();
 	virtualTasks = await getVirtualTasks();
 	todoTaskIds = new Set((await getTODO()).map((item) => item.id));
+
+	let scoresHidden = optionsObject.hideScores;
 
 	// render(menuHTML(), ( as HTMLDivElement)!);
 	// document.querySelector('.problem-title.text-center.content-row > h1')?.insertAdjacentHTML('afterend', menuHTML());
@@ -81,11 +126,16 @@ export async function appendProblemSetMenu(addToTODOAction: (id: string, name: s
 		const id = match?.[1];
 		const name = secondTd?.querySelector('a')?.innerText.toString();
 
+		const scoreTd = tr.querySelector('td.result__margin');
+
+		let thisScore: string;
+		if (scoresHidden && scoreTd != null) thisScore = (scoreTd as HTMLTableElement).innerText;
+
 		if (id != undefined) {
 			const cell = document.createElement('td');
 
 			const renderCell = () => {
-				cell.innerHTML = buildMenu(id, name!, true);
+				cell.innerHTML = buildMenu(id, name!, true, scoresHidden && scoreTd != null);
 				attachHandlers();
 			};
 
@@ -142,11 +192,21 @@ export async function appendProblemSetMenu(addToTODOAction: (id: string, name: s
 					}
 				});
 
+				if (scoresHidden && scoreTd != null)
+				cell.querySelector<HTMLAnchorElement>('.action-score')?.addEventListener('click', (event) => {
+					event.preventDefault();
+					if (confirm('Are you sure?')) {
+						alert(thisScore);
+					}
+				});
+
 				cell.querySelector<HTMLAnchorElement>('.action-notes')?.addEventListener('click', (event) => {
 					event.preventDefault();
 					problemSetMenuSeeNote(id, name!);
 				});
 			};
+
+			if (scoresHidden && scoreTd != null) (scoreTd as HTMLTableElement).innerText = '';
 
 			renderCell();
 
@@ -246,26 +306,55 @@ export function appendHomeDashboardSummary() {
 		if (entry.date >= monthAgo) solvedLastMonth += 1;
 	}
 
-	const solvedToday = solvedByDay.get(toDateKey(today)) ?? 0;
-	const bestDay = Math.max(0, ...Array.from(solvedByDay.values()));
+	let solvedToday = solvedByDay.get(toDateKey(today)) ?? 0;
+	let bestDay = Math.max(0, ...Array.from(solvedByDay.values()));
+	const emittedSolveKeys = new Set(entries
+		.filter((entry) => !!entry.problemId)
+		.map((entry) => `${entry.problemId}|${toDateKey(entry.date)}`));
+
+	const openTask = (id: string) => {
+		if (!id) return;
+		window.location.href = `https://szkopul.edu.pl/problemset/problem/${encodeURIComponent(id)}/site/?key=statement`;
+	};
 
 	const container = document.createElement('section');
 	container.id = 'szkopul-utils-dashboard-summary';
-	container.style.cssText = 'margin-top:12px;padding:12px;border:1px solid #d5d7da;border-radius:8px;background:#fff';
+	container.style.cssText = 'margin-top:12px;padding:12px;border:1px solid #d5d7da;border-radius:8px;background:#fff;display:flex;flex-direction:column;gap:10px';
+
+	const layout = document.createElement('div');
+	layout.style.cssText = 'display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap';
+
+	const rightColumn = document.createElement('div');
+	rightColumn.style.cssText = 'display:flex;flex-direction:column;gap:8px;min-width:280px;flex:1';
 
 	const stats = document.createElement('div');
-	stats.style.cssText = 'display:grid;grid-template-columns:repeat(2,minmax(120px,1fr));gap:8px;margin-bottom:10px';
+	stats.style.cssText = 'display:grid;grid-template-columns:repeat(2,minmax(160px,1fr));gap:8px';
 	stats.innerHTML = `
-		<div><b>${solvedLastMonth}</b> ${t('dashboard_stats_lastMonth')}</div>
-		<div><b>${solvedToday}</b> ${t('dashboard_stats_today')}</div>
-		<div><b>${uniqueSolvedTasks.size}</b> ${t('dashboard_stats_total')}</div>
-		<div><b>${bestDay}</b> ${t('dashboard_stats_bestDay')}</div>
-		<button class="btn btn-secondary">Random task</button>
-		<button class="btn btn-secondary">Random task from TODO</button>
+		<div style="padding:8px;border:1px solid #eceef1;border-radius:6px;"><b id="szkopul-utils-stat-last-month">${solvedLastMonth}</b> ${t('dashboard_stats_lastMonth')}</div>
+		<div style="padding:8px;border:1px solid #eceef1;border-radius:6px;"><b id="szkopul-utils-stat-today">${solvedToday}</b> ${t('dashboard_stats_today')}</div>
+		<div style="padding:8px;border:1px solid #eceef1;border-radius:6px;"><b id="szkopul-utils-stat-total">${uniqueSolvedTasks.size}</b> ${t('dashboard_stats_total')}</div>
+		<div style="padding:8px;border:1px solid #eceef1;border-radius:6px;"><b id="szkopul-utils-stat-best">${bestDay}</b> ${t('dashboard_stats_bestDay')}</div>
 	`;
+
+	const actions = document.createElement('div');
+	actions.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px';
+	actions.innerHTML = `
+		<button class="btn btn-secondary" id="szkopul-utils-random-task-todo">${t('dashboard_randomTaskTODO')}</button>
+	`;
+
+	actions.querySelector<HTMLButtonElement>('#szkopul-utils-random-task-todo')?.addEventListener('click', async () => {
+		const item = await getRandomTODOItem();
+		if (!item) {
+			alert(t('popup_todo_empty'));
+			return;
+		}
+
+		openTask(item.id);
+	});
 
 	const heatmap = document.createElement('div');
 	heatmap.style.cssText = 'display:grid;grid-template-rows:repeat(7,10px);grid-auto-flow:column;grid-auto-columns:10px;gap:3px';
+	const heatCells = new Map<string, HTMLDivElement>();
 
 	const totalCells = 7 * 26;
 	const start = new Date(today);
@@ -280,10 +369,56 @@ export function appendHomeDashboardSummary() {
 		const cell = document.createElement('div');
 		cell.style.cssText = `width:10px;height:10px;border-radius:2px;background:${getHeatColor(value)}`;
 		cell.title = `${key}: ${value}`;
+		heatCells.set(key, cell);
 		heatmap.appendChild(cell);
 	}
 
-	container.append(stats, heatmap);
+	const lastMonthValue = stats.querySelector<HTMLSpanElement>('#szkopul-utils-stat-last-month');
+	const todayValue = stats.querySelector<HTMLSpanElement>('#szkopul-utils-stat-today');
+	const totalValue = stats.querySelector<HTMLSpanElement>('#szkopul-utils-stat-total');
+	const bestValue = stats.querySelector<HTMLSpanElement>('#szkopul-utils-stat-best');
+
+	const updateStats = () => {
+		if (lastMonthValue) lastMonthValue.textContent = String(solvedLastMonth);
+		if (todayValue) todayValue.textContent = String(solvedToday);
+		if (totalValue) totalValue.textContent = String(uniqueSolvedTasks.size);
+		if (bestValue) bestValue.textContent = String(bestDay);
+	};
+
+	const applySolvedEntry = (problemId: string, date: Date) => {
+		const key = toDateKey(date);
+		if (problemId) {
+			const dedupeKey = `${problemId}|${key}`;
+			if (emittedSolveKeys.has(dedupeKey)) return;
+			emittedSolveKeys.add(dedupeKey);
+		}
+
+		solvedByDay.set(key, (solvedByDay.get(key) ?? 0) + 1);
+		if (problemId) {
+			uniqueSolvedTasks.add(problemId);
+		}
+
+		if (date >= monthAgo) solvedLastMonth += 1;
+		solvedToday = solvedByDay.get(toDateKey(today)) ?? 0;
+		bestDay = Math.max(0, ...Array.from(solvedByDay.values()));
+
+		const cell = heatCells.get(key);
+		if (cell) {
+			const value = solvedByDay.get(key) ?? 0;
+			cell.style.background = getHeatColor(value);
+			cell.title = `${key}: ${value}`;
+		}
+
+		updateStats();
+	};
+
+	onTaskSolved((problemId, date) => {
+		applySolvedEntry(problemId, date);
+	});
+
+	rightColumn.append(stats, actions);
+	layout.append(heatmap, rightColumn);
+	container.append(layout);
 	anchor.insertAdjacentElement('afterend', container);
 }
 
@@ -302,7 +437,7 @@ export async function appendVirtualContestPanel() {
 	if (!panel) {
 		panel = document.createElement('div');
 		panel.id = panelId;
-		panel.style = `position:fixed;top:150px;left:-3px;border:1px solid white;z-index:2147483647;width:250px;max-height:70vh;overflow-y:auto;background:rgb(255,255,255);color:rgb(33,37,41);border-radius:0 8px 8px 0;padding:10px;box-shadow:rgba(0,0,0,0.16) 0px 4px 14px;`;
+		panel.style = `display: flex;position:fixed;top:150px;left:-3px;border:1px solid white;z-index:2147483647;width:250px;max-height:70vh;overflow-y:auto;background:rgb(255,255,255);color:rgb(33,37,41);border-radius:0 8px 8px 0;padding:10px;box-shadow:rgba(0,0,0,0.16) 0px 4px 14px;`;
 		panel.innerHTML = `
 			<div style="font-weight: 600; margin-bottom: 8px;">Virtual contest</div>
 			<div id="szkopul-utils-virtual-panel-timer" style="font-size: 22px; margin-bottom: 8px;">00:00:00</div>

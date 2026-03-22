@@ -74,7 +74,7 @@ function loadOptions() {
 		});
 
 		document.getElementById('btn-exportData')?.addEventListener('click', () => {
-			void showDataActionConfirmation(`${t('popup_options_export')}?`, () => exportStorage());
+			exportStorage();
 		});
 
 		document.getElementById('input-importDataFile')?.addEventListener('change', (event) => importStorage(event));

@@ -20,6 +20,9 @@ export const translations = {
 		dashboard_stats_today: "rozwiązanych dzisiaj",
 		dashboard_stats_total: "rozwiązanych łącznie",
 		dashboard_stats_bestDay: "najlepszy dzień",
+		dashboard_randomTask: "Losowe zadanie",
+		dashboard_randomTaskTODO: "Losowe zadanie z TODO",
+		dashboard_noRandomTask: "Brak zadań do losowania.",
 
 		popup_virtual_title: "Konkurs wirtualny",
 		popup_virtual_category_tasks: "Zadania",
@@ -70,6 +73,7 @@ export const translations = {
 		menu_removeFromTODO: "Usuń z listy 'Do zrobienia'",
 		menu_addToVirtual: "Dodaj do konkursu wirtualnego",
 		menu_removeFromVirtual: "Usuń z konkursu wirtualnego",
+		menu_revealScore: "Ujawnij wynik",
 		menu_viewNote: "Zobacz notatkę",
 
 		menu_added: "Dodano!",
@@ -93,6 +97,9 @@ export const translations = {
 		dashboard_stats_today: "solved today",
 		dashboard_stats_total: "solved total",
 		dashboard_stats_bestDay: "best day",
+		dashboard_randomTask: "Random task",
+		dashboard_randomTaskTODO: "Random task from TODO",
+		dashboard_noRandomTask: "No tasks available for random pick.",
 
 		popup_virtual_title: "Virtual contest",
 		popup_virtual_category_tasks: "Tasks",
@@ -143,6 +150,7 @@ export const translations = {
 		menu_removeFromTODO: "Remove from to-do",
 		menu_addToVirtual: "Add to virtual contest",
 		menu_removeFromVirtual: "Remove from virtual contest",
+		menu_revealScore: "Reveal score",
 		menu_viewNote: "View note",
 
 		menu_added: "Added!",
