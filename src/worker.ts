@@ -36,13 +36,13 @@ const onLoad = () => {
 
 	if (optionsObject.statementsOnSamePage) void statementsOnSamePage();
 	if (optionsObject.inlineProblemStatements) void inlineStatements();
+
+	// void addTaskSolvedEventTriggers();
 };
 
 getOptions().then((ans) => { optionsObject = ans; onStart(); });
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', onLoad, { once: true });
 else onLoad();
-
-
 
 
 async function applyVirtualContestPageOptions() {

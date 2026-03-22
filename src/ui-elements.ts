@@ -319,27 +319,48 @@ export function appendHomeDashboardSummary() {
 
 	const container = document.createElement('section');
 	container.id = 'szkopul-utils-dashboard-summary';
-	container.style.cssText = 'margin-top:12px;padding:12px;border:1px solid #d5d7da;border-radius:8px;background:#fff;display:flex;flex-direction:column;gap:10px';
+		  container.style.cssText = 'margin-top:8px;padding:10px;border:1px solid #d5d7da;border-radius:8px;background:#fff';
+
+	const style = document.createElement('style');
+	style.textContent = `
+		#szkopul-utils-dashboard-summary .layout { display:flex; align-items:flex-start; gap:14px; }
+		#szkopul-utils-dashboard-summary .heatmap { height: 135px !important; width: auto !important; display:grid; grid-template-rows:repeat(7,10px); grid-auto-flow:column; grid-auto-columns:10px; gap:3px; flex:0 0 auto; }
+		#szkopul-utils-dashboard-summary .heatmap .cell { width:10px; height:10px; border-radius:2px; }
+		#szkopul-utils-dashboard-summary .right-column { display:flex; flex-direction:column; justify-content:space-between; gap:10px; min-width:240px; flex:1; }
+		#szkopul-utils-dashboard-summary .stats { display:grid; grid-template-columns:repeat(2,minmax(150px,1fr)); gap:6px 12px; }
+		#szkopul-utils-dashboard-summary .stat { line-height:1.25; }
+		#szkopul-utils-dashboard-summary .stat b { display:block; font-size:17px; line-height:1.1; margin-bottom:2px; }
+		#szkopul-utils-dashboard-summary .actions { display:flex; flex-wrap:wrap; gap:8px; }
+@media (max-width: 600px) {
+		  #szkopul-utils-dashboard-summary .layout { flex-direction:column; gap:10px; }
+  #szkopul-utils-dashboard-summary .right-column { min-width:0; width:100%; }
+		  #szkopul-utils-dashboard-summary .heatmap { width:100%; aspect-ratio:26/7; grid-template-rows:repeat(7,minmax(0,1fr)); grid-auto-columns:minmax(0,1fr); }
+		  #szkopul-utils-dashboard-summary .heatmap .cell { width:100%; height:100%; }
+  #szkopul-utils-dashboard-summary .stats { grid-template-columns: 1fr; }
+}
+`;
+	container.appendChild(style);
 
 	const layout = document.createElement('div');
-	layout.style.cssText = 'display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap';
+	layout.className = 'layout';
 
 	const rightColumn = document.createElement('div');
-	rightColumn.style.cssText = 'display:flex;flex-direction:column;gap:8px;min-width:280px;flex:1';
+	rightColumn.className = 'right-column';
 
 	const stats = document.createElement('div');
-	stats.style.cssText = 'display:grid;grid-template-columns:repeat(2,minmax(160px,1fr));gap:8px';
+	stats.className = 'stats';
 	stats.innerHTML = `
-		<div style="padding:8px;border:1px solid #eceef1;border-radius:6px;"><b id="szkopul-utils-stat-last-month">${solvedLastMonth}</b> ${t('dashboard_stats_lastMonth')}</div>
-		<div style="padding:8px;border:1px solid #eceef1;border-radius:6px;"><b id="szkopul-utils-stat-today">${solvedToday}</b> ${t('dashboard_stats_today')}</div>
-		<div style="padding:8px;border:1px solid #eceef1;border-radius:6px;"><b id="szkopul-utils-stat-total">${uniqueSolvedTasks.size}</b> ${t('dashboard_stats_total')}</div>
-		<div style="padding:8px;border:1px solid #eceef1;border-radius:6px;"><b id="szkopul-utils-stat-best">${bestDay}</b> ${t('dashboard_stats_bestDay')}</div>
+		<div class="stat"><b id="szkopul-utils-stat-last-month">${solvedLastMonth}</b>${t('dashboard_stats_lastMonth')}</div>
+		<div class="stat"><b id="szkopul-utils-stat-today">${solvedToday}</b>${t('dashboard_stats_today')}</div>
+		<div class="stat"><b id="szkopul-utils-stat-total">${uniqueSolvedTasks.size}</b>${t('dashboard_stats_total')}</div>
+		<div class="stat"><b id="szkopul-utils-stat-best">${bestDay}</b>${t('dashboard_stats_bestDay')}</div>
 	`;
 
 	const actions = document.createElement('div');
-	actions.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px';
+	actions.className = 'actions';
 	actions.innerHTML = `
 		<button class="btn btn-secondary" id="szkopul-utils-random-task-todo">${t('dashboard_randomTaskTODO')}</button>
+		<button class="btn btn-secondary" id="szkopul-utils-see-stats">${t('dashboard_seeStats')}</button>
 	`;
 
 	actions.querySelector<HTMLButtonElement>('#szkopul-utils-random-task-todo')?.addEventListener('click', async () => {
@@ -352,8 +373,12 @@ export function appendHomeDashboardSummary() {
 		openTask(item.id);
 	});
 
+	actions.querySelector<HTMLButtonElement>('#szkopul-utils-see-stats')?.addEventListener('click', () => {
+		alert(`Stats:\nSolved last month: ${solvedLastMonth}\nSolved today: ${solvedToday}\nTotal solved: ${uniqueSolvedTasks.size}\nBest day: ${bestDay}`);
+	});
+
 	const heatmap = document.createElement('div');
-	heatmap.style.cssText = 'display:grid;grid-template-rows:repeat(7,10px);grid-auto-flow:column;grid-auto-columns:10px;gap:3px';
+	heatmap.className = 'heatmap';
 	const heatCells = new Map<string, HTMLDivElement>();
 
 	const totalCells = 7 * 26;
@@ -367,7 +392,8 @@ export function appendHomeDashboardSummary() {
 		const value = solvedByDay.get(key) ?? 0;
 
 		const cell = document.createElement('div');
-		cell.style.cssText = `width:10px;height:10px;border-radius:2px;background:${getHeatColor(value)}`;
+		cell.className = 'cell';
+		cell.style.background = getHeatColor(value);
 		cell.title = `${key}: ${value}`;
 		heatCells.set(key, cell);
 		heatmap.appendChild(cell);

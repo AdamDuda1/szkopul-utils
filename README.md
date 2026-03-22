@@ -14,8 +14,10 @@ Szkopuł Utils is a browser extension that provides various QOL improvements and
 
 ## Full list of features:
 
-- Virtual contests! (create and participate in a local virtual contest with set tasks, score hiding and calculating options and time)
+- Virtual contests (create and participate in a local virtual contest with set tasks, score hiding and calculating options and time)
 - Task TODO list
+- Inline task statements view and on-the-same-page statement view
+- Preferred language and auto-submit
 - Score hiding (shows only initial testing reports);
 - Notes for tasks (saved in browser's storage);
 - Actually searches when you press enter in the search bar;
@@ -31,6 +33,8 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 - lepszy spacing przy dashboardzie na home pagu
 - menu w problem view
 - preferred language is on home page...
+
+- 'stats' page with for example total chars in submissions
 
 - hideScores unintentionally hides unrelated elements, like the whole 'teachers' tab
 - (??) hide the midified tables (like problems in contest) untill thir html is not modified (display: none on init and then flex when loaded)

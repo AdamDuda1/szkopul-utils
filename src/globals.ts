@@ -22,6 +22,7 @@ export const translations = {
 		dashboard_stats_bestDay: "najlepszy dzień",
 		dashboard_randomTask: "Losowe zadanie",
 		dashboard_randomTaskTODO: "Losowe zadanie z TODO",
+		dashboard_seeStats: "Zobacz staty",
 		dashboard_noRandomTask: "Brak zadań do losowania.",
 
 		popup_virtual_title: "Konkurs wirtualny",
@@ -99,6 +100,7 @@ export const translations = {
 		dashboard_stats_bestDay: "best day",
 		dashboard_randomTask: "Random task",
 		dashboard_randomTaskTODO: "Random task from TODO",
+		dashboard_seeStats: "See stats",
 		dashboard_noRandomTask: "No tasks available for random pick.",
 
 		popup_virtual_title: "Virtual contest",
