@@ -323,21 +323,25 @@ export function appendHomeDashboardSummary() {
 
 	const style = document.createElement('style');
 	style.textContent = `
-		#szkopul-utils-dashboard-summary .layout { display:flex; align-items:flex-start; gap:14px; }
-		#szkopul-utils-dashboard-summary .heatmap { height: 135px !important; width: auto !important; display:grid; grid-template-rows:repeat(7,10px); grid-auto-flow:column; grid-auto-columns:10px; gap:3px; flex:0 0 auto; }
+		#szkopul-utils-dashboard-summary .layout { display:flex; align-items:stretch; gap:14px; min-height:88px; }
+		#szkopul-utils-dashboard-summary .heatmap { height:auto; width:auto; display:grid; grid-template-rows:repeat(7,10px); grid-auto-flow:column; grid-auto-columns:10px; gap:3px; flex:0 0 auto; }
 		#szkopul-utils-dashboard-summary .heatmap .cell { width:10px; height:10px; border-radius:2px; }
-		#szkopul-utils-dashboard-summary .right-column { display:flex; flex-direction:column; justify-content:space-between; gap:10px; min-width:240px; flex:1; }
-		#szkopul-utils-dashboard-summary .stats { display:grid; grid-template-columns:repeat(2,minmax(150px,1fr)); gap:6px 12px; }
-		#szkopul-utils-dashboard-summary .stat { line-height:1.25; }
+		#szkopul-utils-dashboard-summary .right-column { display:flex; flex-direction:row; justify-content:space-between; align-items:flex-start; gap:12px; min-width:240px; flex:1; }
+		#szkopul-utils-dashboard-summary .stats { display:flex; gap:12px; flex-wrap:wrap; }
+		#szkopul-utils-dashboard-summary .stats > div { display:flex; flex-direction:column; gap:6px; }
+		#szkopul-utils-dashboard-summary .stat { line-height:1.25; margin:0; }
 		#szkopul-utils-dashboard-summary .stat b { display:block; font-size:17px; line-height:1.1; margin-bottom:2px; }
-		#szkopul-utils-dashboard-summary .actions { display:flex; flex-wrap:wrap; gap:8px; }
-@media (max-width: 600px) {
-		  #szkopul-utils-dashboard-summary .layout { flex-direction:column; gap:10px; }
-  #szkopul-utils-dashboard-summary .right-column { min-width:0; width:100%; }
-		  #szkopul-utils-dashboard-summary .heatmap { width:100%; aspect-ratio:26/7; grid-template-rows:repeat(7,minmax(0,1fr)); grid-auto-columns:minmax(0,1fr); }
-		  #szkopul-utils-dashboard-summary .heatmap .cell { width:100%; height:100%; }
-  #szkopul-utils-dashboard-summary .stats { grid-template-columns: 1fr; }
-}
+		#szkopul-utils-dashboard-summary .actions { display:flex; flex-wrap:wrap; gap:8px; flex-direction:column; }
+		@media (max-width: 900px) {
+			#szkopul-utils-dashboard-summary .layout { flex-direction:column; gap:10px; min-height:auto; }
+			#szkopul-utils-dashboard-summary .right-column { min-width:0; width:100%; flex-direction:column; gap:10px; }
+			#szkopul-utils-dashboard-summary .heatmap { width:100%; aspect-ratio:26/7; grid-template-rows:repeat(7,minmax(0,1fr)); grid-auto-columns:minmax(0,1fr); gap:2px; }
+			#szkopul-utils-dashboard-summary .heatmap .cell { width:100%; height:100%; }
+			#szkopul-utils-dashboard-summary .stats { width:100%; justify-content:space-between; gap:10px; }
+			#szkopul-utils-dashboard-summary .stats > div { flex:1 1 0; min-width:120px; }
+			#szkopul-utils-dashboard-summary .actions { width:100%; flex-direction:row; }
+			#szkopul-utils-dashboard-summary .actions .btn { flex:1 1 140px; }
+		}
 `;
 	container.appendChild(style);
 
@@ -350,10 +354,10 @@ export function appendHomeDashboardSummary() {
 	const stats = document.createElement('div');
 	stats.className = 'stats';
 	stats.innerHTML = `
-		<div class="stat"><b id="szkopul-utils-stat-last-month">${solvedLastMonth}</b>${t('dashboard_stats_lastMonth')}</div>
-		<div class="stat"><b id="szkopul-utils-stat-today">${solvedToday}</b>${t('dashboard_stats_today')}</div>
-		<div class="stat"><b id="szkopul-utils-stat-total">${uniqueSolvedTasks.size}</b>${t('dashboard_stats_total')}</div>
-		<div class="stat"><b id="szkopul-utils-stat-best">${bestDay}</b>${t('dashboard_stats_bestDay')}</div>
+		<div><div class="stat"><b id="szkopul-utils-stat-last-month">${solvedLastMonth}</b>${t('dashboard_stats_lastMonth')}</div>
+		<div class="stat"><b id="szkopul-utils-stat-today">${solvedToday}</b>${t('dashboard_stats_today')}</div></div>
+		<div><div class="stat"><b id="szkopul-utils-stat-total">${uniqueSolvedTasks.size}</b>${t('dashboard_stats_total')}</div>
+		<div class="stat"><b id="szkopul-utils-stat-best">${bestDay}</b>${t('dashboard_stats_bestDay')}</div></div>
 	`;
 
 	const actions = document.createElement('div');
