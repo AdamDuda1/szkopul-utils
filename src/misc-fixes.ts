@@ -1,5 +1,6 @@
 import { html, render } from 'lit';
 import { programmingLanguage } from './options';
+import {emitTaskSolved} from "./ui-elements";
 
 export function makeEnterSearchThings() {
 	if (!(window.location.href.includes('/problemset') || window.location.href.includes('/contest'))) return;
@@ -209,4 +210,15 @@ export function inlineStatements() {
 			if (embed && !embed.getAttribute('src')) embed.setAttribute('src', statementHref);
 		});
 	});
+}
+
+export function addTaskSolvedEventTriggers() {
+	if (!window.location.href.includes("submit")) return;
+	const submitButtons = document.querySelectorAll<HTMLButtonElement>('.form-group > button[type="submit"]');
+	submitButtons.forEach((button: HTMLButtonElement) => {
+		button.style.color = 'red';
+		button.addEventListener('hover', () => {
+			emitTaskSolved(window.location.href); // TODO change this to task id and the event to actually solved, not just submitted
+		});
+	})
 }

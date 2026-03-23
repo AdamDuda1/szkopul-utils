@@ -1,6 +1,6 @@
 import {
 	fixContactButton, addUtilsFeedbackButton, makeEnterSearchThings, languageSelectorFix,
-	inlineStatements, statementsOnSamePage
+	inlineStatements, statementsOnSamePage, addTaskSolvedEventTriggers
 } from './misc-fixes';
 import browser from "webextension-polyfill";
 import { initNotes } from './notes';
@@ -37,7 +37,7 @@ const onLoad = () => {
 	if (optionsObject.statementsOnSamePage) void statementsOnSamePage();
 	if (optionsObject.inlineProblemStatements) void inlineStatements();
 
-	// void addTaskSolvedEventTriggers();
+	void addTaskSolvedEventTriggers();
 };
 
 getOptions().then((ans) => { optionsObject = ans; onStart(); });
