@@ -36,6 +36,8 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 
 - 'stats' page with for example total chars in submissions
 
+- Things in the contest archive!
+
 - hideScores unintentionally hides unrelated elements, like the whole 'teachers' tab
 - (??) hide the midified tables (like problems in contest) untill thir html is not modified (display: none on init and then flex when loaded)
 - dopracować inline statements i to drugie 

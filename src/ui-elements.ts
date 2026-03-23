@@ -323,13 +323,14 @@ export function appendHomeDashboardSummary() {
 
 	const style = document.createElement('style');
 	style.textContent = `
-		#szkopul-utils-dashboard-summary .layout { display:flex; align-items:flex-start; gap:14px; }
-		#szkopul-utils-dashboard-summary .heatmap { height: 135px !important; width: auto !important; display:grid; grid-template-rows:repeat(7,10px); grid-auto-flow:column; grid-auto-columns:10px; gap:3px; flex:0 0 auto; }
+		#szkopul-utils-dashboard-summary .layout { height: 88px !important; display:flex; align-items:flex-start; gap:14px; }
+		#szkopul-utils-dashboard-summary .heatmap { height: 87px !important; width: auto !important; display:grid; grid-template-rows:repeat(7,10px); grid-auto-flow:column; grid-auto-columns:10px; gap:3px; flex:0 0 auto; }
 		#szkopul-utils-dashboard-summary .heatmap .cell { width:10px; height:10px; border-radius:2px; }
 		#szkopul-utils-dashboard-summary .right-column { display:flex; flex-direction:column; justify-content:space-between; gap:10px; min-width:240px; flex:1; }
-		#szkopul-utils-dashboard-summary .stats { display:grid; grid-template-columns:repeat(2,minmax(150px,1fr)); gap:6px 12px; }
-		#szkopul-utils-dashboard-summary .stat { line-height:1.25; }
-		#szkopul-utils-dashboard-summary .stat b { display:block; font-size:17px; line-height:1.1; margin-bottom:2px; }
+		#szkopul-utils-dashboard-summary .stats { display: flex; flex-direction: row; }
+		#szkopul-utils-dashboard-summary .row { display: flex; flex-direction: column; width: 20%; justify-content: space-around; margin-left: 5%; height: 88px; }
+		#szkopul-utils-dashboard-summary .stat { line-height:1.25; display: flex; align-items: flex-end; }
+		#szkopul-utils-dashboard-summary .stat b { display:block; font-size:17px; line-height:1.1; margin-bottom:2px; font-size: 25px; margin-right: 6px; }
 		#szkopul-utils-dashboard-summary .actions { display:flex; flex-wrap:wrap; gap:8px; }
 @media (max-width: 600px) {
 		  #szkopul-utils-dashboard-summary .layout { flex-direction:column; gap:10px; }
@@ -350,20 +351,21 @@ export function appendHomeDashboardSummary() {
 	const stats = document.createElement('div');
 	stats.className = 'stats';
 	stats.innerHTML = `
-		<div class="stat"><b id="szkopul-utils-stat-last-month">${solvedLastMonth}</b>${t('dashboard_stats_lastMonth')}</div>
-		<div class="stat"><b id="szkopul-utils-stat-today">${solvedToday}</b>${t('dashboard_stats_today')}</div>
-		<div class="stat"><b id="szkopul-utils-stat-total">${uniqueSolvedTasks.size}</b>${t('dashboard_stats_total')}</div>
-		<div class="stat"><b id="szkopul-utils-stat-best">${bestDay}</b>${t('dashboard_stats_bestDay')}</div>
+		<div class="row">
+			<div class="stat"><b id="szkopul-utils-stat-last-month">${solvedLastMonth}</b>${t('dashboard_stats_lastMonth')}</div>
+			<div class="stat"><b id="szkopul-utils-stat-today">${solvedToday}</b>${t('dashboard_stats_today')}</div>
+		</div>
+		<div class="row">
+			<div class="stat"><b id="szkopul-utils-stat-total">${uniqueSolvedTasks.size}</b>${t('dashboard_stats_total')}</div>
+			<div class="stat"><b id="szkopul-utils-stat-best">${bestDay}</b>${t('dashboard_stats_bestDay')}</div>
+		</div>
+		<div class="row">
+			<div class="stat"><b id="szkopul-utils-stat-total">${uniqueSolvedTasks.size}</b>Total chars submitted</div>
+			<button style="width: 300px !important;" class="btn btn-secondary" id="szkopul-utils-random-task-todo">${t('dashboard_randomTaskTODO')}</button>
+		</div>
 	`;
 
-	const actions = document.createElement('div');
-	actions.className = 'actions';
-	actions.innerHTML = `
-		<button class="btn btn-secondary" id="szkopul-utils-random-task-todo">${t('dashboard_randomTaskTODO')}</button>
-		<button class="btn btn-secondary" id="szkopul-utils-see-stats">${t('dashboard_seeStats')}</button>
-	`;
-
-	actions.querySelector<HTMLButtonElement>('#szkopul-utils-random-task-todo')?.addEventListener('click', async () => {
+	stats.querySelector<HTMLButtonElement>('#szkopul-utils-random-task-todo')?.addEventListener('click', async () => {
 		const item = await getRandomTODOItem();
 		if (!item) {
 			alert(t('popup_todo_empty'));
@@ -371,10 +373,6 @@ export function appendHomeDashboardSummary() {
 		}
 
 		openTask(item.id);
-	});
-
-	actions.querySelector<HTMLButtonElement>('#szkopul-utils-see-stats')?.addEventListener('click', () => {
-		alert(`Stats:\nSolved last month: ${solvedLastMonth}\nSolved today: ${solvedToday}\nTotal solved: ${uniqueSolvedTasks.size}\nBest day: ${bestDay}`);
 	});
 
 	const heatmap = document.createElement('div');
@@ -442,7 +440,7 @@ export function appendHomeDashboardSummary() {
 		applySolvedEntry(problemId, date);
 	});
 
-	rightColumn.append(stats, actions);
+	rightColumn.append(stats);
 	layout.append(heatmap, rightColumn);
 	container.append(layout);
 	anchor.insertAdjacentElement('afterend', container);
@@ -463,7 +461,7 @@ export async function appendVirtualContestPanel() {
 	if (!panel) {
 		panel = document.createElement('div');
 		panel.id = panelId;
-		panel.style = `display: flex;position:fixed;top:150px;left:-3px;border:1px solid white;z-index:2147483647;width:250px;max-height:70vh;overflow-y:auto;background:rgb(255,255,255);color:rgb(33,37,41);border-radius:0 8px 8px 0;padding:10px;box-shadow:rgba(0,0,0,0.16) 0px 4px 14px;`;
+		panel.style = `display: flex;flex-direction:column !important;position:fixed;top:150px;left:-3px;border:1px solid white;z-index:2147483647;width:250px;max-height:70vh;overflow-y:auto;background:rgb(255,255,255);color:rgb(33,37,41);border-radius:0 8px 8px 0;padding:10px;box-shadow:rgba(0,0,0,0.16) 0px 4px 14px;`;
 		panel.innerHTML = `
 			<div style="font-weight: 600; margin-bottom: 8px;">Virtual contest</div>
 			<div id="szkopul-utils-virtual-panel-timer" style="font-size: 22px; margin-bottom: 8px;">00:00:00</div>

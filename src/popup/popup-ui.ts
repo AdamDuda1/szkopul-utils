@@ -256,12 +256,19 @@ render(
 			</div>
 		</div>
 
-		<div class="form-check form-switch switch-full d-flex align-items-center justify-content-between" style="min-height: auto;">
-			<label for="hideRulesTabOption" class="mb-0 form-check-label">${t('popup_options_hideRulesTab')}</label>
-			<div class="form-check form-switch m-0">
-				<input class="form-check-input" type="checkbox" id="hideRulesTabOption">
-			</div>
-		</div>
+        <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between" style="min-height: auto;">
+            <label for="hideRulesTabOption" class="mb-0 form-check-label">${t('popup_options_hideRulesTab')}</label>
+            <div class="form-check form-switch m-0">
+                <input class="form-check-input" type="checkbox" id="hideRulesTabOption">
+            </div>
+        </div>
+
+        <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between" style="min-height: auto;">
+            <label for="hideRqweulesTabOption" class="mb-0 form-check-label">Home page summary</label>
+            <div class="form-check form-switch m-0">
+                <input class="form-check-input" type="checkbox" id="hideRqweulesTabOption">
+            </div>
+        </div>
 		
 
 <!--		<div class="form-check form-switch switch-full d-flex align-items-center justify-content-between" style="min-height: auto;">-->

@@ -1,7 +1,7 @@
 {
   "name": "Szkopuł Utils",
   "description": "QOL improvements and additional features for the site szkopul.edu.pl",
-  "version": "1.0",
+  "version": "1.1",
   "manifest_version": 3,
   "action": {
     "default_popup": "popup/index.html",
