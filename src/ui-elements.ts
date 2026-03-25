@@ -549,16 +549,21 @@ export function appendHomeDashboardSummary() {
 		style.id = 'szkopul-utils-dashboard-summary-style';
 		style.textContent = `
 			#szkopul-utils-dashboard-summary { margin-top: 12px; border-top: 1px solid rgba(127, 127, 127, 0.35); }
-			#szkopul-utils-dashboard-summary .dashboard-card-body { display: flex; flex-direction: column; gap: 10px; }
+			#szkopul-utils-dashboard-summary .dashboard-card-body { display: flex; flex-direction: column; gap: 12px; }
 			#szkopul-utils-dashboard-summary .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px; }
 			#szkopul-utils-dashboard-summary .stats-grid-horizontal { display: grid; grid-template-columns: 1fr; gap: 8px 10px; }
 			#szkopul-utils-dashboard-summary .stat-item { line-height: 1.2; }
 			#szkopul-utils-dashboard-summary .stat-item b { display: block; font-size: 18px; }
+			#szkopul-utils-dashboard-summary .stats-grid-primary .stat-item b { font-size: 20px; }
+			#szkopul-utils-dashboard-summary .stats-grid-secondary .stat-item { opacity: 0.9; }
 			#szkopul-utils-dashboard-summary .stat-extra { display: block; opacity: 0.75; font-size: 11px; }
-			#szkopul-utils-dashboard-summary .mini-heatmap-wrap { overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
-			#szkopul-utils-dashboard-summary .mini-heatmap { display: grid; width: max-content; grid-template-rows: repeat(7, 9px); grid-auto-flow: column; grid-auto-columns: 9px; gap: 2px; }
-			#szkopul-utils-dashboard-summary .mini-heatmap .cell { width: 9px; height: 9px; border-radius: 2px; }
+			#szkopul-utils-dashboard-summary .summary-actions { margin-top: 2px; }
+			#szkopul-utils-dashboard-summary #szkopul-utils-random-task-todo { width: 100%; }
+			#szkopul-utils-dashboard-summary .mini-heatmap-wrap { overflow: hidden; padding-bottom: 4px; scrollbar-width: thin; }
+			#szkopul-utils-dashboard-summary .mini-heatmap { scale: 1.17; display: grid; width: max-content; grid-template-rows: repeat(7, 9px); grid-auto-flow: column; grid-auto-columns: 9px; gap: 2px; }
+			#szkopul-utils-dashboard-summary .mini-heatmap .cell { position: relative; top: 7px; left: 30px; width: 9px; height: 9px; border-radius: 2px; }
 			@media (max-width: 991px) {
+				#szkopul-utils-dashboard-summary .stats-grid-secondary { grid-template-columns: 1fr; }
 				#szkopul-utils-dashboard-summary .mini-heatmap { grid-template-rows: repeat(7, 10px); grid-auto-columns: 10px; gap: 3px; }
 				#szkopul-utils-dashboard-summary .mini-heatmap .cell { width: 10px; height: 10px; }
 			}
@@ -571,19 +576,17 @@ export function appendHomeDashboardSummary() {
 			<h4 class="mb-0">Activity</h4>
 		</div>
 		<div class="card-body dashboard-card-body">
-			<div class="stats-grid">
-				<div class="stat-item"><b id="szkopul-utils-stat-last-month">${solvedLastMonth}</b>${t('dashboard_stats_lastMonth')}</div>
-				<div class="stat-item"><b id="szkopul-utils-stat-today">${solvedToday}</b>${t('dashboard_stats_today')}</div>
-			</div>
-			<div class="stats-grid">
+			<div class="stats-grid stats-grid-secondary">
 				<div class="stats-grid-horizontal">
+					<div class="stat-item"><b id="szkopul-utils-stat-last-month">${solvedLastMonth}</b>${t('dashboard_stats_lastMonth')}</div>
 					<div class="stat-item"><b id="szkopul-utils-stat-total">${uniqueSolvedTasks.size}</b>${t('dashboard_stats_total')}</div>
 					<div class="stat-item"><b id="szkopul-utils-stat-chars">${submittedCharsTotal}</b>${t('dashboard_stats_chars')}<span class="stat-extra" id="szkopul-utils-stat-chars-mb">(0.00 MB)</span></div>
 					<div class="stat-item"><b id="szkopul-utils-stat-best">${bestDay}</b>${t('dashboard_stats_bestDay')}</div>
 				</div>
 				<div class="stats-grid-horizontal">
-					<div class="mini-heatmap-wrap"><div class="mini-heatmap" id="szkopul-utils-mini-heatmap"></div></div>
-					<button class="btn btn-sm btn-secondary" id="szkopul-utils-random-task-todo">${t('dashboard_randomTaskTODO')}</button>	
+					<div class="stat-item"><b id="szkopul-utils-stat-today">${solvedToday}</b>${t('dashboard_stats_today')}</div>
+					<div class="mini-heatmap-wrap"><div style="width: 100%; height: 100%;" class="mini-heatmap" id="szkopul-utils-mini-heatmap"></div></div>
+					<button class="btn btn-sm btn-secondary" id="szkopul-utils-random-task-todo">${t('dashboard_randomTaskTODO')}</button>
 				</div>
 			</div>
 		</div>
@@ -605,7 +608,7 @@ export function appendHomeDashboardSummary() {
 	if (!heatmap) return;
 	const heatCells = new Map<string, HTMLDivElement>();
 
-	const weeks = window.matchMedia('(max-width: 991px)').matches ? 14 : 20;
+	const weeks = window.matchMedia('(max-width: 991px)').matches ? 14 : 31;
 	const totalCells = 7 * weeks;
 	const start = new Date(today);
 	start.setDate(start.getDate() - (totalCells - 1));
@@ -624,6 +627,7 @@ export function appendHomeDashboardSummary() {
 		heatCells.set(key, cell);
 		heatmap.appendChild(cell);
 	}
+
 
 	const lastMonthValue = container.querySelector<HTMLElement>('#szkopul-utils-stat-last-month');
 	const todayValue = container.querySelector<HTMLElement>('#szkopul-utils-stat-today');

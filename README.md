@@ -32,6 +32,8 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 
 ## TODO:
 
+- ADD TASKS OUTSIDE OF SZKOPUL TO THE TODO LIST!!!!!!!!!!!
+
 - dashboard doesnt display on mobile
 
 - ! emitTaskSolved('twoj-problem-id'); przy submit albo lepiej przy maxie za zadanie
