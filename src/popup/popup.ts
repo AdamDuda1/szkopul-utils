@@ -88,24 +88,6 @@ function loadOptions() {
 	}
 }
 
-function loadData() {
-	browser.storage.local.get("hideScores").then((result) => {
-		const hideScores = result.hideScores === true;
-		let checkbox = document.getElementById('hideScoresOption') as HTMLInputElement | null;
-		if (checkbox) checkbox.checked = hideScores;
-		checkbox = document.getElementById('hideScoresQuickOption') as HTMLInputElement | null;
-		if (checkbox) checkbox.checked = hideScores;
-	});
-
-
-	browser.storage.local.get("lang").then((result) => {
-		const storedLang: lang = result.lang === "en" ? "en" : "pl";
-		setLang(storedLang);
-		(document.getElementById('lang') as HTMLSelectElement).value = storedLang;
-	});
-}
-
-
 function itemUrl(id: string) {
 	return `https://szkopul.edu.pl/problemset/problem/${encodeURIComponent(id)}/site/`;
 }
@@ -409,9 +391,9 @@ async function syncVirtualRunningPage() {
 		tasksEl.innerHTML = tasks.length === 0
 			? `<div style="opacity: .8;">${t('popup_virtual_noVirtualTasks')}</div>`
 			: tasks.map((task) => `
-				<div style="margin-bottom: 5px;">
+				<li style="margin-bottom: 5px;">
 					<a href="https://szkopul.edu.pl/problemset/problem/${encodeURIComponent(task.id)}/site/?key=statement" target="_blank" rel="noopener noreferrer">${escapeHTML(task.name)}</a>
-				</div>
+				</li>
 			`).join('');
 	}
 
@@ -430,10 +412,16 @@ async function syncVirtualRunningPage() {
 			void saveVirtualOptions({ ...options, isRunning: false }).then(syncVirtualRunningPage);
 		}
 	}, 1000);
+
+	let settings = "";
+	if (options.hideScores) settings += t("popup_home_hideScores") + ", ";
+	if (options.blockOtherSubpages) settings += t("popup_virtual_blockOtherSubpages") + ", ";
+
+	settings += t("popup_virtual_scoreBy") + ": " + (options.scoreBy == 'last' ? t("popup_virtual_scoreBy_last") : t("popup_virtual_scoreBy_best")) + ", ";
+	settings += options.durationInputHours + "h " + options.durationInputMinutes + "m";
+
+	document.getElementById('virtual-running-settings')!.innerText = settings;
 }
-
-
-
 
 async function initVirtual() {
 	let tasks = await getVirtualTasks();
@@ -550,11 +538,6 @@ async function initVirtual() {
 	void syncVirtualRunningPage();
 }
 
-
-
-
-
-
 async function exportStorage() {
 	const data = await browser.storage.local.get(null);
 	const json = JSON.stringify(data, null, 2);
@@ -644,7 +627,7 @@ async function importStorage(event: Event) {
 		await browser.storage.local.clear();
 		await browser.storage.local.set(data as Record<string, unknown>);
 		showPopupNotice(t('popup_data_import_success'));
-		loadData();
+		location.reload();
 	} catch {
 		showPopupNotice(t('popup_data_import_invalid'));
 	}

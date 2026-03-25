@@ -42,9 +42,7 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 
 - Things in the contest archive!
 
-- hideScores unintentionally hides unrelated elements, like the whole 'teachers' tab
 - (??) hide the midified tables (like problems in contest) untill thir html is not modified (display: none on init and then flex when loaded)
-- dopracować inline statements i to drugie 
 - make the user be able to choose what is displayed on the home page of the popup (szkopul stats/quick score hiding setting)
 - **build the menu html on click so it loads faster and is up to date**
 - inline task statements in contest views

@@ -33,17 +33,14 @@ export function hideScores() {
             color: ${fg} !important;
 		}
 		
-        [id*="report"] > article:first-of-type, .container-fluid.body .row > div:first-of-type {
-            display: none !important;                       /* TODO: ^ not safe probably*/
+        [id*="report"] > article:first-of-type, .container-fluid.body .row > div:first-of-type > article {
+            display: none !important;                       /* TODO: ^ not safe probably*/ /*IT INDEED WAS NOT SAFE*/
 		}
 		
 		#submission-status-table tbody tr td:last-of-type, #open-form,
 			#tag-form, .modal-backdrop.fade.show {
 			display: none !important;
 		}
-		
-		
-		
     `;
 
 	attachCSS(css);

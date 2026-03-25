@@ -190,23 +190,17 @@ render(
 
 render(
 	html`
-		<div style="position: absolute; top: 5px; left: 5px; display: flex; height: 50px">
-			<button class="btn btn-default" id="btn-backHome-running"
-					style="width: auto; padding: 3px; color: white; display: flex;">
-				<img src="../icons/ic-arrow-right.svg" alt="" class="back-btn">
-				<h3 style="position: relative; top: -4px; left: 5px;">${t('popup_virtual_running')}</h3>
-			</button>
-		</div>
+		<span class="categ">${t('popup_virtual_running_left')}</span>
+		<div id="virtual-running-remaining" style="font-size: 46px; margin-bottom: 1px;">00:00:00</div>
 
-		<br><br>
+		<span class="categ">${t('popup_virtual_running_tasks')}</span>
+		<ul id="virtual-running-tasks" style="width: 80%;"></ul>
 
-		<div style="width: 88%; margin-top: 8px; font-size: 12px; opacity: .8;">${t('popup_virtual_running_left')}</div>
-		<div id="virtual-running-remaining" style="font-size: 26px; margin-bottom: 10px;">00:00:00</div>
-
-		<div style="width: 88%; font-size: 12px; opacity: .8; margin-bottom: 4px;">${t('popup_virtual_running_tasks')}</div>
-		<div id="virtual-running-tasks" style="width: 88%; max-height: 165px; overflow-y: auto; font-size: 13px;"></div>
-
+		<span class="categ">${t('popup_virtual_running_settings')}</span>
+		<span class="info" id="virtual-running-settings" style="width: 80%; text-align: center"></span>
+		
 		<button id="btn-stopVirtual" type="button" class="btn btn-danger b" style="margin-top: 10px;">${t('popup_virtual_running_stop')}</button>
+		<span class="info" style="margin-bottom: 7px">${t("popup_virtual_running_stopNotice")}</span>
 	`, document.getElementById('virtual-running')!
 );
 

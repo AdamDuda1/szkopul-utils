@@ -39,8 +39,10 @@ export const translations = {
 		popup_virtual_running: "Trwa konkurs",
 		popup_virtual_running_left: "Pozostały czas",
 		popup_virtual_running_tasks: "Zadania",
+		popup_virtual_running_settings: "Ustawienia",
 		popup_virtual_running_stop: "Zakończ konkurs",
 		popup_virtual_running_stopped: "Konkurs zatrzymany",
+		popup_virtual_running_stopNotice: "Zadania i ustawienia pozostaną zapisane",
 		popup_virtual_started: "Konkurs wystartował",
 		popup_virtual_setTimeFirst: "Najpierw ustaw czas konkursu",
 
@@ -119,8 +121,10 @@ export const translations = {
 		popup_virtual_running: "Contest running",
 		popup_virtual_running_left: "Time left",
 		popup_virtual_running_tasks: "Tasks",
+		popup_virtual_running_settings: "Settings",
 		popup_virtual_running_stop: "Stop contest",
 		popup_virtual_running_stopped: "Contest stopped",
+		popup_virtual_running_stopNotice: "Task or settings won't be discarded",
 		popup_virtual_started: "Virtual contest started",
 		popup_virtual_setTimeFirst: "Set contest time first",
 
