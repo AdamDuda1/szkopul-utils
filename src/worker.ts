@@ -4,12 +4,12 @@ import {
 } from './misc-fixes';
 import browser from "webextension-polyfill";
 import { initNotes } from './notes';
-import { appendHomeDashboardSummary, appendProblemSetMenu, appendVirtualContestPanel } from './ui-elements';
-import {hidePageContents, hideRulesTab, hideScores} from './ui-hiders';
+import { appendHomeDashboardSummary, appendProblemSetMenu, appendVirtualContestPanel, prependPinnedContestsDashboardCard } from './ui-elements';
+import { hideInitReportBadges, hidePageContents, hideRulesTab, hideScores } from './ui-hiders';
 import { addToTODOAction } from './todo';
 import { setLang } from './globals';
 import { getVirtualOptions, getVirtualTasks, saveVirtualOptions } from './virtual';
-import {getOptions, optionsTemplate} from "./options";
+import { getOptions, optionsTemplate } from "./options";
 
 const manifestVersion = browser.runtime.getManifest().version;
 console.log(`Thank you for using Szkopuł Utils (v${manifestVersion}), Dzięki! :)`);
@@ -22,6 +22,7 @@ const onStart = () => {
 	void applyVirtualContestPageOptions();
 	if (optionsObject.hideScores) void hideScores();
 	if (optionsObject.hideRulesTab) void hideRulesTab();
+	if (optionsObject.hideInitReportBadges) void hideInitReportBadges();
 };
 
 const onLoad = () => {
@@ -31,8 +32,9 @@ const onLoad = () => {
 	void appendProblemSetMenu(addToTODOAction);
 	void appendVirtualContestPanel();
 	void makeEnterSearchThings();
-	void appendHomeDashboardSummary();
 	void initNotes();
+
+	homePageFixes();
 
 	if (optionsObject.statementsOnSamePage) void statementsOnSamePage();
 	if (optionsObject.inlineProblemStatements) void inlineStatements();
@@ -44,6 +46,14 @@ getOptions().then((ans) => { optionsObject = ans; onStart(); });
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', onLoad, { once: true });
 else onLoad();
 
+function homePageFixes() {
+	if (window.location.hostname !== 'szkopul.edu.pl') return;
+	if (window.location.pathname !== '/') return;
+
+
+	prependPinnedContestsDashboardCard();
+	void appendHomeDashboardSummary();
+}
 
 async function applyVirtualContestPageOptions() {
 	const options = await getVirtualOptions();
@@ -75,11 +85,4 @@ async function applyVirtualContestPageOptions() {
 
 		if (!isVirtualTaskPage) hidePageContents();
 	}
-}
-
-
-export async function storageLogTODO() {
-	const result = await browser.storage.local.get("TODO");
-	const arr = Array.isArray(result.TODO) ? result.TODO : [];
-	console.log(arr);
 }

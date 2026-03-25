@@ -44,7 +44,17 @@ export function hideScores() {
 		
 		
 		
-    `; // TODO find a better way of hiding the actual score text
+    `;
+
+	attachCSS(css);
+}
+
+export function hideInitReportBadges() {
+	const css: string = `
+        section .table-responsive-md tr td a span.badge {
+        	display: none !important;
+        }
+    `;
 
 	attachCSS(css);
 }

@@ -35,6 +35,12 @@ function loadOptions() {
 			saveOptions(optionsObject!).then(() => document.getElementById('refresh-pls-options')!.style.display = 'flex');
 		});
 
+		(document.getElementById('hideInitReportBadgesOption') as HTMLInputElement).checked = optionsObject.hideInitReportBadges;
+		(document.getElementById('hideInitReportBadgesOption') as HTMLInputElement).addEventListener('change', () => {
+			optionsObject!.hideInitReportBadges = (document.getElementById('hideInitReportBadgesOption') as HTMLInputElement).checked as boolean;
+			saveOptions(optionsObject!).then(() => document.getElementById('refresh-pls-options')!.style.display = 'flex');
+		});
+
 		(document.getElementById('preferredLang') as HTMLSelectElement).value = optionsObject.preferredLanguage;
 		(document.getElementById('preferredLang') as HTMLSelectElement).addEventListener('change', () => {
 			optionsObject!.preferredLanguage = (document.getElementById('preferredLang') as HTMLSelectElement).value as programmingLanguage;

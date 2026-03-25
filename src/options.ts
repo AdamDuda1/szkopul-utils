@@ -6,6 +6,7 @@ const KEY_OPTIONS = "options";
 export type optionsTemplate = {
     lang: "pl" | "en",
     hideScores: boolean,
+    hideInitReportBadges: boolean,
     hideRulesTab: boolean,
     preferredLanguage: programmingLanguage,
     inlineProblemStatements: boolean,
@@ -15,6 +16,7 @@ export type optionsTemplate = {
 const DEFAULT_OPTIONS: optionsTemplate = {
     lang: "pl",
     hideScores: false,
+    hideInitReportBadges: false,
     hideRulesTab: false,
     preferredLanguage: "",
     inlineProblemStatements: false,

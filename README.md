@@ -32,7 +32,7 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 
 ## TODO:
 
-- pinned contests
+- dashboard doesnt display on mobile
 
 - ! emitTaskSolved('twoj-problem-id'); przy submit albo lepiej przy maxie za zadanie
 - menu w problem view

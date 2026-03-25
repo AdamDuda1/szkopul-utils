@@ -264,27 +264,14 @@ render(
         </div>
 
         <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between" style="min-height: auto;">
-            <label for="hideRulesTabOption" class="mb-0 form-check-label">Home page summary</label>
+            <label for="hideInitReportBadgesOption" class="mb-0 form-check-label">
+				${t("popup_options_hideInitReportBadges")}
+				<span class="info">${t("popup_options_hideInitReportBadgesInfo")}</span>
+			</label>
             <div class="form-check form-switch m-0">
-                <input class="form-check-input" type="checkbox" id="hideRulesTabOption">
+                <input class="form-check-input" type="checkbox" id="hideInitReportBadgesOption">
             </div>
         </div>
-
-        <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between" style="min-height: auto;">
-            <label for="hideInitReportBadgeOption" class="mb-0 form-check-label">Hide the last submission initial report badge</label>
-            <div class="form-check form-switch m-0">
-                <input class="form-check-input" type="checkbox" id="hideInitReportBadgeOption">
-            </div>
-        </div>
-		
-
-<!--		<div class="form-check form-switch switch-full d-flex align-items-center justify-content-between" style="min-height: auto;">-->
-<!--			<label for="hideTimerOption" class="mb-0 form-check-label">${t('popup_options_hideTimers')}</label>-->
-<!--			<div class="form-check form-switch m-0">-->
-<!--				<input class="form-check-input" type="checkbox" id="hideTimerOption">-->
-<!--			</div>-->
-<!--		</div>-->
-
 
 		<div style="display: flex; justify-content: space-between; width: 82%; margin-top: 7px; min-height: auto; align-items: center;">
 			<label for="preferredLang">

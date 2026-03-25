@@ -401,10 +401,105 @@ async function getDashboardSubmittedCharsTotal() {
 	return total;
 }
 
-export function appendHomeDashboardSummary() {
-	if (window.location.hostname !== 'szkopul.edu.pl') return;
-	if (window.location.pathname !== '/') return;
+type PinnedContest = {
+	href: string;
+	name: string;
+	slug: string;
+};
 
+const PINNED_CONTESTS_STORAGE_KEY = 'szkopul-utils-pinned-contests';
+
+function readPinnedContestsFromStorage() {
+	try {
+		const raw = localStorage.getItem(PINNED_CONTESTS_STORAGE_KEY);
+		if (!raw) return [] as PinnedContest[];
+
+		const parsed = JSON.parse(raw);
+		if (!Array.isArray(parsed)) return [] as PinnedContest[];
+
+		return parsed
+			.filter((item): item is PinnedContest => {
+				return typeof item?.href === 'string' && typeof item?.name === 'string' && typeof item?.slug === 'string';
+			})
+			.slice(0, 8);
+	} catch (_error) {
+		return [] as PinnedContest[];
+	}
+}
+
+function readPinnedContestsFromPanel(panel: HTMLElement, limit = 3) {
+	const rows = Array.from(panel.querySelectorAll<HTMLTableRowElement>('table tr'));
+	const pins: PinnedContest[] = [];
+
+	for (const row of rows) {
+		const cells = row.querySelectorAll('td');
+		const slug = cells[0]?.textContent?.trim() ?? '';
+		const link = row.querySelector<HTMLAnchorElement>('a[href*="/c/"]');
+		const name = link?.textContent?.trim() ?? '';
+		const href = link?.getAttribute('href') ?? '';
+
+		if (!slug || !name || !href) continue;
+		pins.push({ slug, name, href: new URL(href, window.location.origin).toString() });
+		if (pins.length >= limit) break;
+	}
+
+	return pins;
+}
+
+export function prependPinnedContestsDashboardCard() {
+	if (document.getElementById('szkopul-utils-pinned-contests')) return;
+
+	const dashboardPanels = Array.from(document.querySelectorAll<HTMLElement>('.dashboard-panel'));
+	const rightPanel = dashboardPanels.find((panel) => panel.querySelector('a[href="/contest/"]'));
+	if (!rightPanel) return;
+
+	if (!document.getElementById('szkopul-utils-pinned-contests-style')) {
+		const style = document.createElement('style');
+		style.id = 'szkopul-utils-pinned-contests-style';
+		style.textContent = `
+			#szkopul-utils-pinned-contests { border-bottom: 1px solid rgba(127, 127, 127, 0.35); margin-bottom: 12px; padding-bottom: 8px; }
+			#szkopul-utils-pinned-contests .dashboard-card-body { padding-top: 10px; }
+			#szkopul-utils-pinned-contests ul { margin: 0; padding-left: 18px; }
+			#szkopul-utils-pinned-contests li { margin-bottom: 4px; }
+			#szkopul-utils-pinned-contests .pinned-empty { opacity: 0.75; margin: 0; }
+		`;
+		document.head.appendChild(style);
+	}
+
+	const pinnedContests = readPinnedContestsFromStorage();
+	const fallbackPins = pinnedContests.length > 0 ? pinnedContests : readPinnedContestsFromPanel(rightPanel);
+
+	const container = document.createElement('div');
+	container.id = 'szkopul-utils-pinned-contests';
+	container.innerHTML = `
+		<div class="card-header dashboard-panel-head">
+			<h4 class="mb-0">Pinned contests</h4>
+		</div>
+		<div class="card-body dashboard-card-body"></div>
+	`;
+
+	const body = container.querySelector<HTMLDivElement>('.dashboard-card-body');
+	if (!body) return;
+
+	if (fallbackPins.length === 0) {
+		body.innerHTML = '<p class="pinned-empty">No pinned contests yet.</p>';
+	} else {
+		const list = document.createElement('ul');
+		for (const contest of fallbackPins) {
+			const li = document.createElement('li');
+			const link = document.createElement('a');
+			link.href = contest.href;
+			link.textContent = `${contest.slug} - ${contest.name}`;
+			li.appendChild(link);
+			list.appendChild(li);
+		}
+		body.appendChild(list);
+	}
+
+	rightPanel.prepend(container);
+}
+
+export function appendHomeDashboardSummary() {
 	if (document.getElementById('szkopul-utils-dashboard-summary')) return;
 
 	const submissionsTable = document.querySelector<HTMLTableElement>('table.submission');
