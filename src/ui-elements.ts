@@ -457,7 +457,7 @@ export function prependPinnedContestsDashboardCard() {
 		const style = document.createElement('style');
 		style.id = 'szkopul-utils-pinned-contests-style';
 		style.textContent = `
-			#szkopul-utils-pinned-contests { border-bottom: 1px solid rgba(127, 127, 127, 0.35); margin-bottom: 12px; padding-bottom: 8px; }
+			#szkopul-utils-pinned-contests { margin-bottom: 12px; padding-bottom: 8px; }
 			#szkopul-utils-pinned-contests .dashboard-card-body { padding-top: 10px; }
 			#szkopul-utils-pinned-contests ul { margin: 0; padding-left: 18px; }
 			#szkopul-utils-pinned-contests li { margin-bottom: 4px; }
@@ -466,37 +466,38 @@ export function prependPinnedContestsDashboardCard() {
 		document.head.appendChild(style);
 	}
 
-	const pinnedContests = readPinnedContestsFromStorage();
-	const fallbackPins = pinnedContests.length > 0 ? pinnedContests : readPinnedContestsFromPanel(rightPanel);
+	let header = document.createElement('div');
+	header.classList.add('card-header', 'dashboard-panel-head');
+	header.innerHTML = '<h4 class="mb-0">Pinned contests</h4>';
 
 	const container = document.createElement('div');
 	container.id = 'szkopul-utils-pinned-contests';
-	container.innerHTML = `
-		<div class="card-header dashboard-panel-head">
-			<h4 class="mb-0">Pinned contests</h4>
-		</div>
-		<div class="card-body dashboard-card-body"></div>
-	`;
+	container.classList.add('card-body', 'dashboard-card-body');
+	container.innerHTML = '<table class="table break-all-words"></table>'
 
-	const body = container.querySelector<HTMLDivElement>('.dashboard-card-body');
+
+	let fallbackPins: PinnedContest[] = [];
+
+	const body = container.querySelector<HTMLTableElement>('.table.break-all-words');
 	if (!body) return;
 
 	if (fallbackPins.length === 0) {
 		body.innerHTML = '<p class="pinned-empty">No pinned contests yet.</p>';
 	} else {
-		const list = document.createElement('ul');
+		const list = document.createElement('tbody');
 		for (const contest of fallbackPins) {
-			const li = document.createElement('li');
-			const link = document.createElement('a');
-			link.href = contest.href;
-			link.textContent = `${contest.slug} - ${contest.name}`;
-			li.appendChild(link);
-			list.appendChild(li);
+			const tr = document.createElement('tr');
+			tr.innerHTML = `
+				<td>${contest.slug}</td>
+				<td><a href="${contest.href}">${contest.name}</a></td>
+			`;
+			list.appendChild(tr);
 		}
 		body.appendChild(list);
 	}
 
 	rightPanel.prepend(container);
+	rightPanel.prepend(header);
 }
 
 export function appendHomeDashboardSummary() {

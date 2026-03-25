@@ -2,6 +2,13 @@ import { html, render } from 'lit';
 import { programmingLanguage } from './options';
 import {emitTaskSolved} from "./ui-elements";
 
+function attachCSS(css: string) {
+	const styleElement: HTMLStyleElement = document.createElement('style');
+	styleElement.textContent = css;
+
+	document.documentElement.appendChild(styleElement);
+}
+
 export function makeEnterSearchThings() {
 	if (!(window.location.href.includes('/problemset') || window.location.href.includes('/contest'))) return;
 	const input = document.querySelector("input[type='search']"); // TODO fix doesnt work on /contest on chrome for some reason
@@ -33,17 +40,31 @@ export function fixContactButton() {
 		    display: flex;
 		    align-items: center;
         }
-        
+    `;
+
+	attachCSS(css);
+}
+
+export function mandatoryCSSFixes() {
+	const css: string = `
 		.szkopul-dashboard__container.body .dashboard-container {
 			margin-left: 0; /* not the contact button but also a mandatory fix */
 			margin-top: 20px !important;
 		}
+		
+		.card-body.dashboard-card-body table.table.break-all-words tbody tr td:first-child { display: none; }
+		.card-body.dashboard-card-body table.table.break-all-words tbody tr td:last-child { width: 100%; font-weight: bold; }
+		.card-body.dashboard-card-body table.table.break-all-words { margin: 0; }
+		
+		#szkopul-utils-pinned-contests table.table.break-all-words tbody tr td:first-child { display: none; }
+		#szkopul-utils-pinned-contests table.table.break-all-words tbody tr td:last-child { width: 100%; font-weight: bold; }
+		#szkopul-utils-pinned-contests table.table.break-all-words { margin: 0; }
+		
+		.card-header.dashboard-panel-head { border-radius: 10px 10px 0 0; }
     `;
 
-	const styleElement: HTMLStyleElement = document.createElement('style');
-	styleElement.textContent = css;
+	attachCSS(css);
 
-	document.documentElement.appendChild(styleElement);
 }
 
 export function addUtilsFeedbackButton() {

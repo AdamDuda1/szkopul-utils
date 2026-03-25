@@ -1,6 +1,6 @@
 import {
 	fixContactButton, addUtilsFeedbackButton, makeEnterSearchThings, languageSelectorFix,
-	inlineStatements, statementsOnSamePage, addTaskSolvedEventTriggers
+	inlineStatements, statementsOnSamePage, addTaskSolvedEventTriggers, mandatoryCSSFixes
 } from './misc-fixes';
 import browser from "webextension-polyfill";
 import { initNotes } from './notes';
@@ -19,6 +19,7 @@ let optionsObject: optionsTemplate;
 const onStart = () => {
 	setLang(optionsObject.lang);
 	void fixContactButton();
+	void mandatoryCSSFixes();
 	void applyVirtualContestPageOptions();
 	if (optionsObject.hideScores) void hideScores();
 	if (optionsObject.hideRulesTab) void hideRulesTab();
