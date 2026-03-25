@@ -29,8 +29,9 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 
 ## TODO:
 
+- pinned contests
+
 - ! emitTaskSolved('twoj-problem-id'); przy submit albo lepiej przy maxie za zadanie
-- lepszy spacing przy dashboardzie na home pagu
 - menu w problem view
 - preferred language is on home page...
 

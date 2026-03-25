@@ -227,7 +227,10 @@ function formatRemaining(ms: number) {
 let virtualPanelIntervalId = 0;
 
 function toDateKey(date: Date) {
-	return date.toISOString().slice(0, 10);
+	const yyyy = date.getFullYear();
+	const mm = String(date.getMonth() + 1).padStart(2, '0');
+	const dd = String(date.getDate()).padStart(2, '0');
+	return `${yyyy}-${mm}-${dd}`;
 }
 
 function parseDate(raw: string) {
@@ -237,6 +240,18 @@ function parseDate(raw: string) {
 	const parsed = new Date(trimmed);
 	if (!Number.isNaN(parsed.getTime())) return parsed;
 
+	const monthDayMatch = trimmed.match(/^(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})$/);
+	if (monthDayMatch) {
+		let year = new Date().getFullYear();
+		const [, mm, dd, hh, min, ss] = monthDayMatch;
+		let monthDayParsed = new Date(year, Number(mm) - 1, Number(dd), Number(hh), Number(min), Number(ss));
+		if (monthDayParsed.getTime() > Date.now() + 24 * 60 * 60 * 1000) {
+			year -= 1;
+			monthDayParsed = new Date(year, Number(mm) - 1, Number(dd), Number(hh), Number(min), Number(ss));
+		}
+		if (!Number.isNaN(monthDayParsed.getTime())) return monthDayParsed;
+	}
+
 	const dotMatch = trimmed.match(/^(\d{2})\.(\d{2})\.(\d{4})/);
 	if (!dotMatch) return null;
 
@@ -245,27 +260,66 @@ function parseDate(raw: string) {
 	return Number.isNaN(dotParsed.getTime()) ? null : dotParsed;
 }
 
+function parseSolvedEntryFromRow(row: HTMLTableRowElement) {
+	const statusCell = row.querySelector<HTMLElement>('td[id*="-status"]');
+	const statusClass = statusCell?.className.toLowerCase() ?? '';
+	const text = row.textContent?.toLowerCase() ?? '';
+	const solvedByClass = /submission--ok/.test(statusClass);
+	const solvedByText = /(\b100\b|accepted|\bok\b|zaakcept|poprawne|\bac\b)/.test(text);
+	if (!solvedByClass && !solvedByText) return null;
+
+	const href = row.querySelector<HTMLAnchorElement>('a[href*="/problemset/problem/"]')?.href ?? '';
+	const submissionProblem = row.querySelector<HTMLElement>('td[id*="-problem-instance"], td.col-lg-4')?.textContent?.trim() ?? '';
+	const problemId = href.match(/\/problemset\/problem\/([^/]+)/)?.[1] ?? submissionProblem;
+
+	const dateRaw = row.querySelector('time')?.getAttribute('datetime')
+		?? row.querySelector('time')?.textContent
+		?? row.querySelector<HTMLElement>('td[id*="-link"]')?.textContent
+		?? Array.from(row.querySelectorAll('td')).map((td) => td.textContent?.trim() ?? '').find((value) => /\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}/.test(value) || value.length > 4)
+		?? '';
+
+	const parsedDate = parseDate(dateRaw);
+	if (!parsedDate) return null;
+
+	parsedDate.setHours(0, 0, 0, 0);
+	return { date: parsedDate, problemId };
+}
+
 function getSolvedDashboardEntries() {
-	const rows = Array.from(document.querySelectorAll<HTMLTableRowElement>('.szkopul-dashboard__container tr'));
+	const rows = Array.from(document.querySelectorAll<HTMLTableRowElement>('table.submission tbody tr, .szkopul-dashboard__container tr'));
 	const entries: { date: Date; problemId: string }[] = [];
 
 	for (const row of rows) {
-		const text = row.textContent?.toLowerCase() ?? '';
-		if (!/(\b100\b|accepted|\bok\b|zaakcept|poprawne|\bac\b)/.test(text)) continue;
+		const parsedEntry = parseSolvedEntryFromRow(row);
+		if (parsedEntry) entries.push(parsedEntry);
+	}
 
-		const href = row.querySelector<HTMLAnchorElement>('a[href*="/problemset/problem/"]')?.href ?? '';
-		const problemId = href.match(/\/problemset\/problem\/([^/]+)/)?.[1] ?? '';
+	return entries;
+}
 
-		const dateRaw = row.querySelector('time')?.getAttribute('datetime')
-			?? row.querySelector('time')?.textContent
-			?? Array.from(row.querySelectorAll('td')).map((td) => td.textContent?.trim() ?? '').find((value) => value.length > 4)
-			?? '';
+async function getSolvedEntriesFromSubmissionsPages(maxPages = 12) {
+	const entries: { date: Date; problemId: string }[] = [];
+	let nextUrl = `${window.location.origin}/submissions/`;
 
-		const parsedDate = parseDate(dateRaw);
-		if (!parsedDate) continue;
+	for (let page = 0; page < maxPages && nextUrl; page++) {
+		try {
+			const response = await fetch(nextUrl, { credentials: 'include' });
+			if (!response.ok) break;
 
-		parsedDate.setHours(0, 0, 0, 0);
-		entries.push({ date: parsedDate, problemId });
+			const html = await response.text();
+			const doc = new DOMParser().parseFromString(html, 'text/html');
+			const rows = Array.from(doc.querySelectorAll<HTMLTableRowElement>('table.submission tbody tr'));
+			for (const row of rows) {
+				const parsedEntry = parseSolvedEntryFromRow(row);
+				if (parsedEntry) entries.push(parsedEntry);
+			}
+
+			const nextHref = doc.querySelector<HTMLAnchorElement>('a[rel="next"], .pagination a[aria-label*="Next"], .pagination a[aria-label*="Nast"]')?.getAttribute('href') ?? '';
+			nextUrl = nextHref ? new URL(nextHref, window.location.origin).toString() : '';
+		} catch (error) {
+			console.warn('Failed to load submissions history page', nextUrl, error);
+			break;
+		}
 	}
 
 	return entries;
@@ -279,12 +333,83 @@ function getHeatColor(value: number) {
 	return '#39d353';
 }
 
+function getDashboardSubmissionDetailUrls() {
+	const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('table.submission tbody tr a[href*="/s/"]'));
+	const unique = new Set<string>();
+
+	for (const link of links) {
+		const url = link.getAttribute('href');
+		if (!url || !/\/s\/\d+\//.test(url)) continue;
+		unique.add(new URL(url, window.location.origin).toString());
+	}
+
+	return Array.from(unique);
+}
+
+function parseSubmittedCharsFromDetailsDoc(doc: Document) {
+	const rows = Array.from(doc.querySelectorAll('tr'));
+	for (const row of rows) {
+		const cells = Array.from(row.querySelectorAll<HTMLTableCellElement>('th, td'));
+		for (let i = 0; i < cells.length - 1; i++) {
+			const label = (cells[i].textContent ?? '').toLowerCase();
+			if (!/(chars?|characters?|znak(?:i|ow|ów)?|length|dlugosc|d[łl]ugo[śs]c)/.test(label)) continue;
+
+			const valueText = cells[i + 1].textContent ?? '';
+			const numeric = valueText.replace(/\s+/g, '').match(/\d+/)?.[0];
+			if (!numeric) continue;
+
+			const parsed = Number.parseInt(numeric, 10);
+			if (Number.isFinite(parsed) && parsed >= 0) return parsed;
+		}
+	}
+
+	const bodyText = (doc.body?.textContent ?? '').replace(/\s+/g, ' ');
+	const inlineMatches = [
+		bodyText.match(/(?:chars?|characters?|znak(?:i|ow|ów)?|length|dlugosc|d[łl]ugo[śs]c)\s*[:\-]?\s*(\d[\d\s]*)/i),
+		bodyText.match(/(\d[\d\s]*)\s*(?:chars?|characters?|znak(?:i|ow|ów)?)/i),
+	];
+
+	for (const match of inlineMatches) {
+		const raw = match?.[1];
+		if (!raw) continue;
+		const parsed = Number.parseInt(raw.replace(/\s+/g, ''), 10);
+		if (Number.isFinite(parsed) && parsed >= 0) return parsed;
+	}
+
+	return null;
+}
+
+async function getDashboardSubmittedCharsTotal() {
+	const detailUrls = getDashboardSubmissionDetailUrls();
+	if (detailUrls.length === 0) return 0;
+
+	let total = 0;
+	for (const detailUrl of detailUrls) {
+		try {
+			const response = await fetch(detailUrl, { credentials: 'include' });
+			if (!response.ok) continue;
+
+			const html = await response.text();
+			const doc = new DOMParser().parseFromString(html, 'text/html');
+			const chars = parseSubmittedCharsFromDetailsDoc(doc);
+			if (chars != null) total += chars;
+		} catch (error) {
+			console.warn('Failed to parse submitted chars from details page', detailUrl, error);
+		}
+	}
+
+	return total;
+}
+
 export function appendHomeDashboardSummary() {
 	if (window.location.hostname !== 'szkopul.edu.pl') return;
 	if (window.location.pathname !== '/') return;
 
-	const anchor = document.querySelector<HTMLElement>('.szkopul-dashboard__container div');
-	if (!anchor || document.getElementById('szkopul-utils-dashboard-summary')) return;
+	if (document.getElementById('szkopul-utils-dashboard-summary')) return;
+
+	const submissionsTable = document.querySelector<HTMLTableElement>('table.submission');
+	const submissionsPanel = submissionsTable?.closest<HTMLElement>('.dashboard-panel');
+	if (!submissionsPanel) return;
 
 	const entries = getSolvedDashboardEntries();
 	const solvedByDay = new Map<string, number>();
@@ -317,55 +442,60 @@ export function appendHomeDashboardSummary() {
 		window.location.href = `https://szkopul.edu.pl/problemset/problem/${encodeURIComponent(id)}/site/?key=statement`;
 	};
 
-	const container = document.createElement('section');
+	let submittedCharsTotal = 0;
+
+	const container = document.createElement('div');
 	container.id = 'szkopul-utils-dashboard-summary';
-		  container.style.cssText = 'margin-top:8px;padding:10px;border:1px solid #d5d7da;border-radius:8px;background:#fff';
+	container.className = 'szkopul-utils-dashboard-summary-card';
 
-	const style = document.createElement('style');
-	style.textContent = `
-		#szkopul-utils-dashboard-summary .layout { height: 88px !important; display:flex; align-items:flex-start; gap:14px; }
-		#szkopul-utils-dashboard-summary .heatmap { height: 87px !important; width: auto !important; display:grid; grid-template-rows:repeat(7,10px); grid-auto-flow:column; grid-auto-columns:10px; gap:3px; flex:0 0 auto; }
-		#szkopul-utils-dashboard-summary .heatmap .cell { width:10px; height:10px; border-radius:2px; }
-		#szkopul-utils-dashboard-summary .right-column { display:flex; flex-direction:column; justify-content:space-between; gap:10px; min-width:240px; flex:1; }
-		#szkopul-utils-dashboard-summary .stats { display: flex; flex-direction: row; }
-		#szkopul-utils-dashboard-summary .row { display: flex; flex-direction: column; width: 20%; justify-content: space-around; margin-left: 5%; height: 88px; }
-		#szkopul-utils-dashboard-summary .stat { line-height:1.25; display: flex; align-items: flex-end; }
-		#szkopul-utils-dashboard-summary .stat b { display:block; font-size:17px; line-height:1.1; margin-bottom:2px; font-size: 25px; margin-right: 6px; }
-		#szkopul-utils-dashboard-summary .actions { display:flex; flex-wrap:wrap; gap:8px; }
-@media (max-width: 600px) {
-		  #szkopul-utils-dashboard-summary .layout { flex-direction:column; gap:10px; }
-  #szkopul-utils-dashboard-summary .right-column { min-width:0; width:100%; }
-		  #szkopul-utils-dashboard-summary .heatmap { width:100%; aspect-ratio:26/7; grid-template-rows:repeat(7,minmax(0,1fr)); grid-auto-columns:minmax(0,1fr); }
-		  #szkopul-utils-dashboard-summary .heatmap .cell { width:100%; height:100%; }
-  #szkopul-utils-dashboard-summary .stats { grid-template-columns: 1fr; }
-}
-`;
-	container.appendChild(style);
+	if (!document.getElementById('szkopul-utils-dashboard-summary-style')) {
+		const style = document.createElement('style');
+		style.id = 'szkopul-utils-dashboard-summary-style';
+		style.textContent = `
+			#szkopul-utils-dashboard-summary { margin-top: 12px; border-top: 1px solid rgba(127, 127, 127, 0.35); }
+			#szkopul-utils-dashboard-summary .dashboard-card-body { display: flex; flex-direction: column; gap: 10px; }
+			#szkopul-utils-dashboard-summary .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px; }
+			#szkopul-utils-dashboard-summary .stats-grid-horizontal { display: grid; grid-template-columns: 1fr; gap: 8px 10px; }
+			#szkopul-utils-dashboard-summary .stat-item { line-height: 1.2; }
+			#szkopul-utils-dashboard-summary .stat-item b { display: block; font-size: 18px; }
+			#szkopul-utils-dashboard-summary .stat-extra { display: block; opacity: 0.75; font-size: 11px; }
+			#szkopul-utils-dashboard-summary .mini-heatmap-wrap { overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+			#szkopul-utils-dashboard-summary .mini-heatmap { display: grid; width: max-content; grid-template-rows: repeat(7, 9px); grid-auto-flow: column; grid-auto-columns: 9px; gap: 2px; }
+			#szkopul-utils-dashboard-summary .mini-heatmap .cell { width: 9px; height: 9px; border-radius: 2px; }
+			@media (max-width: 991px) {
+				#szkopul-utils-dashboard-summary .mini-heatmap { grid-template-rows: repeat(7, 10px); grid-auto-columns: 10px; gap: 3px; }
+				#szkopul-utils-dashboard-summary .mini-heatmap .cell { width: 10px; height: 10px; }
+			}
+		`;
+		document.head.appendChild(style);
+	}
 
-	const layout = document.createElement('div');
-	layout.className = 'layout';
-
-	const rightColumn = document.createElement('div');
-	rightColumn.className = 'right-column';
-
-	const stats = document.createElement('div');
-	stats.className = 'stats';
-	stats.innerHTML = `
-		<div class="row">
-			<div class="stat"><b id="szkopul-utils-stat-last-month">${solvedLastMonth}</b>${t('dashboard_stats_lastMonth')}</div>
-			<div class="stat"><b id="szkopul-utils-stat-today">${solvedToday}</b>${t('dashboard_stats_today')}</div>
+	container.innerHTML = `
+		<div class="card-header dashboard-panel-head">
+			<h4 class="mb-0">Activity</h4>
 		</div>
-		<div class="row">
-			<div class="stat"><b id="szkopul-utils-stat-total">${uniqueSolvedTasks.size}</b>${t('dashboard_stats_total')}</div>
-			<div class="stat"><b id="szkopul-utils-stat-best">${bestDay}</b>${t('dashboard_stats_bestDay')}</div>
-		</div>
-		<div class="row">
-			<div class="stat"><b id="szkopul-utils-stat-total">${uniqueSolvedTasks.size}</b>Total chars submitted</div>
-			<button style="width: 300px !important;" class="btn btn-secondary" id="szkopul-utils-random-task-todo">${t('dashboard_randomTaskTODO')}</button>
+		<div class="card-body dashboard-card-body">
+			<div class="stats-grid">
+				<div class="stat-item"><b id="szkopul-utils-stat-last-month">${solvedLastMonth}</b>${t('dashboard_stats_lastMonth')}</div>
+				<div class="stat-item"><b id="szkopul-utils-stat-today">${solvedToday}</b>${t('dashboard_stats_today')}</div>
+			</div>
+			<div class="stats-grid">
+				<div class="stats-grid-horizontal">
+					<div class="stat-item"><b id="szkopul-utils-stat-total">${uniqueSolvedTasks.size}</b>${t('dashboard_stats_total')}</div>
+					<div class="stat-item"><b id="szkopul-utils-stat-chars">${submittedCharsTotal}</b>${t('dashboard_stats_chars')}<span class="stat-extra" id="szkopul-utils-stat-chars-mb">(0.00 MB)</span></div>
+					<div class="stat-item"><b id="szkopul-utils-stat-best">${bestDay}</b>${t('dashboard_stats_bestDay')}</div>
+				</div>
+				<div class="stats-grid-horizontal">
+					<div class="mini-heatmap-wrap"><div class="mini-heatmap" id="szkopul-utils-mini-heatmap"></div></div>
+					<button class="btn btn-sm btn-secondary" id="szkopul-utils-random-task-todo">${t('dashboard_randomTaskTODO')}</button>	
+				</div>
+			</div>
 		</div>
 	`;
 
-	stats.querySelector<HTMLButtonElement>('#szkopul-utils-random-task-todo')?.addEventListener('click', async () => {
+	submissionsPanel.appendChild(container);
+
+	container.querySelector<HTMLButtonElement>('#szkopul-utils-random-task-todo')?.addEventListener('click', async () => {
 		const item = await getRandomTODOItem();
 		if (!item) {
 			alert(t('popup_todo_empty'));
@@ -375,13 +505,15 @@ export function appendHomeDashboardSummary() {
 		openTask(item.id);
 	});
 
-	const heatmap = document.createElement('div');
-	heatmap.className = 'heatmap';
+	const heatmap = container.querySelector<HTMLDivElement>('#szkopul-utils-mini-heatmap');
+	if (!heatmap) return;
 	const heatCells = new Map<string, HTMLDivElement>();
 
-	const totalCells = 7 * 26;
+	const weeks = window.matchMedia('(max-width: 991px)').matches ? 14 : 20;
+	const totalCells = 7 * weeks;
 	const start = new Date(today);
 	start.setDate(start.getDate() - (totalCells - 1));
+	const oldestShownDate = new Date(start);
 
 	for (let i = 0; i < totalCells; i++) {
 		const date = new Date(start);
@@ -397,15 +529,19 @@ export function appendHomeDashboardSummary() {
 		heatmap.appendChild(cell);
 	}
 
-	const lastMonthValue = stats.querySelector<HTMLSpanElement>('#szkopul-utils-stat-last-month');
-	const todayValue = stats.querySelector<HTMLSpanElement>('#szkopul-utils-stat-today');
-	const totalValue = stats.querySelector<HTMLSpanElement>('#szkopul-utils-stat-total');
-	const bestValue = stats.querySelector<HTMLSpanElement>('#szkopul-utils-stat-best');
+	const lastMonthValue = container.querySelector<HTMLElement>('#szkopul-utils-stat-last-month');
+	const todayValue = container.querySelector<HTMLElement>('#szkopul-utils-stat-today');
+	const totalValue = container.querySelector<HTMLElement>('#szkopul-utils-stat-total');
+	const charsValue = container.querySelector<HTMLElement>('#szkopul-utils-stat-chars');
+	const charsMbValue = container.querySelector<HTMLElement>('#szkopul-utils-stat-chars-mb');
+	const bestValue = container.querySelector<HTMLElement>('#szkopul-utils-stat-best');
 
 	const updateStats = () => {
 		if (lastMonthValue) lastMonthValue.textContent = String(solvedLastMonth);
 		if (todayValue) todayValue.textContent = String(solvedToday);
 		if (totalValue) totalValue.textContent = String(uniqueSolvedTasks.size);
+		if (charsValue) charsValue.textContent = String(submittedCharsTotal);
+		if (charsMbValue) charsMbValue.textContent = `(${(submittedCharsTotal / (1024 * 1024)).toFixed(2)} MB)`;
 		if (bestValue) bestValue.textContent = String(bestDay);
 	};
 
@@ -440,10 +576,18 @@ export function appendHomeDashboardSummary() {
 		applySolvedEntry(problemId, date);
 	});
 
-	rightColumn.append(stats);
-	layout.append(heatmap, rightColumn);
-	container.append(layout);
-	anchor.insertAdjacentElement('afterend', container);
+	void (async () => {
+		const historicalEntries = await getSolvedEntriesFromSubmissionsPages();
+		for (const entry of historicalEntries) {
+			if (entry.date < oldestShownDate && entry.date < monthAgo) continue;
+			applySolvedEntry(entry.problemId, entry.date);
+		}
+
+		submittedCharsTotal = await getDashboardSubmittedCharsTotal();
+		updateStats();
+	})();
+
+	// where did the skibidi thing go????????????????
 }
 
 export async function appendVirtualContestPanel() {

@@ -264,9 +264,16 @@ render(
         </div>
 
         <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between" style="min-height: auto;">
-            <label for="hideRqweulesTabOption" class="mb-0 form-check-label">Home page summary</label>
+            <label for="hideRulesTabOption" class="mb-0 form-check-label">Home page summary</label>
             <div class="form-check form-switch m-0">
-                <input class="form-check-input" type="checkbox" id="hideRqweulesTabOption">
+                <input class="form-check-input" type="checkbox" id="hideRulesTabOption">
+            </div>
+        </div>
+
+        <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between" style="min-height: auto;">
+            <label for="hideInitReportBadgeOption" class="mb-0 form-check-label">Hide the last submission initial report badge</label>
+            <div class="form-check form-switch m-0">
+                <input class="form-check-input" type="checkbox" id="hideInitReportBadgeOption">
             </div>
         </div>
 		
