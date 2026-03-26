@@ -1,6 +1,6 @@
 import { html, render } from 'lit';
 import { programmingLanguage } from './options';
-import {emitTaskSolved} from "./ui-elements";
+import { emitTaskSolved } from './ui-elements';
 
 function attachCSS(css: string) {
 	const styleElement: HTMLStyleElement = document.createElement('style');
@@ -11,11 +11,11 @@ function attachCSS(css: string) {
 
 export function makeEnterSearchThings() {
 	if (!(window.location.href.includes('/problemset') || window.location.href.includes('/contest'))) return;
-	const input = document.querySelector("input[type='search']"); // TODO fix doesnt work on /contest on chrome for some reason
+	const input = document.querySelector('input[type=\'search\']'); // TODO fix doesnt work on /contest on chrome for some reason
 
-	input?.addEventListener("keydown", function(e) {
+	input?.addEventListener('keydown', function (e) {
 		// @ts-ignore
-		if (e.key === "Enter") {
+		if (e.key === 'Enter') {
 			console.log('safjhasdsdfajhldsfa');
 			e.preventDefault(); // optional
 			// @ts-ignore
@@ -68,17 +68,17 @@ export function addUtilsFeedbackButton() {
 	if (contactContainer) {
 		// contactContainer.children[0].classList.add('btn-sm');
 		const template = html`
-			<button
-				class="btn btn-info"
-				id="szkopul-contact-form-open"
-				type="button"
-				style="margin-left: 7px"
-				data-toggle="modal"
-				data-target="#szkopul-contact-form"
-                onclick="event.stopPropagation(); window.open('https://github.com/AdamDuda1/szkopul-utils/issues/new', '_blank').focus();"
-			>
-				Utils Feedback
-			</button>
+            <button
+                    class="btn btn-info"
+                    id="szkopul-contact-form-open"
+                    type="button"
+                    style="margin-left: 7px"
+                    data-toggle="modal"
+                    data-target="#szkopul-contact-form"
+                    onclick="event.stopPropagation(); window.open('https://github.com/AdamDuda1/szkopul-utils/issues/new', '_blank').focus();"
+            >
+                Utils Feedback
+            </button>
 		`;
 		render(template, contactContainer);
 	}
@@ -230,12 +230,12 @@ export function inlineStatements() {
 }
 
 export function addTaskSolvedEventTriggers() {
-	if (!window.location.href.includes("submit")) return;
+	if (!window.location.href.includes('submit')) return;
 	const submitButtons = document.querySelectorAll<HTMLButtonElement>('.form-group > button[type="submit"]');
 	submitButtons.forEach((button: HTMLButtonElement) => {
 		button.style.color = 'red';
 		button.addEventListener('hover', () => {
 			emitTaskSolved(window.location.href); // TODO change this to task id and the event to actually solved, not just submitted
 		});
-	})
+	});
 }

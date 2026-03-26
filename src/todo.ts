@@ -12,7 +12,7 @@ function phraseTODO(raw: unknown): TodoItem[] {
 	const mapped = raw
 		.map((item, index): TodoItem | null => {
 			if (typeof item === 'string') {
-				return { pos: index + 1, name: '', id: item };
+				return {pos: index + 1, name: '', id: item};
 			}
 
 			if (item && typeof item === 'object') {
@@ -36,21 +36,21 @@ function phraseTODO(raw: unknown): TodoItem[] {
 	for (const item of mapped) {
 		if (seenIds.has(item.id)) continue;
 		seenIds.add(item.id);
-		unique.push({ ...item, pos: unique.length + 1 });
+		unique.push({...item, pos: unique.length + 1});
 	}
 
 	return unique;
 }
 
 async function waitForTODO(): Promise<TodoItem[]> {
-	const result = await browser.storage.local.get("TODO");
-	return phraseTODO(result["TODO"]);
+	const result = await browser.storage.local.get('TODO');
+	return phraseTODO(result['TODO']);
 }
 
 async function updateTODO(mutator: (todo: TodoItem[]) => TodoItem[]): Promise<TodoItem[]> {
 	const latest = await waitForTODO();
-	const next = mutator(latest).map((item, index) => ({ ...item, pos: index + 1 }));
-	await browser.storage.local.set({ TODO: next });
+	const next = mutator(latest).map((item, index) => ({...item, pos: index + 1}));
+	await browser.storage.local.set({TODO: next});
 	sessionStorage.setItem('todo', JSON.stringify(next));
 	return next;
 }
@@ -76,8 +76,8 @@ export function removeTODOItem(id: string) {
 
 export function reorderTODO(orderIds: string[]) {
 	return updateTODO((todo) => {
-		const uniqueOrder = [...new Set(orderIds)];
-		const byId = new Map(todo.map((item) => [item.id, item]));
+		const uniqueOrder = [ ...new Set(orderIds) ];
+		const byId = new Map(todo.map((item) => [ item.id, item ]));
 		const ordered: TodoItem[] = [];
 
 		for (const id of uniqueOrder) {
@@ -99,7 +99,7 @@ export async function addToTODOAction(id: string, name: string, _btn: HTMLAnchor
 				return todo.filter((item) => item.id !== id);
 			}
 
-			return [...todo, { pos: todo.length + 1, name, id }];
+			return [ ...todo, {pos: todo.length + 1, name, id} ];
 		});
 	} catch (error) {
 		console.error('TODO save failed', error);

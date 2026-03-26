@@ -2,20 +2,20 @@ import {
 	fixContactButton, addUtilsFeedbackButton, makeEnterSearchThings, languageSelectorFix,
 	inlineStatements, statementsOnSamePage, addTaskSolvedEventTriggers, mandatoryCSSFixes
 } from './misc-fixes';
-import browser from "webextension-polyfill";
+import browser from 'webextension-polyfill';
 import { initNotes } from './notes';
 import {
-	appendHomeDashboardSummary, appendProblemSetMenu, appendVirtualContestPanel,
+	appendHomeDashboardSummary, appendProblemSetMenu, appendVirtualContestPanel, pinContestButtonInContest,
 	pinContestButtons, prependPinnedContestsDashboardCard
 } from './ui-elements';
 import { hideInitReportBadges, hidePageContents, hideRulesTab, hideScores } from './ui-hiders';
 import { addToTODOAction } from './todo';
 import { setLang } from './globals';
 import { getVirtualOptions, getVirtualTasks, saveVirtualOptions } from './virtual';
-import { getOptions, optionsTemplate } from "./options";
+import { getOptions, optionsTemplate } from './options';
 
 const manifestVersion = browser.runtime.getManifest().version;
-console.log(`Thank you for using Szkopuł Utils (v${manifestVersion}), Dzięki! :)`);
+console.log(`Thank you for using Szkopuł Utils (v${ manifestVersion }), Dzięki! :)`);
 
 let optionsObject: optionsTemplate;
 
@@ -46,8 +46,11 @@ const onLoad = () => {
 	void addTaskSolvedEventTriggers();
 };
 
-getOptions().then((ans) => { optionsObject = ans; onStart(); });
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', onLoad, { once: true });
+getOptions().then((ans) => {
+	optionsObject = ans;
+	onStart();
+});
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', onLoad, {once: true});
 else onLoad();
 
 function urlSpecificFixes() {
@@ -58,9 +61,8 @@ function urlSpecificFixes() {
 		void pinContestButtons();
 	}
 
-	if (window.location.pathname.includes('/contest')) {
-		void pinContestButtons();
-	}
+	if (window.location.pathname.includes('/contest')) void pinContestButtons();
+	if (window.location.href.includes('/')) void pinContestButtonInContest();
 }
 
 async function applyVirtualContestPageOptions() {
@@ -69,7 +71,7 @@ async function applyVirtualContestPageOptions() {
 
 	const isExpired = options.startTime <= 0 || options.duration <= 0 || options.startTime + options.duration <= Date.now();
 	if (isExpired) {
-		await saveVirtualOptions({ ...options, isRunning: false });
+		await saveVirtualOptions({...options, isRunning: false});
 		return;
 	}
 

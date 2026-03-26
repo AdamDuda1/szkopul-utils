@@ -1,14 +1,14 @@
 import { html, render } from 'lit';
-import browser from "webextension-polyfill";
+import browser from 'webextension-polyfill';
 
 export async function saveNotes(notes: string, id: string) {
 	const key = 'notes-' + id;
 
 	if (notes.length > 0) {
-		await browser.storage.local.set({ [key]: notes });
+		await browser.storage.local.set({[key]: notes});
 		return true;
 	} else {
-		await browser.storage.local.remove([key]);
+		await browser.storage.local.remove([ key ]);
 		return false;
 	}
 }
@@ -20,11 +20,12 @@ export async function getNotes(id: string) {
 }
 
 function renderNotes(host: HTMLDivElement, id: string, name: string, displayName: boolean = false) {
-	const header = displayName ? html`<h2>Notatki do \'${name}\'</h2>` : '';
+	const header = displayName ? html`<h2>Notatki do \'${ name }\'</h2>` : '';
 	render(
 		html`
-            ${header}
-			<textarea class="form-control" rows="3" id="notes-area" placeholder="Twoje notatki do tego zadania..."></textarea>
+            ${ header }
+            <textarea class="form-control" rows="3" id="notes-area"
+                      placeholder="Twoje notatki do tego zadania..."></textarea>
             <div style="width: 100%; display: flex; justify-content: space-between;">
                 <span style="font-size: 11px; margin-left: 5px; color: gray;">ctrl+z działa!</span>
                 <button type="button" class="btn btn-success" style="margin-top: 7px;" id="notes-save">Zapisz</button>
@@ -37,7 +38,7 @@ function renderNotes(host: HTMLDivElement, id: string, name: string, displayName
 	if (!area || !saveButton) return;
 
 	getNotes(id).then(notes => {
-		if (notes != undefined)	{
+		if (notes != undefined) {
 			area.value = notes.toString();
 			area.rows = Math.min(Math.max(area.value.split(/\r\n|\r|\n/).length, 3), 25);
 		}
@@ -103,12 +104,12 @@ export function problemSetMenuSeeNote(id: string, name: string) {
 	render(html`
         <div style="position: fixed; top: 0; left: 0; z-index: 1999; width: 100%; height: 100%;
 	        	display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.14);"
-             id="szkopul-utils-notes-overlay" @click=${closeOverlay}>
-	        <div id="szkopul-utils-note-content" @click=${(event: Event) => event.stopPropagation()}
-	        style="background: ${(localStorage.getItem("dark-mode") === "enabled" ? '#181a1b' : 'white')} !important; padding: 15px; border-radius: 14px;
-	        box-shadow: 0 0 18px 3px ${(localStorage.getItem("dark-mode") === "enabled" ? '#181a1b' : 'white')}; width: 70%; min-height 300px"></div>
+             id="szkopul-utils-notes-overlay" @click=${ closeOverlay }>
+            <div id="szkopul-utils-note-content" @click=${ (event: Event) => event.stopPropagation() }
+                 style="background: ${ (localStorage.getItem('dark-mode') === 'enabled' ? '#181a1b' : 'white') } !important; padding: 15px; border-radius: 14px;
+	        box-shadow: 0 0 18px 3px ${ (localStorage.getItem('dark-mode') === 'enabled' ? '#181a1b' : 'white') }; width: 70%; min-height 300px"></div>
         </div>
-		  `, host);
+	`, host);
 
 	const noteHost = host.querySelector('#szkopul-utils-note-content') as HTMLDivElement | null;
 	if (!noteHost) {

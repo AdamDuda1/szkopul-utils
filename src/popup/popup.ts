@@ -1,7 +1,7 @@
-import {setLang, t, type lang} from "../globals.js";
-import { getTODO, removeTODOItem, reorderTODO, type TodoItem } from "../todo.js";
+import { setLang, t, type lang } from '../globals.js';
+import { getTODO, removeTODOItem, reorderTODO, type TodoItem } from '../todo.js';
 
-import browser from "webextension-polyfill";
+import browser from 'webextension-polyfill';
 import { getVirtualOptions, getVirtualTasks, removeVirtualTask, saveVirtualOptions } from '../virtual';
 import { getOptions, optionsTemplate, programmingLanguage, saveOptions } from '../options';
 
@@ -89,13 +89,13 @@ function loadOptions() {
 }
 
 function itemUrl(id: string) {
-	return `https://szkopul.edu.pl/problemset/problem/${encodeURIComponent(id)}/site/`;
+	return `https://szkopul.edu.pl/problemset/problem/${ encodeURIComponent(id) }/site/`;
 }
 
 function renderTODOEmpty() {
 	const container = document.getElementById('todo-table');
 	if (!container) return;
-	container.innerHTML = `<div style="opacity: .8; font-size: 12px; margin-top: 6px;">${t('popup_todo_empty')}</div>`;
+	container.innerHTML = `<div style="opacity: .8; font-size: 12px; margin-top: 6px;">${ t('popup_todo_empty') }</div>`;
 }
 
 async function renderTODOTable() {
@@ -112,24 +112,24 @@ async function renderTODOTable() {
 		const title = item.name || item.id;
 		const url = itemUrl(item.id);
 		return `
-			<tr data-todo-id="${encodeURIComponent(item.id)}">
+			<tr data-todo-id="${ encodeURIComponent(item.id) }">
 				<td style="padding: 8px;">
-					<a href="${url}" target="_blank" rel="noopener noreferrer">${escapeHTML(title)}</a>
+					<a href="${ url }" target="_blank" rel="noopener noreferrer">${ escapeHTML(title) }</a>
 				</td>
 				<td class="text-center" style="padding: 8px;">
 					<div class="todo-actions-cell">
-						<button type="button" class="btn btn-outline-success btn-xs" data-todo-complete="${encodeURIComponent(item.id)}" title="Done">
+						<button type="button" class="btn btn-outline-success btn-xs" data-todo-complete="${ encodeURIComponent(item.id) }" title="Done">
 							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2" viewBox="0 0 16 16">
 								<path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0"/>
 							</svg>
 						</button>
 						<div class="todo-move-buttons">
-							<button type="button" class="btn btn-outline-secondary btn-xs" data-todo-move="up" data-todo-id="${encodeURIComponent(item.id)}" title="Move up" style="border: 0;">
+							<button type="button" class="btn btn-outline-secondary btn-xs" data-todo-move="up" data-todo-id="${ encodeURIComponent(item.id) }" title="Move up" style="border: 0;">
 								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-up" viewBox="0 0 16 16">
 									<path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
 								</svg>
 							</button>
-							<button type="button" class="btn btn-outline-secondary btn-xs" data-todo-move="down" data-todo-id="${encodeURIComponent(item.id)}" title="Move down" style="border: 0;">
+							<button type="button" class="btn btn-outline-secondary btn-xs" data-todo-move="down" data-todo-id="${ encodeURIComponent(item.id) }" title="Move down" style="border: 0;">
 								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
 									<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
 								</svg>
@@ -146,11 +146,11 @@ async function renderTODOTable() {
 			<table class="table button-flat" style="font-size: 12px; margin-bottom: 0; width: 100%;">
 				<thead>
 				<tr style="border-bottom: 2px solid #383d3f;">
-					<th class="col-md-auto">${t('popup_todo_col_task')}</th>
-					<th class="col-sm-4">${t('popup_todo_col_actions')}</th>
+					<th class="col-md-auto">${ t('popup_todo_col_task') }</th>
+					<th class="col-sm-4">${ t('popup_todo_col_actions') }</th>
 				</tr>
 				</thead>
-				<tbody>${rows}</tbody>
+				<tbody>${ rows }</tbody>
 			</table>
 		</div>
 	`;
@@ -174,7 +174,7 @@ async function onTodoTableClick(event: Event) {
 		const to = direction === 'up' ? from - 1 : from + 1;
 		if (from < 0 || to < 0 || to >= ids.length) return;
 
-		const [current] = ids.splice(from, 1);
+		const [ current ] = ids.splice(from, 1);
 		ids.splice(to, 0, current);
 
 		await reorderTODO(ids.map((id) => decodeURIComponent(id)));
@@ -218,7 +218,7 @@ function escapeHTML(text: string) {
 		'<': '&lt;',
 		'>': '&gt;',
 		'"': '&quot;',
-		"'": '&#39;'
+		'\'': '&#39;'
 	};
 
 	return text.replace(/[&<>"']/g, (char) => map[char]);
@@ -231,7 +231,7 @@ function formatRemaining(ms: number) {
 	const hours = Math.floor(totalSeconds / 3600);
 	const minutes = Math.floor((totalSeconds % 3600) / 60);
 	const seconds = totalSeconds % 60;
-	return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+	return `${ hours.toString().padStart(2, '0') }:${ minutes.toString().padStart(2, '0') }:${ seconds.toString().padStart(2, '0') }`;
 }
 
 type SzkopulStatusResponse = {
@@ -249,9 +249,9 @@ function formatStatusDuration(ms: number) {
 	const hours = Math.floor((totalMinutes % (24 * 60)) / 60);
 	const minutes = totalMinutes % 60;
 
-	if (days > 0) return `${days}d ${hours}h ${minutes}m`;
-	if (hours > 0) return `${hours}h ${minutes}m`;
-	return `${minutes}m`;
+	if (days > 0) return `${ days }d ${ hours }h ${ minutes }m`;
+	if (hours > 0) return `${ hours }h ${ minutes }m`;
+	return `${ minutes }m`;
 }
 
 function setSzkopulStatusState(state: 'online' | 'offline' | 'unknown') {
@@ -287,7 +287,7 @@ function startSzkopulStatusTicker(fromMs: number, isUp: boolean) {
 
 	const update = () => {
 		const duration = Date.now() - fromMs;
-		upForEl.textContent = `${formatStatusDuration(duration)}${isUp ? '' : ' (down)'}`;
+		upForEl.textContent = `${ formatStatusDuration(duration) }${ isUp ? '' : ' (down)' }`;
 	};
 
 	update();
@@ -312,7 +312,7 @@ async function syncSzkopulStatus() {
 	metaEl.textContent = 'Loading...';
 
 	try {
-		const response = await fetch('https://czywyjebalohomika.xyz/api/status', { cache: 'no-store' });
+		const response = await fetch('https://czywyjebalohomika.xyz/api/status', {cache: 'no-store'});
 		if (!response.ok) {
 			setUnavailable();
 			return;
@@ -336,7 +336,7 @@ async function syncSzkopulStatus() {
 		}
 
 		setSzkopulStatusState(data.isUp ? 'online' : 'offline');
-		metaEl.textContent = `${Math.max(0, data.downtimeCount)} crash${data.downtimeCount === 1 ? '' : 'es'}`;
+		metaEl.textContent = `${ Math.max(0, data.downtimeCount) } crash${ data.downtimeCount === 1 ? '' : 'es' }`;
 		startSzkopulStatusTicker(fromTime, data.isUp);
 	} catch {
 		setUnavailable();
@@ -367,7 +367,7 @@ async function syncVirtualRunningPage() {
 			runningViewIntervalId = 0;
 		}
 		if (options.isRunning && endsAt <= now) {
-			await saveVirtualOptions({ ...options, isRunning: false });
+			await saveVirtualOptions({...options, isRunning: false});
 		}
 		if (remainingEl) remainingEl.textContent = '00:00:00';
 		if (tasksEl) tasksEl.innerHTML = '';
@@ -389,10 +389,10 @@ async function syncVirtualRunningPage() {
 	const tasks = await getVirtualTasks();
 	if (tasksEl) {
 		tasksEl.innerHTML = tasks.length === 0
-			? `<div style="opacity: .8;">${t('popup_virtual_noVirtualTasks')}</div>`
+			? `<div style="opacity: .8;">${ t('popup_virtual_noVirtualTasks') }</div>`
 			: tasks.map((task) => `
 				<li style="margin-bottom: 5px;">
-					<a href="https://szkopul.edu.pl/problemset/problem/${encodeURIComponent(task.id)}/site/?key=statement" target="_blank" rel="noopener noreferrer">${escapeHTML(task.name)}</a>
+					<a href="https://szkopul.edu.pl/problemset/problem/${ encodeURIComponent(task.id) }/site/?key=statement" target="_blank" rel="noopener noreferrer">${ escapeHTML(task.name) }</a>
 				</li>
 			`).join('');
 	}
@@ -409,16 +409,16 @@ async function syncVirtualRunningPage() {
 		if (Date.now() >= endsAt) {
 			window.clearInterval(runningViewIntervalId);
 			runningViewIntervalId = 0;
-			void saveVirtualOptions({ ...options, isRunning: false }).then(syncVirtualRunningPage);
+			void saveVirtualOptions({...options, isRunning: false}).then(syncVirtualRunningPage);
 		}
 	}, 1000);
 
-	let settings = "";
-	if (options.hideScores) settings += t("popup_home_hideScores") + ", ";
-	if (options.blockOtherSubpages) settings += t("popup_virtual_blockOtherSubpages") + ", ";
+	let settings = '';
+	if (options.hideScores) settings += t('popup_home_hideScores') + ', ';
+	if (options.blockOtherSubpages) settings += t('popup_virtual_blockOtherSubpages') + ', ';
 
-	settings += t("popup_virtual_scoreBy") + ": " + (options.scoreBy == 'last' ? t("popup_virtual_scoreBy_last") : t("popup_virtual_scoreBy_best")) + ", ";
-	settings += options.durationInputHours + "h " + options.durationInputMinutes + "m";
+	settings += t('popup_virtual_scoreBy') + ': ' + (options.scoreBy == 'last' ? t('popup_virtual_scoreBy_last') : t('popup_virtual_scoreBy_best')) + ', ';
+	settings += options.durationInputHours + 'h ' + options.durationInputMinutes + 'm';
 
 	document.getElementById('virtual-running-settings')!.innerText = settings;
 }
@@ -432,17 +432,17 @@ async function initVirtual() {
 		let randomShit = Math.floor(Math.random() * 1000000);
 		let id = 't' + task.id + randomShit;
 
-		let _tr = document.createElement("tr");
+		let _tr = document.createElement('tr');
 		_tr.id = id;
 		_tr.innerHTML = `
 			<td style="padding: 8px;">
-				<a href="https://szkopul.edu.pl/problemset/problem/${task.id}/site/?key=statement" target="_blank">
-					${task.name}
+				<a href="https://szkopul.edu.pl/problemset/problem/${ task.id }/site/?key=statement" target="_blank">
+					${ task.name }
 				</a>
 			</td>
 
 			<td class="text-center" style="padding: 8px;">
-				<button type="button" class="btn btn-outline-danger btn-xs" id="${'remove' + id}">
+				<button type="button" class="btn btn-outline-danger btn-xs" id="${ 'remove' + id }">
 					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3"
 						 viewBox="0 0 16 16" style="position: relative; top: -2px;">
 						<path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
@@ -519,7 +519,7 @@ async function initVirtual() {
 			durationInputMinutes: minutes,
 			duration: durationMs,
 			startTime: Date.now(),
-			isRunning: true,
+			isRunning: true
 		});
 
 		showPopupNotice(t('popup_virtual_started'));
@@ -528,7 +528,7 @@ async function initVirtual() {
 
 	document.getElementById('btn-stopVirtual')?.addEventListener('click', async () => {
 		const currentOptions = await getVirtualOptions();
-		await saveVirtualOptions({ ...currentOptions, isRunning: false });
+		await saveVirtualOptions({...currentOptions, isRunning: false});
 		showPopupNotice(t('popup_virtual_running_stopped'));
 		document.getElementById('virtual-running')!.style.display = 'none';
 		document.getElementById('home')!.style.display = 'flex';
@@ -542,12 +542,12 @@ async function exportStorage() {
 	const data = await browser.storage.local.get(null);
 	const json = JSON.stringify(data, null, 2);
 
-	const blob = new Blob([json], { type: "application/json" });
+	const blob = new Blob([ json ], {type: 'application/json'});
 	const url = URL.createObjectURL(blob);
 
-	const a = document.createElement("a");
+	const a = document.createElement('a');
 	a.href = url;
-	a.download = "szkopul-utils-data.json";
+	a.download = 'szkopul-utils-data.json';
 	document.body.appendChild(a);
 	a.click();
 	document.body.removeChild(a);
@@ -622,7 +622,7 @@ async function importStorage(event: Event) {
 
 	try {
 		const data = JSON.parse(text);
-		if (typeof data !== "object" || data === null || Array.isArray(data)) throw new Error("Invalid JSON");
+		if (typeof data !== 'object' || data === null || Array.isArray(data)) throw new Error('Invalid JSON');
 
 		await browser.storage.local.clear();
 		await browser.storage.local.set(data as Record<string, unknown>);
@@ -632,11 +632,11 @@ async function importStorage(event: Event) {
 		showPopupNotice(t('popup_data_import_invalid'));
 	}
 
-	input.value = "";
+	input.value = '';
 }
 
 async function deleteAllData() {
-	await showDataActionConfirmation(t("popup_data_confirm_delete_all"), async () => {
+	await showDataActionConfirmation(t('popup_data_confirm_delete_all'), async () => {
 		await browser.storage.local.clear();
 		window.location.reload();
 	});

@@ -1,4 +1,4 @@
-import {t} from "./globals";
+import { t } from './globals';
 
 function attachCSS(css: string) {
 	const styleElement: HTMLStyleElement = document.createElement('style');
@@ -8,20 +8,20 @@ function attachCSS(css: string) {
 }
 
 export function hideScores() {
-	console.log('HIDE!!!')
+	console.log('HIDE!!!');
 
-	const bg = localStorage.getItem("dark-mode") === "enabled" ? '#181a1b' : 'white';
-	const fg = localStorage.getItem("dark-mode") === "enabled" ? '#d1cdc7' : 'black';
+	const bg = localStorage.getItem('dark-mode') === 'enabled' ? '#181a1b' : 'white';
+	const fg = localStorage.getItem('dark-mode') === 'enabled' ? '#d1cdc7' : 'black';
 
 	const css: string = `
         .result__margin {
-            background-image: linear-gradient(to right, ${bg}, #ce61d4 50%, ${bg}) !important;
+            background-image: linear-gradient(to right, ${ bg }, #ce61d4 50%, ${ bg }) !important;
             font-size: 0 !important;
         }
         .result__margin::after {
             content: '???' !important;
             font-size: 1rem !important;
-            color: ${fg} !important;
+            color: ${ fg } !important;
         }
         [id*="score"] {
             font-size: 0 !important;
@@ -30,7 +30,7 @@ export function hideScores() {
         [id*="score"]::after {
             content: '???' !important;
             font-size: 1rem !important;
-            color: ${fg} !important;
+            color: ${ fg } !important;
 		}
 		
         [id*="report"] > article:first-of-type, .container-fluid.body .row > div:first-of-type > article {
@@ -57,7 +57,7 @@ export function hideInitReportBadges() {
 }
 
 export function hidePageContents() {
-	const color = localStorage.getItem("dark-mode") === "enabled" ? '#d1cdc7' : '#212529';
+	const color = localStorage.getItem('dark-mode') === 'enabled' ? '#d1cdc7' : '#212529';
 
 	const css: string = `
 		.body {
@@ -74,7 +74,7 @@ export function hidePageContents() {
 		.body .pageHiddenMessage {
 			display: block !important;
 			margin-bottom: 10px;
-			color: ${color};
+			color: ${ color };
 			text-align: center;
 			font-size: 20px;
 		}
@@ -91,8 +91,8 @@ export function hidePageContents() {
 				el.textContent = text;
 				bodyEl.appendChild(el);
 			};
-			createMsg(t("pageBlockedMessage1"));
-			createMsg(t("pageBlockedMessage2"));
+			createMsg(t('pageBlockedMessage1'));
+			createMsg(t('pageBlockedMessage2'));
 			return true;
 		}
 		return false;
@@ -102,7 +102,7 @@ export function hidePageContents() {
 		const observer = new MutationObserver((_, obs) => {
 			if (tryToAttach()) obs.disconnect();
 		});
-		observer.observe(document.documentElement, { childList: true, subtree: true });
+		observer.observe(document.documentElement, {childList: true, subtree: true});
 	}
 }
 
