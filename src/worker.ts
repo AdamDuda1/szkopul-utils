@@ -6,7 +6,7 @@ import browser from 'webextension-polyfill';
 import { initNotes } from './notes';
 import {
 	appendHomeDashboardSummary, appendProblemSetMenu, appendVirtualContestPanel, pinContestButtonInContest,
-	pinContestButtons, prependPinnedContestsDashboardCard
+	pinContestButtons, prependPinnedContestsDashboardCard, taskArchive
 } from './ui-elements';
 import { hideInitReportBadges, hidePageContents, hideRulesTab, hideScores } from './ui-hiders';
 import { addToTODOAction } from './todo';
@@ -62,7 +62,8 @@ function urlSpecificFixes() {
 	}
 
 	if (window.location.pathname.includes('/contest')) void pinContestButtons();
-	if (window.location.href.includes('/')) void pinContestButtonInContest();
+	if (window.location.href.includes('/c/') && window.location.href.includes('/dashboard/')) void pinContestButtonInContest();
+	if (window.location.href.includes('task_archive')) void taskArchive();
 }
 
 async function applyVirtualContestPageOptions() {

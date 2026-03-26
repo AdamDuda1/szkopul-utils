@@ -26,9 +26,9 @@ Szkopuł Utils is a browser extension that provides various QOL improvements and
 <img width="1003" height="111" alt="image" src="https://github.com/user-attachments/assets/01f03ce2-b69a-4a44-9ca3-e49ce9c91931" />
 
 
-## Notes
+## Note
 
-I originally wanted to make the 'frontend' part of this extension in Angular, but it was a bit hard to start with it and mix it with the extension file structure. Because of that, I started with just standard TS and a template for the extension files from the internet, and Im using libraries that imitate parts of Angular (I mean, do something similar), like `lit` for inserting reactive HTML **duh, the TS files dont even have classes...** (<-- I might have to change that in the very near future). I may make a 2.0 version in the future with full Angular if there is a need for it (and if I have the time).
+I originally wanted to make the 'frontend' part of this extension in Angular, but it was a bit hard to start with it and mix it with the extension file structure. Because of that, I started with just standard TS and a template for the extension files from the internet, and Im using libraries that imitate parts of Angular (I mean, do something similar), like `lit` for inserting reactive HTML **duh, the TS files dont even have classes...** (<-- I might have to change that in the very near future). I may make a 2.0 version in the future with full Angular if there is a need for it (and if I have the time). Edit: Im not sure that Angular is a good idea here but I need to reorganize the files and functions...
 
 ## TODO:
 
@@ -47,7 +47,6 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 - (??) hide the midified tables (like problems in contest) untill thir html is not modified (display: none on init and then flex when loaded)
 - make the user be able to choose what is displayed on the home page of the popup (szkopul stats/quick score hiding setting)
 - **build the menu html on click so it loads faster and is up to date**
-- inline task statements in contest views
 - Add the same menu in the problem set to the top of the problem page
 - Remove the popups and the 'i' when the task is solved (for hideScores) -> 
 - **Add comments under tasks ?**
