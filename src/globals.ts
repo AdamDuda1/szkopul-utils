@@ -1,3 +1,16 @@
+export const DEBUG = false;
+
+export type task = {
+	id: string,
+	name: string
+};
+
+export type contest = {
+	name: string,
+	slug: string,
+	href: string,
+};
+
 let currentLang: lang = "pl";
 export type lang = "en" | "pl";
 

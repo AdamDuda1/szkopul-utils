@@ -56,10 +56,6 @@ export function mandatoryCSSFixes() {
 		.card-body.dashboard-card-body table.table.break-all-words tbody tr td:last-child { width: 100%; font-weight: bold; }
 		.card-body.dashboard-card-body table.table.break-all-words { margin: 0; }
 		
-		#szkopul-utils-pinned-contests table.table.break-all-words tbody tr td:first-child { display: none; }
-		#szkopul-utils-pinned-contests table.table.break-all-words tbody tr td:last-child { width: 100%; font-weight: bold; }
-		#szkopul-utils-pinned-contests table.table.break-all-words { margin: 0; }
-		
 		.card-header.dashboard-panel-head { border-radius: 10px 10px 0 0; }
     `;
 

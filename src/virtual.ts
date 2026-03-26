@@ -1,8 +1,9 @@
 import browser from "webextension-polyfill";
+import {task} from "./globals";
 
 const KEY_VIRTUAL_TASKS = "virtualTasks";
 const KEY_VIRTUAL_OPTIONS = "virtualOptions";
-export type task = { id: string; name: string };
+
 export type virtualOptionsTemplate = {
 	hideScores: boolean,
 	blockOtherSubpages: boolean,

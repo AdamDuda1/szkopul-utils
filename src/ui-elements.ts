@@ -1,10 +1,11 @@
 import { problemSetMenuSeeNote } from './notes';
-import { t } from './globals';
+import { DEBUG, t, contest, task } from './globals';
 import { getRandomTODOItem, getTODO } from './todo';
-import { addVirtualTask, getVirtualOptions, getVirtualTasks, removeVirtualTask, saveVirtualOptions, task } from './virtual';
-import { getOptions, optionsTemplate } from './options';
+import { addVirtualTask, getVirtualOptions, getVirtualTasks, removeVirtualTask, saveVirtualOptions } from './virtual';
+import {getOptions, getPinnedContests, optionsTemplate, savePinnedContests} from './options';
 
 let optionsObject: optionsTemplate;
+let pinnedContests: contest[];
 let virtualTasks: task[] = [];
 let todoTaskIds = new Set<string>();
 const TASK_SOLVED_EVENT = 'szkopul-utils:taskSolved';
@@ -401,49 +402,97 @@ async function getDashboardSubmittedCharsTotal() {
 	return total;
 }
 
-type PinnedContest = {
-	href: string;
-	name: string;
-	slug: string;
-};
+export async function pinContestButtons() {
+	pinnedContests = await getPinnedContests();
 
-const PINNED_CONTESTS_STORAGE_KEY = 'szkopul-utils-pinned-contests';
+	const tds = document.querySelectorAll<HTMLTableElement>(
+		'.card-body.dashboard-card-body table.table.break-all-words tbody tr td:last-child,' +
+		'article .table-responsive-md table.table tbody tr td:last-child'
+	);
 
-function readPinnedContestsFromStorage() {
-	try {
-		const raw = localStorage.getItem(PINNED_CONTESTS_STORAGE_KEY);
-		if (!raw) return [] as PinnedContest[];
+	tds.forEach((td: HTMLTableElement) => {
+		if (DEBUG) td.style.background = 'red';
 
-		const parsed = JSON.parse(raw);
-		if (!Array.isArray(parsed)) return [] as PinnedContest[];
+		if (td.children.length > 1) return;
 
-		return parsed
-			.filter((item): item is PinnedContest => {
-				return typeof item?.href === 'string' && typeof item?.name === 'string' && typeof item?.slug === 'string';
-			})
-			.slice(0, 8);
-	} catch (_error) {
-		return [] as PinnedContest[];
+		let thisContest: contest = {
+			name: (td.children[0] as HTMLAnchorElement).innerText,
+			href: (td.children[0] as HTMLAnchorElement).href,
+			slug: (td.parentElement?.children[0] as HTMLElement).innerText
+		};
+
+		td.style.display = 'flex';
+
+		let btnDiv = document.createElement('div');
+		btnDiv.style = 'display: flex; position: relative; top: 1px; left: 5px; cursor: pointer; color: gray;';
+		btnDiv.setAttribute('data-pin-button-href', thisContest.href);
+		btnDiv.addEventListener('mouseenter', () => btnDiv.style.color = 'orange');
+		btnDiv.addEventListener('mouseleave', () => btnDiv.style.color = 'gray');
+
+		const button = (q: HTMLDivElement) => {
+			if (!pinnedContests.some((c) => c.href === thisContest.href))
+				q.innerHTML = `
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pin-angle" viewBox="0 0 16 16">
+						<path d="M9.828.722a.5.5 0 0 1 .354.146l4.95 4.95a.5.5 0 0 1 0 .707c-.48.48-1.072.588-1.503.588-.177 0-.335-.018-.46-.039l-3.134 3.134a6 6 0 0 1 .16 1.013c.046.702-.032 1.687-.72 2.375a.5.5 0 0 1-.707 0l-2.829-2.828-3.182 3.182c-.195.195-1.219.902-1.414.707s.512-1.22.707-1.414l3.182-3.182-2.828-2.829a.5.5 0 0 1 0-.707c.688-.688 1.673-.767 2.375-.72a6 6 0 0 1 1.013.16l3.134-3.133a3 3 0 0 1-.04-.461c0-.43.108-1.022.589-1.503a.5.5 0 0 1 .353-.146m.122 2.112v-.002zm0-.002v.002a.5.5 0 0 1-.122.51L6.293 6.878a.5.5 0 0 1-.511.12H5.78l-.014-.004a5 5 0 0 0-.288-.076 5 5 0 0 0-.765-.116c-.422-.028-.836.008-1.175.15l5.51 5.509c.141-.34.177-.753.149-1.175a5 5 0 0 0-.192-1.054l-.004-.013v-.001a.5.5 0 0 1 .12-.512l3.536-3.535a.5.5 0 0 1 .532-.115l.096.022c.087.017.208.034.344.034q.172.002.343-.04L9.927 2.028q-.042.172-.04.343a1.8 1.8 0 0 0 .062.46z"/>
+					</svg>
+				`;
+			else
+				q.innerHTML = `
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pin-fill" viewBox="0 0 16 16">
+						<path d="M4.146.146A.5.5 0 0 1 4.5 0h7a.5.5 0 0 1 .5.5c0 .68-.342 1.174-.646 1.479-.126.125-.25.224-.354.298v4.431l.078.048c.203.127.476.314.751.555C12.36 7.775 13 8.527 13 9.5a.5.5 0 0 1-.5.5h-4v4.5c0 .276-.224 1.5-.5 1.5s-.5-1.224-.5-1.5V10h-4a.5.5 0 0 1-.5-.5c0-.973.64-1.725 1.17-2.189A6 6 0 0 1 5 6.708V2.277a3 3 0 0 1-.354-.298C4.342 1.674 4 1.179 4 .5a.5.5 0 0 1 .146-.354"/>
+					</svg>
+				`;
+		};
+
+		btnDiv.addEventListener('click', () => {
+			const isPinned = pinnedContests.some((c) => c.href === thisContest.href);
+			if (isPinned) pinnedContests = pinnedContests.filter((c) => c.href !== thisContest.href);
+			else pinnedContests.push(thisContest);
+
+			savePinnedContests(pinnedContests);
+			button(btnDiv);
+			const container = document.getElementById('szkopul-utils-pinned-contests') as HTMLDivElement;
+			if (container) { renderPinnedContests(container); pinContestButtons(); }
+			updateAllPinButtons();
+		});
+
+		button(btnDiv);
+
+		td.append(btnDiv);
+	});
+}
+
+async function renderPinnedContests(container: HTMLDivElement) {
+	const fallbackPins = await getPinnedContests();
+
+	const body = container.querySelector<HTMLTableElement>('.table.break-all-words');
+	if (!body) return;
+
+	if (fallbackPins.length === 0) {
+		body.innerHTML = '<p class="pinned-empty">No pinned contests yet.</p>';
+	} else {
+		body.innerHTML = '';
+		const list = document.createElement('tbody');
+		for (const contest of fallbackPins) {
+			const tr = document.createElement('tr');
+			tr.innerHTML = `
+				<td>${contest.slug}</td>
+				<td><a href="${contest.href}">${contest.name}</a></td>
+			`;
+			list.appendChild(tr);
+		}
+		body.appendChild(list);
 	}
 }
 
-function readPinnedContestsFromPanel(panel: HTMLElement, limit = 3) {
-	const rows = Array.from(panel.querySelectorAll<HTMLTableRowElement>('table tr'));
-	const pins: PinnedContest[] = [];
-
-	for (const row of rows) {
-		const cells = row.querySelectorAll('td');
-		const slug = cells[0]?.textContent?.trim() ?? '';
-		const link = row.querySelector<HTMLAnchorElement>('a[href*="/c/"]');
-		const name = link?.textContent?.trim() ?? '';
-		const href = link?.getAttribute('href') ?? '';
-
-		if (!slug || !name || !href) continue;
-		pins.push({ slug, name, href: new URL(href, window.location.origin).toString() });
-		if (pins.length >= limit) break;
-	}
-
-	return pins;
+function updateAllPinButtons() {
+	document.querySelectorAll<HTMLDivElement>('[data-pin-button-href]').forEach(btn => {
+		const href = btn.getAttribute('data-pin-button-href');
+		const isPinned = pinnedContests.some((c) => c.href === href);
+		btn.innerHTML = isPinned ? 
+			'<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pin-fill" viewBox="0 0 16 16"><path d="M4.146.146A.5.5 0 0 1 4.5 0h7a.5.5 0 0 1 .5.5c0 .68-.342 1.174-.646 1.479-.126.125-.25.224-.354.298v4.431l.078.048c.203.127.476.314.751.555C12.36 7.775 13 8.527 13 9.5a.5.5 0 0 1-.5.5h-4v4.5c0 .276-.224 1.5-.5 1.5s-.5-1.224-.5-1.5V10h-4a.5.5 0 0 1-.5-.5c0-.973.64-1.725 1.17-2.189A6 6 0 0 1 5 6.708V2.277a3 3 0 0 1-.354-.298C4.342 1.674 4 1.179 4 .5a.5.5 0 0 1 .146-.354"/></svg>'
+			: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pin-angle" viewBox="0 0 16 16"><path d="M9.828.722a.5.5 0 0 1 .354.146l4.95 4.95a.5.5 0 0 1 0 .707c-.48.48-1.072.588-1.503.588-.177 0-.335-.018-.46-.039l-3.134 3.134a6 6 0 0 1 .16 1.013c.046.702-.032 1.687-.72 2.375a.5.5 0 0 1-.707 0l-2.829-2.828-3.182 3.182c-.195.195-1.219.902-1.414.707s.512-1.22.707-1.414l3.182-3.182-2.828-2.829a.5.5 0 0 1 0-.707c.688-.688 1.673-.767 2.375-.72a6 6 0 0 1 1.013.16l3.134-3.133a3 3 0 0 1-.04-.461c0-.43.108-1.022.589-1.503a.5.5 0 0 1 .353-.146m.122 2.112v-.002zm0-.002v.002a.5.5 0 0 1-.122.51L6.293 6.878a.5.5 0 0 1-.511.12H5.78l-.014-.004a5 5 0 0 0-.288-.076 5 5 0 0 0-.765-.116c-.422-.028-.836.008-1.175.15l5.51 5.509c.141-.34.177-.753.149-1.175a5 5 0 0 0-.192-1.054l-.004-.013v-.001a.5.5 0 0 1 .12-.512l3.536-3.535a.5.5 0 0 1 .532-.115l.096.022c.087.017.208.034.344.034q.172.002.343-.04L9.927 2.028q-.042.172-.04.343a1.8 1.8 0 0 0 .062.46z"/></svg>';
+	});
 }
 
 export function prependPinnedContestsDashboardCard() {
@@ -456,6 +505,7 @@ export function prependPinnedContestsDashboardCard() {
 	if (!document.getElementById('szkopul-utils-pinned-contests-style')) {
 		const style = document.createElement('style');
 		style.id = 'szkopul-utils-pinned-contests-style';
+		style.classList.add('card-body', 'dashboard-card-body');
 		style.textContent = `
 			#szkopul-utils-pinned-contests { margin-bottom: 12px; padding-bottom: 8px; }
 			#szkopul-utils-pinned-contests .dashboard-card-body { padding-top: 10px; }
@@ -475,26 +525,7 @@ export function prependPinnedContestsDashboardCard() {
 	container.classList.add('card-body', 'dashboard-card-body');
 	container.innerHTML = '<table class="table break-all-words"></table>'
 
-
-	let fallbackPins: PinnedContest[] = [];
-
-	const body = container.querySelector<HTMLTableElement>('.table.break-all-words');
-	if (!body) return;
-
-	if (fallbackPins.length === 0) {
-		body.innerHTML = '<p class="pinned-empty">No pinned contests yet.</p>';
-	} else {
-		const list = document.createElement('tbody');
-		for (const contest of fallbackPins) {
-			const tr = document.createElement('tr');
-			tr.innerHTML = `
-				<td>${contest.slug}</td>
-				<td><a href="${contest.href}">${contest.name}</a></td>
-			`;
-			list.appendChild(tr);
-		}
-		body.appendChild(list);
-	}
+	renderPinnedContests(container);
 
 	rightPanel.prepend(container);
 	rightPanel.prepend(header);
@@ -603,6 +634,9 @@ export function appendHomeDashboardSummary() {
 
 		openTask(item.id);
 	});
+
+	let pinButton = document.createElement('divf');
+
 
 	const heatmap = container.querySelector<HTMLDivElement>('#szkopul-utils-mini-heatmap');
 	if (!heatmap) return;

@@ -4,7 +4,10 @@ import {
 } from './misc-fixes';
 import browser from "webextension-polyfill";
 import { initNotes } from './notes';
-import { appendHomeDashboardSummary, appendProblemSetMenu, appendVirtualContestPanel, prependPinnedContestsDashboardCard } from './ui-elements';
+import {
+	appendHomeDashboardSummary, appendProblemSetMenu, appendVirtualContestPanel,
+	pinContestButtons, prependPinnedContestsDashboardCard
+} from './ui-elements';
 import { hideInitReportBadges, hidePageContents, hideRulesTab, hideScores } from './ui-hiders';
 import { addToTODOAction } from './todo';
 import { setLang } from './globals';
@@ -35,7 +38,7 @@ const onLoad = () => {
 	void makeEnterSearchThings();
 	void initNotes();
 
-	homePageFixes();
+	void urlSpecificFixes();
 
 	if (optionsObject.statementsOnSamePage) void statementsOnSamePage();
 	if (optionsObject.inlineProblemStatements) void inlineStatements();
@@ -47,13 +50,17 @@ getOptions().then((ans) => { optionsObject = ans; onStart(); });
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', onLoad, { once: true });
 else onLoad();
 
-function homePageFixes() {
+function urlSpecificFixes() {
 	if (window.location.hostname !== 'szkopul.edu.pl') return;
-	if (window.location.pathname !== '/') return;
+	if (!(window.location.pathname !== '/')) {
+		void prependPinnedContestsDashboardCard();
+		void appendHomeDashboardSummary();
+		void pinContestButtons();
+	}
 
-
-	prependPinnedContestsDashboardCard();
-	void appendHomeDashboardSummary();
+	if (window.location.pathname.includes('/contest')) {
+		void pinContestButtons();
+	}
 }
 
 async function applyVirtualContestPageOptions() {
