@@ -14,17 +14,20 @@ Szkopuł Utils is a browser extension that provides various QOL improvements and
 
 ## Full list of features:
 
+- A nice home page dashboard;
 - Virtual contests (create and participate in a local virtual contest with set tasks, score hiding and calculating options and time)
-- Task TODO list
-- Inline task statements view and on-the-same-page statement view
+- Task TODO list;
+- Random task pickers in the task archive (from contests, rounds, categories) and from TODO;
+- Inline task statements view and on-the-same-page statement view;
 - Preferred language and auto-submit
 - Score hiding (shows only initial testing reports);
 - Notes for tasks (saved in browser's storage);
 - Actually searches when you press enter in the search bar;
 - Hides the 'Contact' (or 'Send feedback' in english) button in the bottom left corner of the footer. It previously caused bottom part of the website's elements to be non-interactable (because of bad flex-box styling and `z-index: 999`).
 
-<img width="1003" height="111" alt="image" src="https://github.com/user-attachments/assets/01f03ce2-b69a-4a44-9ca3-e49ce9c91931" />
+ <img width="1003" height="111" alt="image" src="https://github.com/user-attachments/assets/01f03ce2-b69a-4a44-9ca3-e49ce9c91931" />
 
+- Other misc fixes and improvements, so many I dont even remember!
 
 ## Note
 
@@ -34,13 +37,13 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 
 - ADD TASKS OUTSIDE OF SZKOPUL TO THE TODO LIST!!!!!!!!!!!
 
+- link  to search task in problemset 
+
 - dashboard doesnt display on mobile
 
 - ! emitTaskSolved('twoj-problem-id'); przy submit albo lepiej przy maxie za zadanie
 - menu w problem view
-- preferred language is on home page...
-
-- 'stats' page with for example total chars in submissions
+- preferred language is on home page... ??????????????????????????? what did I mean =
 
 - Things in the contest archive!
 
@@ -48,10 +51,6 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 - make the user be able to choose what is displayed on the home page of the popup (szkopul stats/quick score hiding setting)
 - **build the menu html on click so it loads faster and is up to date**
 - Add the same menu in the problem set to the top of the problem page
-- Remove the popups and the 'i' when the task is solved (for hideScores) -> 
 - **Add comments under tasks ?**
-
-// małę todo:
-
-- zrobić todo i wirtualkę jako array w storage
-- wczyteć te dwie arrayki przy renderowaniu rzeczy i wyświetlać odpowiednie przyciski
+- por favor senior arrow
+- ahhh

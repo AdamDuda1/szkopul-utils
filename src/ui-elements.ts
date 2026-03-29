@@ -3,22 +3,221 @@ import { DEBUG, t, contest, task } from './globals';
 import { getRandomTODOItem, getTODO } from './todo';
 import { addVirtualTask, getVirtualOptions, getVirtualTasks, removeVirtualTask, saveVirtualOptions } from './virtual';
 import { getOptions, getPinnedContests, optionsTemplate, savePinnedContests } from './options';
+import browser from 'webextension-polyfill';
 
 let optionsObject: optionsTemplate;
 let pinnedContests: contest[];
 let virtualTasks: task[] = [];
 let todoTaskIds = new Set<string>();
 const TASK_SOLVED_EVENT = 'szkopul-utils:taskSolved';
+const KEY_TASK_SOLVED_HISTORY = 'taskSolvedHistory';
+const KEY_TASK_SOLVED_PENDING = 'szkopul-utils:taskSolvedPending';
+const KEY_SUBMITTED_CHARS_PENDING = 'szkopul-utils:submittedCharsPending';
+
+type SolvedHistoryEntry = {
+	problemId: string;
+	solvedAt: string;
+};
 
 type TaskSolvedEventPayload = {
 	problemId?: string;
 	solvedAt?: string | number | Date;
 };
 
-export function emitTaskSolved(problemId = '', solvedAt = new Date()) {
+function normalizeProblemId(problemId = '') {
+	const trimmed = problemId.trim();
+	if (!trimmed) return '';
+
+	const normalizeFromPath = (pathname: string) => {
+		const fromProblemset = pathname.match(/\/problemset\/problem\/([^/]+)/)?.[1];
+		if (fromProblemset) return decodeURIComponent(fromProblemset);
+		const fromSubmit = pathname.match(/\/submit\/([^/]+)/)?.[1];
+		if (fromSubmit) return decodeURIComponent(fromSubmit);
+		return '';
+	};
+
+	try {
+		const url = new URL(trimmed, window.location.origin);
+		return normalizeFromPath(url.pathname) || trimmed.replace(/\/+$/, '');
+	} catch {
+		return normalizeFromPath(trimmed) || trimmed.replace(/\/+$/, '');
+	}
+}
+
+export function emitTaskSolved(problemId = '', chars: number, solvedAt = new Date()) {
+	const parsedSolvedAt = parseTaskSolvedDate(solvedAt) ?? new Date();
+	const normalizedProblemId = normalizeProblemId(problemId);
+	const normalizedChars = Number.isFinite(chars) && chars > 0 ? Math.floor(chars) : 0;
+	queuePendingSolvedEntry(normalizedProblemId, parsedSolvedAt);
+	if (normalizedChars > 0) queuePendingSubmittedChars(normalizedChars);
+	void flushPendingSolvedHistory();
+	if (normalizedChars > 0) void flushPendingSubmittedChars();
+
 	window.dispatchEvent(new CustomEvent(TASK_SOLVED_EVENT, {
-		detail: {problemId, solvedAt: solvedAt.toISOString()}
+		detail: {problemId: normalizedProblemId, solvedAt: parsedSolvedAt.toISOString()}
 	}));
+}
+
+function queuePendingSubmittedChars(chars: number) {
+	if (!Number.isFinite(chars) || chars <= 0) return;
+
+	try {
+		const current = Number(localStorage.getItem(KEY_SUBMITTED_CHARS_PENDING) ?? '0');
+		const safeCurrent = Number.isFinite(current) && current > 0 ? Math.floor(current) : 0;
+		localStorage.setItem(KEY_SUBMITTED_CHARS_PENDING, String(safeCurrent + Math.floor(chars)));
+	} catch {
+		// ignore localStorage write issues
+	}
+}
+
+async function flushPendingSubmittedChars() {
+	let pendingChars = 0;
+	try {
+		const raw = Number(localStorage.getItem(KEY_SUBMITTED_CHARS_PENDING) ?? '0');
+		pendingChars = Number.isFinite(raw) && raw > 0 ? Math.floor(raw) : 0;
+		if (pendingChars <= 0) return;
+		localStorage.removeItem(KEY_SUBMITTED_CHARS_PENDING);
+	} catch {
+		return;
+	}
+
+	try {
+		const data = await browser.storage.local.get('submittedCharsTotal');
+		const current = pickStoredNumber(data.submittedCharsTotal);
+		await browser.storage.local.set({submittedCharsTotal: current + pendingChars});
+	} catch {
+		queuePendingSubmittedChars(pendingChars);
+	}
+}
+
+function queuePendingSolvedEntry(problemId: string, solvedAt: Date) {
+	if (!problemId) return;
+
+	try {
+		const raw = localStorage.getItem(KEY_TASK_SOLVED_PENDING);
+		const pending = Array.isArray(JSON.parse(raw ?? '[]')) ? JSON.parse(raw ?? '[]') as unknown[] : [];
+		const normalizedPending = pending.filter((entry) => {
+			if (!entry || typeof entry !== 'object') return false;
+			const item = entry as Partial<SolvedHistoryEntry>;
+			return typeof item.problemId === 'string' && typeof item.solvedAt === 'string';
+		});
+		normalizedPending.push({problemId, solvedAt: solvedAt.toISOString()});
+		localStorage.setItem(KEY_TASK_SOLVED_PENDING, JSON.stringify(normalizedPending));
+	} catch {
+		// ignore localStorage write issues
+	}
+}
+
+async function flushPendingSolvedHistory() {
+	let pending: SolvedHistoryEntry[] = [];
+	try {
+		const raw = localStorage.getItem(KEY_TASK_SOLVED_PENDING);
+		const parsed = JSON.parse(raw ?? '[]');
+		if (!Array.isArray(parsed) || parsed.length === 0) return;
+		pending = parsed.filter((entry) => {
+			if (!entry || typeof entry !== 'object') return false;
+			const item = entry as Partial<SolvedHistoryEntry>;
+			return typeof item.problemId === 'string' && typeof item.solvedAt === 'string';
+		}) as SolvedHistoryEntry[];
+		if (pending.length === 0) {
+			localStorage.removeItem(KEY_TASK_SOLVED_PENDING);
+			return;
+		}
+	} catch {
+		return;
+	}
+
+	for (const entry of pending) {
+		const parsedDate = parseDate(entry.solvedAt);
+		if (!parsedDate) continue;
+		await appendSolvedHistoryEntry(entry.problemId, parsedDate);
+	}
+
+	try {
+		localStorage.removeItem(KEY_TASK_SOLVED_PENDING);
+	} catch {
+		// ignore localStorage cleanup issues
+	}
+}
+
+async function appendSolvedHistoryEntry(problemId: string, solvedAt: Date) {
+	if (!problemId) return;
+
+	const data = await browser.storage.local.get(KEY_TASK_SOLVED_HISTORY);
+	const rawHistory = data[KEY_TASK_SOLVED_HISTORY];
+	const history = Array.isArray(rawHistory) ? rawHistory : [];
+
+	const dayKey = toDateKey(solvedAt);
+	const dedupeKey = `${ problemId }|${ dayKey }`;
+	const dedupedHistory = history.filter((entry) => {
+		if (!entry || typeof entry !== 'object') return false;
+		const normalized = entry as Partial<SolvedHistoryEntry>;
+		if (typeof normalized.problemId !== 'string') return false;
+		if (typeof normalized.solvedAt !== 'string') return false;
+		const parsedDate = parseDate(normalized.solvedAt);
+		if (!parsedDate) return false;
+		return `${ normalized.problemId }|${ toDateKey(parsedDate) }` !== dedupeKey;
+	});
+
+	dedupedHistory.push({problemId, solvedAt: solvedAt.toISOString()});
+	await browser.storage.local.set({[KEY_TASK_SOLVED_HISTORY]: dedupedHistory});
+}
+
+async function getSolvedDashboardEntries() {
+	await flushPendingSolvedHistory();
+
+	const data = await browser.storage.local.get(KEY_TASK_SOLVED_HISTORY);
+	const rawHistory = data[KEY_TASK_SOLVED_HISTORY];
+	const source = Array.isArray(rawHistory) ? rawHistory : [];
+
+	const entries: Array<{problemId: string, date: Date}> = [];
+	for (const entry of source) {
+		if (!entry || typeof entry !== 'object') continue;
+		const normalized = entry as Partial<SolvedHistoryEntry>;
+		if (typeof normalized.problemId !== 'string' || typeof normalized.solvedAt !== 'string') continue;
+		const parsedDate = parseDate(normalized.solvedAt);
+		if (!parsedDate) continue;
+		parsedDate.setHours(0, 0, 0, 0);
+		entries.push({problemId: normalizeProblemId(normalized.problemId), date: parsedDate});
+	}
+
+	return entries;
+}
+
+function pickStoredNumber(...values: unknown[]) {
+	for (const value of values) {
+		if (typeof value === 'number' && Number.isFinite(value) && value >= 0) return value;
+	}
+	return 0;
+}
+
+async function getDashboardStoredStats() {
+	await flushPendingSubmittedChars();
+
+	const data = await browser.storage.local.get(null);
+	const nestedStats = (data.dashboardStats && typeof data.dashboardStats === 'object') ? data.dashboardStats as Record<string, unknown> : {};
+
+	const submittedCharsTotal = pickStoredNumber(
+		data.submittedCharsTotal,
+		data.submittedChars,
+		data.charsSubmitted,
+		nestedStats.submittedCharsTotal,
+		nestedStats.submittedChars,
+		nestedStats.charsSubmitted,
+	);
+
+	const solvedSiteTotal = pickStoredNumber(
+		data.solvedSiteTotal,
+		data.siteSolvedTotal,
+		data.solvedTotal,
+		data.site,
+		nestedStats.solvedSiteTotal,
+		nestedStats.siteSolvedTotal,
+		nestedStats.solvedTotal,
+		nestedStats.site,
+	);
+
+	return {submittedCharsTotal, solvedSiteTotal};
 }
 
 function parseTaskSolvedDate(raw: TaskSolvedEventPayload['solvedAt']) {
@@ -261,145 +460,12 @@ function parseDate(raw: string) {
 	return Number.isNaN(dotParsed.getTime()) ? null : dotParsed;
 }
 
-function parseSolvedEntryFromRow(row: HTMLTableRowElement) {
-	const statusCell = row.querySelector<HTMLElement>('td[id*="-status"]');
-	const statusClass = statusCell?.className.toLowerCase() ?? '';
-	const text = row.textContent?.toLowerCase() ?? '';
-	const solvedByClass = /submission--ok/.test(statusClass);
-	const solvedByText = /(\b100\b|accepted|\bok\b|zaakcept|poprawne|\bac\b)/.test(text);
-	if (!solvedByClass && !solvedByText) return null;
-
-	const href = row.querySelector<HTMLAnchorElement>('a[href*="/problemset/problem/"]')?.href ?? '';
-	const submissionProblem = row.querySelector<HTMLElement>('td[id*="-problem-instance"], td.col-lg-4')?.textContent?.trim() ?? '';
-	const problemId = href.match(/\/problemset\/problem\/([^/]+)/)?.[1] ?? submissionProblem;
-
-	const dateRaw = row.querySelector('time')?.getAttribute('datetime')
-		?? row.querySelector('time')?.textContent
-		?? row.querySelector<HTMLElement>('td[id*="-link"]')?.textContent
-		?? Array.from(row.querySelectorAll('td')).map((td) => td.textContent?.trim() ?? '').find((value) => /\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}/.test(value) || value.length > 4)
-		?? '';
-
-	const parsedDate = parseDate(dateRaw);
-	if (!parsedDate) return null;
-
-	parsedDate.setHours(0, 0, 0, 0);
-	return {date: parsedDate, problemId};
-}
-
-function getSolvedDashboardEntries() {
-	const rows = Array.from(document.querySelectorAll<HTMLTableRowElement>('table.submission tbody tr, .szkopul-dashboard__container tr'));
-	const entries: { date: Date; problemId: string }[] = [];
-
-	for (const row of rows) {
-		const parsedEntry = parseSolvedEntryFromRow(row);
-		if (parsedEntry) entries.push(parsedEntry);
-	}
-
-	return entries;
-}
-
-async function getSolvedEntriesFromSubmissionsPages(maxPages = 12) {
-	const entries: { date: Date; problemId: string }[] = [];
-	let nextUrl = `${ window.location.origin }/submissions/`;
-
-	for (let page = 0; page < maxPages && nextUrl; page++) {
-		try {
-			const response = await fetch(nextUrl, {credentials: 'include'});
-			if (!response.ok) break;
-
-			const html = await response.text();
-			const doc = new DOMParser().parseFromString(html, 'text/html');
-			const rows = Array.from(doc.querySelectorAll<HTMLTableRowElement>('table.submission tbody tr'));
-			for (const row of rows) {
-				const parsedEntry = parseSolvedEntryFromRow(row);
-				if (parsedEntry) entries.push(parsedEntry);
-			}
-
-			const nextHref = doc.querySelector<HTMLAnchorElement>('a[rel="next"], .pagination a[aria-label*="Next"], .pagination a[aria-label*="Nast"]')?.getAttribute('href') ?? '';
-			nextUrl = nextHref ? new URL(nextHref, window.location.origin).toString() : '';
-		} catch (error) {
-			console.warn('Failed to load submissions history page', nextUrl, error);
-			break;
-		}
-	}
-
-	return entries;
-}
-
 function getHeatColor(value: number) {
 	if (value <= 0) return '#2d333b';
 	if (value === 1) return '#0e4429';
 	if (value <= 3) return '#006d32';
 	if (value <= 6) return '#26a641';
 	return '#39d353';
-}
-
-function getDashboardSubmissionDetailUrls() {
-	const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('table.submission tbody tr a[href*="/s/"]'));
-	const unique = new Set<string>();
-
-	for (const link of links) {
-		const url = link.getAttribute('href');
-		if (!url || !/\/s\/\d+\//.test(url)) continue;
-		unique.add(new URL(url, window.location.origin).toString());
-	}
-
-	return Array.from(unique);
-}
-
-function parseSubmittedCharsFromDetailsDoc(doc: Document) {
-	const rows = Array.from(doc.querySelectorAll('tr'));
-	for (const row of rows) {
-		const cells = Array.from(row.querySelectorAll<HTMLTableCellElement>('th, td'));
-		for (let i = 0; i < cells.length - 1; i++) {
-			const label = (cells[i].textContent ?? '').toLowerCase();
-			if (!/(chars?|characters?|znak(?:i|ow|ów)?|length|dlugosc|d[łl]ugo[śs]c)/.test(label)) continue;
-
-			const valueText = cells[i + 1].textContent ?? '';
-			const numeric = valueText.replace(/\s+/g, '').match(/\d+/)?.[0];
-			if (!numeric) continue;
-
-			const parsed = Number.parseInt(numeric, 10);
-			if (Number.isFinite(parsed) && parsed >= 0) return parsed;
-		}
-	}
-
-	const bodyText = (doc.body?.textContent ?? '').replace(/\s+/g, ' ');
-	const inlineMatches = [
-		bodyText.match(/(?:chars?|characters?|znak(?:i|ow|ów)?|length|dlugosc|d[łl]ugo[śs]c)\s*[:\-]?\s*(\d[\d\s]*)/i),
-		bodyText.match(/(\d[\d\s]*)\s*(?:chars?|characters?|znak(?:i|ow|ów)?)/i)
-	];
-
-	for (const match of inlineMatches) {
-		const raw = match?.[1];
-		if (!raw) continue;
-		const parsed = Number.parseInt(raw.replace(/\s+/g, ''), 10);
-		if (Number.isFinite(parsed) && parsed >= 0) return parsed;
-	}
-
-	return null;
-}
-
-async function getDashboardSubmittedCharsTotal() {
-	const detailUrls = getDashboardSubmissionDetailUrls();
-	if (detailUrls.length === 0) return 0;
-
-	let total = 0;
-	for (const detailUrl of detailUrls) {
-		try {
-			const response = await fetch(detailUrl, {credentials: 'include'});
-			if (!response.ok) continue;
-
-			const html = await response.text();
-			const doc = new DOMParser().parseFromString(html, 'text/html');
-			const chars = parseSubmittedCharsFromDetailsDoc(doc);
-			if (chars != null) total += chars;
-		} catch (error) {
-			console.warn('Failed to parse submitted chars from details page', detailUrl, error);
-		}
-	}
-
-	return total;
 }
 
 const pinButton = (q: HTMLDivElement, thisContest: contest) => {
@@ -421,7 +487,7 @@ export async function pinContestButtonInContest() {
 	pinnedContests = await getPinnedContests();
 	let title = document.querySelector('.row .col-lg-9.col-xl-10.main-content h1') as HTMLElement;
 
-	let thisContest: contest = {name: title.innerText, href: window.location.href.slice(0, -10), slug: ''};
+	let thisContest: contest = {name: (title as HTMLElement).innerText, href: window.location.href.slice(0, -10), slug: ''};
 
 	let btnDiv = document.createElement('div');
 	title.style.display = 'flex';
@@ -574,15 +640,8 @@ export function appendHomeDashboardSummary() {
 	const submissionsPanel = submissionsTable?.closest<HTMLElement>('.dashboard-panel');
 	if (!submissionsPanel) return;
 
-	const entries = getSolvedDashboardEntries();
 	const solvedByDay = new Map<string, number>();
 	const uniqueSolvedTasks = new Set<string>();
-
-	for (const entry of entries) {
-		const key = toDateKey(entry.date);
-		solvedByDay.set(key, (solvedByDay.get(key) ?? 0) + 1);
-		if (entry.problemId) uniqueSolvedTasks.add(entry.problemId);
-	}
 
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);
@@ -590,15 +649,10 @@ export function appendHomeDashboardSummary() {
 	monthAgo.setDate(monthAgo.getDate() - 29);
 
 	let solvedLastMonth = 0;
-	for (const entry of entries) {
-		if (entry.date >= monthAgo) solvedLastMonth += 1;
-	}
-
-	let solvedToday = solvedByDay.get(toDateKey(today)) ?? 0;
-	let bestDay = Math.max(0, ...Array.from(solvedByDay.values()));
-	const emittedSolveKeys = new Set(entries
-		.filter((entry) => !!entry.problemId)
-		.map((entry) => `${ entry.problemId }|${ toDateKey(entry.date) }`));
+	let solvedToday = 0;
+	let bestDay = 0;
+	const emittedSolveKeys = new Set<string>();
+	let solvedSiteTotal = 0;
 
 	const openTask = (id: string) => {
 		if (!id) return;
@@ -706,7 +760,7 @@ export function appendHomeDashboardSummary() {
 	const updateStats = () => {
 		if (lastMonthValue) lastMonthValue.textContent = String(solvedLastMonth);
 		if (todayValue) todayValue.textContent = String(solvedToday);
-		if (totalValue) totalValue.textContent = String(uniqueSolvedTasks.size);
+		if (totalValue) totalValue.textContent = String(solvedSiteTotal || uniqueSolvedTasks.size);
 		if (charsValue) charsValue.textContent = String(submittedCharsTotal);
 		if (charsMbValue) charsMbValue.textContent = `(${ (submittedCharsTotal / (1024 * 1024)).toFixed(2) } MB)`;
 		if (bestValue) bestValue.textContent = String(bestDay);
@@ -744,13 +798,15 @@ export function appendHomeDashboardSummary() {
 	});
 
 	void (async () => {
-		const historicalEntries = await getSolvedEntriesFromSubmissionsPages();
+		const historicalEntries = await getSolvedDashboardEntries();
 		for (const entry of historicalEntries) {
 			if (entry.date < oldestShownDate && entry.date < monthAgo) continue;
 			applySolvedEntry(entry.problemId, entry.date);
 		}
 
-		submittedCharsTotal = await getDashboardSubmittedCharsTotal();
+		const storedStats = await getDashboardStoredStats();
+		submittedCharsTotal = storedStats.submittedCharsTotal;
+		solvedSiteTotal = storedStats.solvedSiteTotal;
 		updateStats();
 	})();
 

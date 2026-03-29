@@ -1,6 +1,7 @@
 import { html, render } from 'lit';
 import { programmingLanguage } from './options';
 import { emitTaskSolved } from './ui-elements';
+import browser from 'webextension-polyfill';
 
 function attachCSS(css: string) {
 	const styleElement: HTMLStyleElement = document.createElement('style');
@@ -229,13 +230,115 @@ export function inlineStatements() {
 	});
 }
 
-export function addTaskSolvedEventTriggers() {
+export function attachSubmitFormFixesAndListeners() {
 	if (!window.location.href.includes('submit')) return;
-	const submitButtons = document.querySelectorAll<HTMLButtonElement>('.form-group > button[type="submit"]');
-	submitButtons.forEach((button: HTMLButtonElement) => {
-		button.style.color = 'red';
-		button.addEventListener('hover', () => {
-			emitTaskSolved(window.location.href); // TODO change this to task id and the event to actually solved, not just submitted
+	if ((window as unknown as { __szkopulSubmitTracked?: boolean }).__szkopulSubmitTracked) return;
+	(window as unknown as { __szkopulSubmitTracked?: boolean }).__szkopulSubmitTracked = true;
+
+	// const editorToggle = document.getElementById('id_toggle_editor') as HTMLInputElement;
+	// if (editorToggle.checked) editorToggle.click();
+	// editorToggle.parentElement!.style.display = 'none';
+
+	const findCodeTextarea = () => document.querySelector<HTMLTextAreaElement>('#id_code, textarea[name="code"]/*, textarea.ace_text-input*/');
+	const getCodeValue = () => {
+		const codeTextarea = findCodeTextarea();
+		const textareaValue = codeTextarea?.value ?? '';
+		const aceRef = (window as unknown as { ace?: { edit: (id: string) => { getSession: () => { getValue: () => string; on: (eventName: string, cb: () => void) => void } } } }).ace;
+		const editorEl = document.getElementById('editor');
+		if (!aceRef || !editorEl || editorEl.style.display === 'none') return textareaValue;
+		try {
+			return aceRef.edit('editor').getSession().getValue() ?? textareaValue;
+		} catch {
+			return textareaValue;
+		}
+	};
+
+	const codeTextarea = findCodeTextarea();
+	if (codeTextarea && !document.getElementById('utils-code-counter')) {
+		const counter = document.createElement('div');
+		counter.id = 'utils-code-counter';
+		counter.style.cssText = 'display:block;margin-top:6px;font-size:12px;color:#6c757d;';
+
+		const updateCounter = () => {
+			const value = getCodeValue();
+			const lines = value.length === 0 ? 0 : value.split(/\r\n|\r|\n/).length;
+			counter.textContent = `Chars: ${ value.length } | Lines: ${ lines }`;
+		};
+
+		(codeTextarea.closest('.form-group') ?? codeTextarea.parentElement)?.appendChild(counter);
+		codeTextarea.addEventListener('input', updateCounter);
+		codeTextarea.addEventListener('change', updateCounter);
+		document.addEventListener('mousemove', updateCounter);
+
+		let aceCounterBound = false;
+		const bindAceCounter = () => {
+			if (aceCounterBound) return true;
+			const aceRef = (window as unknown as { ace?: { edit: (id: string) => { getSession: () => { on: (eventName: string, cb: () => void) => void } } } }).ace;
+			if (!aceRef) return false;
+			try {
+				aceRef.edit('editor').getSession().on('change', updateCounter);
+				aceCounterBound = true;
+				return true;
+			} catch {
+				return false;
+			}
+		};
+
+		for (const delay of [ 0, 250, 700, 1500, 2500 ]) {
+			window.setTimeout(() => {
+				if (bindAceCounter()) updateCounter();
+			}, delay);
+		}
+
+		window.setTimeout(updateCounter, 0);
+		window.setTimeout(updateCounter, 500);
+	}
+
+	let solvedEmitted = false;
+	let charsPersisted = false;
+	let submitIntent = false;
+	const getCodeLength = () => getCodeValue().length;
+	const persistCharsOnce = () => {
+		if (charsPersisted) return;
+		charsPersisted = true;
+
+		const chars = getCodeLength();
+		if (chars <= 0) return;
+
+		void browser.storage.local.get('submittedCharsTotal').then((data) => {
+			const current = typeof data.submittedCharsTotal === 'number' && Number.isFinite(data.submittedCharsTotal) && data.submittedCharsTotal >= 0 ? data.submittedCharsTotal : 0;
+			return browser.storage.local.set({submittedCharsTotal: current + chars});
+		}).catch(() => {
+			charsPersisted = false;
 		});
-	});
+	};
+
+	const emitSolvedOnce = () => {
+		if (solvedEmitted) return;
+		solvedEmitted = true;
+		persistCharsOnce();
+		emitTaskSolved(window.location.href, 0);
+	};
+
+	document.addEventListener('submit', (event) => {
+		const form = event.target instanceof HTMLFormElement ? event.target : null;
+		if (!form || (!form.action.includes('/submit') && !window.location.pathname.includes('/submit'))) return;
+		submitIntent = true;
+		emitSolvedOnce();
+	}, true);
+
+	document.addEventListener('click', (event) => {
+		const target = event.target as Element | null;
+		const submitControl = target?.closest('button[type="submit"], input[type="submit"]') as HTMLButtonElement | HTMLInputElement | null;
+		if (!submitControl) return;
+		const form = submitControl.form ?? submitControl.closest('form');
+		if (!(form instanceof HTMLFormElement)) return;
+		if (!form.action.includes('/submit') && !window.location.pathname.includes('/submit')) return;
+		submitIntent = true;
+		emitSolvedOnce();
+	}, true);
+
+	window.addEventListener('beforeunload', () => {
+		if (submitIntent) emitSolvedOnce();
+	}, {capture: true});
 }

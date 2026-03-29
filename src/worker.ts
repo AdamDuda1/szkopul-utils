@@ -1,6 +1,7 @@
 import {
 	fixContactButton, addUtilsFeedbackButton, makeEnterSearchThings, languageSelectorFix,
-	inlineStatements, statementsOnSamePage, addTaskSolvedEventTriggers, mandatoryCSSFixes
+	inlineStatements, statementsOnSamePage, mandatoryCSSFixes,
+	attachSubmitFormFixesAndListeners
 } from './misc-fixes';
 import browser from 'webextension-polyfill';
 import { initNotes } from './notes';
@@ -40,10 +41,10 @@ const onLoad = () => {
 
 	void urlSpecificFixes();
 
+	void attachSubmitFormFixesAndListeners();
+
 	if (optionsObject.statementsOnSamePage) void statementsOnSamePage();
 	if (optionsObject.inlineProblemStatements) void inlineStatements();
-
-	void addTaskSolvedEventTriggers();
 };
 
 getOptions().then((ans) => {
