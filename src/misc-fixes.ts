@@ -303,28 +303,37 @@ export function attachSubmitFormFixesAndListeners() {
 	}
 
 	let solvedEmitted = false;
-	let charsPersisted = false;
+	let statsPersisted = false;
 	let submitIntent = false;
-	const getCodeLength = () => getCodeValue().length;
-	const persistCharsOnce = () => {
-		if (charsPersisted) return;
-		charsPersisted = true;
+	const getCodeStats = () => {
+		const code = getCodeValue();
+		const chars = code.length;
+		const lines = chars === 0 ? 0 : code.split(/\r\n|\r|\n/).length;
+		return {chars, lines};
+	};
+	const persistSubmissionStatsOnce = () => {
+		if (statsPersisted) return;
+		statsPersisted = true;
 
-		const chars = getCodeLength();
-		if (chars <= 0) return;
+		const {chars, lines} = getCodeStats();
+		if (chars <= 0 && lines <= 0) return;
 
-		void browser.storage.local.get('submittedCharsTotal').then((data) => {
-			const current = typeof data.submittedCharsTotal === 'number' && Number.isFinite(data.submittedCharsTotal) && data.submittedCharsTotal >= 0 ? data.submittedCharsTotal : 0;
-			return browser.storage.local.set({submittedCharsTotal: current + chars});
+		void browser.storage.local.get([ 'submittedCharsTotal', 'submittedLinesTotal' ]).then((data) => {
+			const currentChars = typeof data.submittedCharsTotal === 'number' && Number.isFinite(data.submittedCharsTotal) && data.submittedCharsTotal >= 0 ? data.submittedCharsTotal : 0;
+			const currentLines = typeof data.submittedLinesTotal === 'number' && Number.isFinite(data.submittedLinesTotal) && data.submittedLinesTotal >= 0 ? data.submittedLinesTotal : 0;
+			return browser.storage.local.set({
+				submittedCharsTotal: currentChars + chars,
+				submittedLinesTotal: currentLines + lines,
+			});
 		}).catch(() => {
-			charsPersisted = false;
+			statsPersisted = false;
 		});
 	};
 
 	const emitSolvedOnce = () => {
 		if (solvedEmitted) return;
 		solvedEmitted = true;
-		persistCharsOnce();
+		persistSubmissionStatsOnce();
 		emitTaskSolved(window.location.href, 0);
 	};
 

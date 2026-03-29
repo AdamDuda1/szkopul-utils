@@ -206,6 +206,15 @@ async function getDashboardStoredStats() {
 		nestedStats.charsSubmitted,
 	);
 
+	const submittedLinesTotal = pickStoredNumber(
+		data.submittedLinesTotal,
+		data.submittedLines,
+		data.linesSubmitted,
+		nestedStats.submittedLinesTotal,
+		nestedStats.submittedLines,
+		nestedStats.linesSubmitted,
+	);
+
 	const solvedSiteTotal = pickStoredNumber(
 		data.solvedSiteTotal,
 		data.siteSolvedTotal,
@@ -217,7 +226,7 @@ async function getDashboardStoredStats() {
 		nestedStats.site,
 	);
 
-	return {submittedCharsTotal, solvedSiteTotal};
+	return {submittedCharsTotal, submittedLinesTotal, solvedSiteTotal};
 }
 
 function parseTaskSolvedDate(raw: TaskSolvedEventPayload['solvedAt']) {
@@ -659,8 +668,6 @@ export function appendHomeDashboardSummary() {
 		window.location.href = `https://szkopul.edu.pl/problemset/problem/${ encodeURIComponent(id) }/site/?key=statement`;
 	};
 
-	let submittedCharsTotal = 0;
-
 	const container = document.createElement('div');
 	container.id = 'szkopul-utils-dashboard-summary';
 	container.className = 'szkopul-utils-dashboard-summary-card';
@@ -692,6 +699,10 @@ export function appendHomeDashboardSummary() {
 		document.head.appendChild(style);
 	}
 
+	let submittedLines = 0;
+	let submittedChars = 0;
+	let submittedMB = 0;
+
 	container.innerHTML = `
 		<div class="card-header dashboard-panel-head">
 			<h4 class="mb-0">Activity</h4>
@@ -701,7 +712,11 @@ export function appendHomeDashboardSummary() {
 				<div class="stats-grid-horizontal">
 					<div class="stat-item"><b id="szkopul-utils-stat-last-month">${ solvedLastMonth }</b>${ t('dashboard_stats_lastMonth') }</div>
 					<div class="stat-item"><b id="szkopul-utils-stat-total">${ uniqueSolvedTasks.size }</b>${ t('dashboard_stats_total') }</div>
-					<div class="stat-item"><b id="szkopul-utils-stat-chars">${ submittedCharsTotal }</b>${ t('dashboard_stats_chars') }<span class="stat-extra" id="szkopul-utils-stat-chars-mb">(0.00 MB)</span></div>
+					<div class="stat-item">
+						<b id="szkopul-utils-stat-lines">${ submittedLines }</b>
+						${ t('dashboard_stats_lines') }
+						<span class="stat-extra"><span id="szkopul-utils-stat-chars">${ submittedChars }</span> ${t("dashboard_stats_chars")}, (<span id="szkopul-utils-stat-chars-mb">${ submittedMB }</span> MB)</span>
+					</div>
 					<div class="stat-item"><b id="szkopul-utils-stat-best">${ bestDay }</b>${ t('dashboard_stats_bestDay') }</div>
 				</div>
 				<div class="stats-grid-horizontal">
@@ -753,16 +768,19 @@ export function appendHomeDashboardSummary() {
 	const lastMonthValue = container.querySelector<HTMLElement>('#szkopul-utils-stat-last-month');
 	const todayValue = container.querySelector<HTMLElement>('#szkopul-utils-stat-today');
 	const totalValue = container.querySelector<HTMLElement>('#szkopul-utils-stat-total');
+	const linesValue = container.querySelector<HTMLElement>('#szkopul-utils-stat-lines');
 	const charsValue = container.querySelector<HTMLElement>('#szkopul-utils-stat-chars');
-	const charsMbValue = container.querySelector<HTMLElement>('#szkopul-utils-stat-chars-mb');
+	const mbValue = container.querySelector<HTMLElement>('#szkopul-utils-stat-chars-mb');
 	const bestValue = container.querySelector<HTMLElement>('#szkopul-utils-stat-best');
 
 	const updateStats = () => {
 		if (lastMonthValue) lastMonthValue.textContent = String(solvedLastMonth);
 		if (todayValue) todayValue.textContent = String(solvedToday);
 		if (totalValue) totalValue.textContent = String(solvedSiteTotal || uniqueSolvedTasks.size);
-		if (charsValue) charsValue.textContent = String(submittedCharsTotal);
-		if (charsMbValue) charsMbValue.textContent = `(${ (submittedCharsTotal / (1024 * 1024)).toFixed(2) } MB)`;
+		if (linesValue) linesValue.textContent = String(submittedLines);
+		if (charsValue) charsValue.textContent = String(submittedChars);
+		submittedMB = Number((submittedChars / (1024 * 1024)).toFixed(2));
+		if (mbValue) mbValue.textContent = submittedMB.toFixed(2);
 		if (bestValue) bestValue.textContent = String(bestDay);
 	};
 
@@ -805,7 +823,9 @@ export function appendHomeDashboardSummary() {
 		}
 
 		const storedStats = await getDashboardStoredStats();
-		submittedCharsTotal = storedStats.submittedCharsTotal;
+		submittedLines = storedStats.submittedLinesTotal;
+		submittedChars = storedStats.submittedCharsTotal;
+		submittedMB = Number((submittedChars / (1024 * 1024)).toFixed(2));
 		solvedSiteTotal = storedStats.solvedSiteTotal;
 		updateStats();
 	})();
@@ -884,11 +904,6 @@ export async function appendVirtualContestPanel() {
 }
 
 function openArchiveVirtualContestModal(tasks: task[]) {
-	if (tasks.length === 0) {
-		alert('Oh, no! Brak zadań w tej grupie!');
-		return;
-	}
-
 	document.getElementById('szkopul-utils-archive-virtual-modal')?.remove();
 
 	const host = document.createElement('div');
@@ -1014,3 +1029,4 @@ export function taskArchive() {
 		header.appendChild(contestButton);
 	});
 }
+

@@ -1,12 +1,18 @@
-# <img height="34" src="https://github.com/user-attachments/assets/b57de719-2720-4056-951e-be4c36a5f73e" /> Szkopuł Utils
+[//]: # (# <img height="34" src="https://github.com/user-attachments/assets/b57de719-2720-4056-951e-be4c36a5f73e" /> Szkopuł Utils)
+
+# <div align="center"><img height="34" src="https://github.com/user-attachments/assets/b57de719-2720-4056-951e-be4c36a5f73e" /> Szkopuł Utils</div>
 
 Szkopuł Utils is a browser extension that provides various QOL improvements and additional features for the [Szkopuł.edu.pl](https://szkopul.edu.pl/) website.
+
+![Hackatime Badge](https://hackatime-badge.hackclub.com/U0AAK0EB2LE/szkopul-utils) ![GitHub Release](https://img.shields.io/github/v/release/AdamDuda1/szkopul-utils)
+
 
 ## Installation
 
 **Install from the extension store:**
 - <img height="18" alt="image" src="https://github.com/user-attachments/assets/ebb9c716-c5e0-4e2b-9568-9cd72ecb2be1" /> [Chrome Web Store](https://chromewebstore.google.com/detail/szkopu%C5%82-utils/obbgoakgbnjcfojfajlmndhlpnlafbfl)
 - <img height="20" alt="image" src="https://github.com/user-attachments/assets/13ac0475-98ac-494b-b9ac-14f3f0182c9f" /> [Firefox Add-ons](https://addons.mozilla.org/pl/firefox/addon/szkopul-utils/) (still, after 3 weeks, isnt reviewed yet so you cent download)
+- Load the latest .crx file from the [Releases](https://github.com/AdamDuda1/szkopul-utils/releases) in developer move.
 
 **Load locally:**
 - Compress the files in the `src` folder into a zip file (manifest.json must be directly in the zip's root). **Make sure to run `npm install` and `npm run build` to compile all the TS scripts before** (you might also need to install `esbuild` and `typescript` if you don't have that already)**!**
@@ -29,6 +35,10 @@ Szkopuł Utils is a browser extension that provides various QOL improvements and
 
 - Other misc fixes and improvements, so many I dont even remember!
 
+# Contributing
+
+All PRs are welcome! Leave your suggestions, feature requests and bug reports in the [Issues](https://github.com/AdamDuda1/szkopul-utils/issues).
+
 ## Note
 
 I originally wanted to make the 'frontend' part of this extension in Angular, but it was a bit hard to start with it and mix it with the extension file structure. Because of that, I started with just standard TS and a template for the extension files from the internet, and Im using libraries that imitate parts of Angular (I mean, do something similar), like `lit` for inserting reactive HTML **duh, the TS files dont even have classes...** (<-- I might have to change that in the very near future). I may make a 2.0 version in the future with full Angular if there is a need for it (and if I have the time). Edit: Im not sure that Angular is a good idea here but I need to reorganize the files and functions...
@@ -45,12 +55,8 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 - menu w problem view
 - preferred language is on home page... ??????????????????????????? what did I mean =
 
-- Things in the contest archive!
-
 - (??) hide the midified tables (like problems in contest) untill thir html is not modified (display: none on init and then flex when loaded)
 - make the user be able to choose what is displayed on the home page of the popup (szkopul stats/quick score hiding setting)
 - **build the menu html on click so it loads faster and is up to date**
 - Add the same menu in the problem set to the top of the problem page
 - **Add comments under tasks ?**
-- por favor senior arrow
-- ahhh
