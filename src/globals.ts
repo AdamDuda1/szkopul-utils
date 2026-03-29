@@ -99,7 +99,16 @@ export const translations = {
 		menu_removed: 'Usunięto!',
 
 		pageBlockedMessage1: 'Hej! Piszesz konkurs wirtualny a to jest niezwiązana podstrona.',
-		pageBlockedMessage2: 'Wybierz jedno z zadań z panelu po lewej lub wcześnie zakończ konkurs w panelu rozszerzenia.'
+		pageBlockedMessage2: 'Wybierz jedno z zadań z panelu po lewej lub wcześnie zakończ konkurs w panelu rozszerzenia.',
+
+		archive_forAll: 'Dla wszystkich:',
+		archive_random: 'Losowe zadań z tego konkursu',
+		archive_contest: 'Konkurs wirtualny z zadaniami z tego konkursu',
+		archive_replaceTaskInVirtual: 'Czy na pewno chcesz zastąpić wszystkie zadania konkursu wirtualnego zadaniami z tego konkursu?',
+		archive_tasksToAdd: 'Ilość zadań:',
+		archive_yes: 'Tak',
+		archive_justAdd: 'Dodaj, nie zamieniaj',
+		archive_cancel: 'Anuluj',
 	},
 	en: {
 		popup_home_virtual: 'Virtual contest',
@@ -181,6 +190,15 @@ export const translations = {
 		menu_removed: 'Removed!',
 
 		pageBlockedMessage1: 'Hey! You\'re writing a virtual contest and this is an unrelated subpage.',
-		pageBlockedMessage2: 'Please select one of the tasks from the panel on the left or finish the contest early in the extension panel.'
+		pageBlockedMessage2: 'Please select one of the tasks from the panel on the left or finish the contest early in the extension panel.',
+
+		archive_forAll: 'For all:',
+		archive_random: 'Random from tasks from this contest',
+		archive_contest: 'Virtual contest with tasks from this contest',
+		archive_replaceTaskInVirtual: 'Are you sure you want to replace all the tasks for virtual contest with tasks from this contest?',
+		archive_tasksToAdd: 'Tasks to add:',
+		archive_yes: 'Yes',
+		archive_justAdd: 'Just add',
+		archive_cancel: 'Cancel',
 	}
 };

@@ -883,28 +883,134 @@ export async function appendVirtualContestPanel() {
 	}, 1000);
 }
 
+function openArchiveVirtualContestModal(tasks: task[]) {
+	if (tasks.length === 0) {
+		alert('Oh, no! Brak zadań w tej grupie!');
+		return;
+	}
+
+	document.getElementById('szkopul-utils-archive-virtual-modal')?.remove();
+
+	const host = document.createElement('div');
+	host.id = 'szkopul-utils-archive-virtual-modal';
+	host.innerHTML = `
+		<div id="szkopul-utils-archive-virtual-overlay" style="position: fixed; top: 0; left: 0; z-index: 2147483647; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.24);">
+			<div id="szkopul-utils-archive-virtual-content" style="background: ${ (localStorage.getItem('dark-mode') === 'enabled' ? '#181a1b' : 'white') }; color: ${ (localStorage.getItem('dark-mode') === 'enabled' ? '#f8f9fa' : '#212529') }; padding: 16px; border-radius: 12px; width: min(520px, 90vw); box-shadow: 0 8px 32px rgba(0,0,0,0.28);">
+				<p style="margin: 0 0 6px 0;">${ t('archive_replaceTaskInVirtual') } <br> ${t("archive_tasksToAdd")} ${ tasks.length }</p>
+				<div style="display: flex; gap: 8px; justify-content: flex-end;">
+					<button type="button" class="btn btn-primary" id="szkopul-utils-archive-virtual-replace">${t("archive_yes")}</button>
+					<button type="button" class="btn btn-outline-primary" id="szkopul-utils-archive-virtual-add">${t("archive_justAdd")}</button>
+					<button type="button" class="btn btn-secondary" id="szkopul-utils-archive-virtual-cancel">${t("archive_cancel")}</button>
+				</div>
+			</div>
+		</div>
+	`;
+	document.body.appendChild(host);
+
+	const overlay = host.querySelector<HTMLDivElement>('#szkopul-utils-archive-virtual-overlay');
+	const content = host.querySelector<HTMLDivElement>('#szkopul-utils-archive-virtual-content');
+	const replaceButton = host.querySelector<HTMLButtonElement>('#szkopul-utils-archive-virtual-replace');
+	const addButton = host.querySelector<HTMLButtonElement>('#szkopul-utils-archive-virtual-add');
+	const cancelButton = host.querySelector<HTMLButtonElement>('#szkopul-utils-archive-virtual-cancel');
+
+	const closeModal = () => {
+		document.removeEventListener('keydown', onKeyDown);
+		host.remove();
+	};
+
+	const applyTasks = async (replaceExisting: boolean) => {
+		const pendingTasks = tasks.filter((item) => item.id);
+		if (pendingTasks.length === 0) {
+			closeModal();
+			return;
+		}
+
+		if (replaceExisting) {
+			const existing = await getVirtualTasks();
+			for (const existingTask of existing) {
+				await removeVirtualTask(existingTask.id);
+			}
+		}
+
+		const nowExistingIds = new Set((await getVirtualTasks()).map((item) => item.id));
+		for (const archiveTask of pendingTasks) {
+			if (nowExistingIds.has(archiveTask.id)) continue;
+			await addVirtualTask(archiveTask.id, archiveTask.name);
+			nowExistingIds.add(archiveTask.id);
+		}
+
+		closeModal();
+	};
+
+	const onKeyDown = (event: KeyboardEvent) => {
+		if (event.key === 'Escape') closeModal();
+	};
+
+	overlay?.addEventListener('click', closeModal);
+	content?.addEventListener('click', (event) => event.stopPropagation());
+	replaceButton?.addEventListener('click', () => {
+		void applyTasks(true);
+	});
+	addButton?.addEventListener('click', () => {
+		void applyTasks(false);
+	});
+	cancelButton?.addEventListener('click', closeModal);
+	document.addEventListener('keydown', onKeyDown);
+}
+
 export function taskArchive() {
 	const headers = document.querySelectorAll<HTMLDivElement>('.problemgroup-heading');
 
+	let first: boolean = true;
+
 	headers.forEach(header => {
+		if (first) {
+			header.innerHTML = t("archive_forAll");
+			first = false;
+		}
+
 		header.querySelectorAll<HTMLElement>('i.link-getter').forEach(e => e.style.display = 'none');
 
-		let tasks: string[] = [];
-		(header.nextElementSibling as HTMLElement | null)?.querySelectorAll<HTMLAnchorElement>('td a').forEach(a => tasks.push(a.href));
-		console.log(header.querySelectorAll<HTMLAnchorElement>('td a'));
+		const tasks: task[] = [];
+		(header.nextElementSibling as HTMLElement | null)?.querySelectorAll<HTMLAnchorElement>('td a').forEach((a) => {
+			const href = a.href;
+			const id = href.match(/\/problemset\/problem\/([^/]+)/)?.[1] ?? '';
+			if (!id) return;
+			tasks.push({id: decodeURIComponent(id), name: a.textContent?.trim() || decodeURIComponent(id)});
+		});
+		const taskUrls = tasks.map((item) => `https://szkopul.edu.pl/problemset/problem/${ encodeURIComponent(item.id) }/site/?key=statement`);
 
 		const randomButton = document.createElement('button');
 		randomButton.classList.add('btn', 'btn-sm');
-		randomButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-shuffle" viewBox="0 0 16 16">
-  <path fill-rule="evenodd" d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.6 9.6 0 0 0 7.556 8a9.6 9.6 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.6 10.6 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.6 9.6 0 0 0 6.444 8a9.6 9.6 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5"/>
-  <path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192m0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192"/>
-</svg>`;
+		randomButton.style = 'position: relative; top: -2px;';
+		randomButton.title = t("archive_random");
+		randomButton.innerHTML = `
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-shuffle" viewBox="0 0 16 16">
+				<path fill-rule="evenodd" d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.6 9.6 0 0 0 7.556 8a9.6 9.6 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.6 10.6 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.6 9.6 0 0 0 6.444 8a9.6 9.6 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5"/>
+				<path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192m0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192"/>
+			</svg>
+		`;
 		randomButton.addEventListener('click', () => {
-			if (tasks.length === 0) { alert('Oh, no! Brak zadań w tej grupie!'); return; }
-			const randomTask = tasks[Math.floor(Math.random() * tasks.length)];
+			if (taskUrls.length === 0) { alert('Oh, no! Brak zadań w tej grupie!'); return; }
+			const randomTask = taskUrls[Math.floor(Math.random() * taskUrls.length)];
 			window.open(randomTask, '_blank');
 		});
 
+		const contestButton = document.createElement('button');
+		contestButton.classList.add('btn', 'btn-sm');
+		contestButton.style = 'position: relative; top: -2px;';
+		contestButton.title = t("archive_contest");
+		contestButton.innerHTML = `
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-stopwatch" viewBox="0 0 16 16">
+				<path d="M8.5 5.6a.5.5 0 1 0-1 0v2.9h-3a.5.5 0 0 0 0 1H8a.5.5 0 0 0 .5-.5z"/>
+				<path d="M6.5 1A.5.5 0 0 1 7 .5h2a.5.5 0 0 1 0 1v.57c1.36.196 2.594.78 3.584 1.64l.012-.013.354-.354-.354-.353a.5.5 0 0 1 .707-.708l1.414 1.415a.5.5 0 1 1-.707.707l-.353-.354-.354.354-.013.012A7 7 0 1 1 7 2.071V1.5a.5.5 0 0 1-.5-.5M8 3a6 6 0 1 0 .001 12A6 6 0 0 0 8 3"/>
+			</svg>
+		`;
+		contestButton.addEventListener('click', () => {
+			openArchiveVirtualContestModal(tasks);
+		});
+
 		header.appendChild(randomButton);
+		header.appendChild(contestButton);
 	});
 }

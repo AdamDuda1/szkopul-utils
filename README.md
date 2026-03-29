@@ -25,7 +25,7 @@ Szkopuł Utils is a browser extension that provides various QOL improvements and
 - Actually searches when you press enter in the search bar;
 - Hides the 'Contact' (or 'Send feedback' in english) button in the bottom left corner of the footer. It previously caused bottom part of the website's elements to be non-interactable (because of bad flex-box styling and `z-index: 999`).
 
- <img width="1003" height="111" alt="image" src="https://github.com/user-attachments/assets/01f03ce2-b69a-4a44-9ca3-e49ce9c91931" />
+ <img width="800" alt="image" src="https://github.com/user-attachments/assets/01f03ce2-b69a-4a44-9ca3-e49ce9c91931" />
 
 - Other misc fixes and improvements, so many I dont even remember!
 

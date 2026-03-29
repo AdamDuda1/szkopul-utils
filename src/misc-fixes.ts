@@ -175,7 +175,6 @@ export function statementsOnSamePage() {
 export function inlineStatements() {
 	const table = document.querySelector<HTMLTableElement>('.table.table-striped.table--narrow');
 	if (!table) return;
-	const singleOpenMode = true;
 
 	table.style.width = '100%';
 	table.style.maxWidth = '100%';
@@ -219,13 +218,22 @@ export function inlineStatements() {
 		details?.addEventListener('toggle', () => {
 			if (!details.open) return;
 
-			if (singleOpenMode) {
-				table.querySelectorAll<HTMLDetailsElement>('details').forEach((other) => {
-					if (other !== details) other.open = false;
-				});
-			}
+			if (!embed) return;
 
 			if (embed && !embed.getAttribute('src')) embed.setAttribute('src', statementHref);
+
+			// fetch(statementHref)
+			// 	.then(res => res.text())
+			// 	.then(html => {
+			// 		const parser = new DOMParser();
+			// 		const doc = parser.parseFromString(html, 'text/html');
+			// 		const el = doc.querySelector('.content');
+			// 		console.log(doc);
+			// 		console.log(el);
+			// 		if (el) {
+			// 			embed.parentElement!.innerHTML = doc.querySelector('html')!.innerHTML;
+			// 		} else if (embed && !embed.getAttribute('src')) embed.setAttribute('src', statementHref);
+			// 	});
 		});
 	});
 }
