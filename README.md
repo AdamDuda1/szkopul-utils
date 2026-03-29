@@ -1,12 +1,12 @@
-# Szkopuł Utils
+# <img height="34" src="https://github.com/user-attachments/assets/b57de719-2720-4056-951e-be4c36a5f73e" /> Szkopuł Utils
 
 Szkopuł Utils is a browser extension that provides various QOL improvements and additional features for the [Szkopuł.edu.pl](https://szkopul.edu.pl/) website.
 
 ## Installation
 
 **Install from the extension store:**
-- [Chrome Web Store](https://chromewebstore.google.com/detail/szkopu%C5%82-utils/obbgoakgbnjcfojfajlmndhlpnlafbfl)
-- [Firefox Add-ons](https://addons.mozilla.org/pl/firefox/addon/szkopul-utils/)
+- <img height="18" alt="image" src="https://github.com/user-attachments/assets/ebb9c716-c5e0-4e2b-9568-9cd72ecb2be1" /> [Chrome Web Store](https://chromewebstore.google.com/detail/szkopu%C5%82-utils/obbgoakgbnjcfojfajlmndhlpnlafbfl)
+- <img height="20" alt="image" src="https://github.com/user-attachments/assets/13ac0475-98ac-494b-b9ac-14f3f0182c9f" /> [Firefox Add-ons](https://addons.mozilla.org/pl/firefox/addon/szkopul-utils/) (still, after 3 weeks, isnt reviewed yet so you cent download)
 
 **Load locally:**
 - Compress the files in the `src` folder into a zip file (manifest.json must be directly in the zip's root). **Make sure to run `npm install` and `npm run build` to compile all the TS scripts before** (you might also need to install `esbuild` and `typescript` if you don't have that already)**!**
