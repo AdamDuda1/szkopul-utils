@@ -1,14 +1,7 @@
-import {
-	fixContactButton, addUtilsFeedbackButton, makeEnterSearchThings, languageSelectorFix,
-	inlineStatements, statementsOnSamePage, mandatoryCSSFixes,
-	attachSubmitFormFixesAndListeners
-} from './misc-fixes';
+import { attachSubmitFormFixesAndListeners, inlineStatements, languageSelectorFix, makeEnterSearchThings, mandatoryFixesAfterDOMLoad, mandatoryFixesOnStart, statementsOnSamePage } from './misc-fixes';
 import browser from 'webextension-polyfill';
 import { initNotes } from './notes';
-import {
-	appendHomeDashboardSummary, appendProblemSetMenu, appendVirtualContestPanel, pinContestButtonInContest,
-	pinContestButtons, prependPinnedContestsDashboardCard, taskArchive
-} from './ui-elements';
+import { appendHomeDashboardSummary, appendProblemSetMenu, appendVirtualContestPanel, pinContestButtonInContest, pinContestButtons, prependPinnedContestsDashboardCard, taskArchive } from './ui-elements';
 import { hideInitReportBadges, hidePageContents, hideRulesTab, hideScores } from './ui-hiders';
 import { addToTODOAction } from './todo';
 import { setLang } from './globals';
@@ -16,14 +9,15 @@ import { getVirtualOptions, getVirtualTasks, saveVirtualOptions } from './virtua
 import { getOptions, optionsTemplate } from './options';
 
 const manifestVersion = browser.runtime.getManifest().version;
-console.log(`Thank you for using Szkopuł Utils (v${ manifestVersion }), Dzięki! :)`);
+console.log(`Thank you for using Szkopuł Utils (v${manifestVersion}), Dzięki! :)`);
 
 let optionsObject: optionsTemplate;
 
 const onStart = () => {
 	setLang(optionsObject.lang);
-	void fixContactButton();
-	void mandatoryCSSFixes();
+
+	mandatoryFixesOnStart();
+
 	void applyVirtualContestPageOptions();
 	if (optionsObject.hideScores) void hideScores();
 	if (optionsObject.hideRulesTab) void hideRulesTab();
@@ -31,7 +25,8 @@ const onStart = () => {
 };
 
 const onLoad = () => {
-	void addUtilsFeedbackButton();
+	mandatoryFixesAfterDOMLoad();
+
 	void languageSelectorFix(optionsObject.preferredLanguage);
 
 	void appendProblemSetMenu(addToTODOAction);

@@ -3,24 +3,30 @@ import { programmingLanguage } from './options';
 import { emitTaskSolved } from './ui-elements';
 import browser from 'webextension-polyfill';
 
+export function mandatoryFixesOnStart() {
+	mandatoryCSSFixes();
+	fixContactButton();
+}
+
+export function mandatoryFixesAfterDOMLoad() {
+	addUtilsFeedbackButton();
+	openLinksInNewTab();
+	contestLinksOnHomePageLinkToProblems();
+}
+
 function attachCSS(css: string) {
 	const styleElement: HTMLStyleElement = document.createElement('style');
-	styleElement.textContent = css;
-
-	document.documentElement.appendChild(styleElement);
+	styleElement.textContent = css;	document.documentElement.appendChild(styleElement);
 }
 
 export function makeEnterSearchThings() {
 	if (!(window.location.href.includes('/problemset') || window.location.href.includes('/contest'))) return;
-	const input = document.querySelector('input[type=\'search\']'); // TODO fix doesnt work on /contest on chrome for some reason
+	const input = document.querySelector<HTMLElement>('input[type=\'search\']');
 
 	input?.addEventListener('keydown', function (e) {
-		// @ts-ignore
-		if (e.key === 'Enter') {
-			console.log('safjhasdsdfajhldsfa');
-			e.preventDefault(); // optional
-			// @ts-ignore
-			input.parentElement.parentElement!.submit();
+		if ((e as KeyboardEvent).key === 'Enter') {
+			e.preventDefault();
+			(input?.parentElement?.parentElement! as HTMLFormElement).submit();
 		}
 	});
 }
@@ -358,4 +364,20 @@ export function attachSubmitFormFixesAndListeners() {
 	window.addEventListener('beforeunload', () => {
 		if (submitIntent) emitSolvedOnce();
 	}, {capture: true});
+}
+
+export function openLinksInNewTab() {
+	if (document.location.href.endsWith('/p/')) return;
+	const as = document.querySelectorAll<HTMLAnchorElement>('.table-responsive-md table td > a');
+	as.forEach(a => {
+		if (a.href.includes('/p/')) a.target = '_blank';
+	})
+}
+
+export function contestLinksOnHomePageLinkToProblems() {
+	if (document.location.href.endsWith('.pl/')) return;
+	const as = document.querySelectorAll<HTMLAnchorElement>('.dashboard-panel.col-lg-4 td > a');
+	as.forEach(a => {
+		a.href = a.href + 'p/';
+	})
 }
