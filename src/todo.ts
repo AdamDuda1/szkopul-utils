@@ -92,14 +92,19 @@ export function reorderTODO(orderIds: string[]) {
 	});
 }
 
-export async function addToTODOAction(id: string, name: string, _btn: HTMLAnchorElement) {
+export async function addToTODOAction(id: string, name: string, _btn?: HTMLElement | null) {
+	const normalizedId = id.trim();
+	if (!normalizedId) return;
+
+	const normalizedName = name.trim();
+
 	try {
 		await updateTODO((todo) => {
-			if (todo.some((item) => item.id === id)) {
-				return todo.filter((item) => item.id !== id);
+			if (todo.some((item) => item.id === normalizedId)) {
+				return todo.filter((item) => item.id !== normalizedId);
 			}
 
-			return [ ...todo, {pos: todo.length + 1, name, id} ];
+			return [ ...todo, {pos: todo.length + 1, name: normalizedName, id: normalizedId} ];
 		});
 	} catch (error) {
 		console.error('TODO save failed', error);

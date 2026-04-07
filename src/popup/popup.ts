@@ -1,5 +1,5 @@
 import { setLang, t, type lang } from '../globals.js';
-import { getTODO, removeTODOItem, reorderTODO, type TodoItem } from '../todo.js';
+import { addToTODOAction, getTODO, removeTODOItem, reorderTODO, type TodoItem } from '../todo.js';
 
 import browser from 'webextension-polyfill';
 import { getVirtualOptions, getVirtualTasks, removeVirtualTask, saveVirtualOptions } from '../virtual';
@@ -99,7 +99,31 @@ function loadOptions() {
 }
 
 function itemUrl(id: string) {
-	return `https://szkopul.edu.pl/problemset/problem/${ encodeURIComponent(id) }/site/`;
+	const trimmed = id.trim();
+	if (/^https?:\/\//i.test(trimmed)) return trimmed;
+	return `https://szkopul.edu.pl/problemset/problem/${ encodeURIComponent(trimmed) }/site/`;
+}
+
+function parseExternalTodoUrl(raw: string) {
+	try {
+		const parsed = new URL(raw.trim());
+		if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return null;
+		return parsed.toString();
+	} catch {
+		return null;
+	}
+}
+
+async function getCurrentTabTodoItem() {
+	const tabs = await browser.tabs.query({active: true, currentWindow: true});
+	const current = tabs[0];
+	const parsedUrl = parseExternalTodoUrl(current?.url ?? '');
+	if (!parsedUrl) return null;
+
+	return {
+		url: parsedUrl,
+		title: current?.title?.trim() ?? ''
+	};
 }
 
 function renderTODOEmpty() {
@@ -216,6 +240,48 @@ function initTODOView() {
 
 	document.getElementById('btn-showTODO')?.addEventListener('click', () => {
 		void renderTODOTable();
+	});
+
+	const addExternalButton = document.getElementById('btn-addTodoExternal');
+	const addCurrentButton = document.getElementById('btn-addTodoCurrent');
+	const externalUrlInput = document.getElementById('todo-external-url') as HTMLInputElement | null;
+	const externalNameInput = document.getElementById('todo-external-name') as HTMLInputElement | null;
+	const addExternalTodo = async () => {
+		const parsedUrl = parseExternalTodoUrl(externalUrlInput?.value ?? '');
+		if (!parsedUrl) return;
+
+		const title = externalNameInput?.value.trim() ?? '';
+		await addToTODOAction(parsedUrl, title, addExternalButton as HTMLElement | null);
+
+		if (externalUrlInput) externalUrlInput.value = '';
+		if (externalNameInput) externalNameInput.value = '';
+		void renderTODOTable();
+	};
+
+	addExternalButton?.addEventListener('click', () => {
+		void addExternalTodo();
+	});
+
+	addCurrentButton?.addEventListener('click', () => {
+		void (async () => {
+			const currentTabTodo = await getCurrentTabTodoItem();
+			if (!currentTabTodo) return;
+
+			await addToTODOAction(currentTabTodo.url, currentTabTodo.title, addCurrentButton as HTMLElement | null);
+			void renderTODOTable();
+		})();
+	});
+
+	externalUrlInput?.addEventListener('keydown', (event) => {
+		if (event.key !== 'Enter') return;
+		event.preventDefault();
+		void addExternalTodo();
+	});
+
+	externalNameInput?.addEventListener('keydown', (event) => {
+		if (event.key !== 'Enter') return;
+		event.preventDefault();
+		void addExternalTodo();
 	});
 
 	todoViewInitialized = true;

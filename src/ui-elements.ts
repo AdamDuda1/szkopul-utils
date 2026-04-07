@@ -667,8 +667,14 @@ export function appendHomeDashboardSummary() {
 	let solvedSiteTotal = 0;
 
 	const openTask = (id: string) => {
-		if (!id) return;
-		window.location.href = `https://szkopul.edu.pl/problemset/problem/${ encodeURIComponent(id) }/site/?key=statement`;
+		const trimmed = id.trim();
+		if (!trimmed) return;
+		if (/^https?:\/\//i.test(trimmed)) {
+			window.location.href = trimmed;
+			return;
+		}
+
+		window.location.href = `https://szkopul.edu.pl/problemset/problem/${ encodeURIComponent(trimmed) }/site/?key=statement`;
 	};
 
 	const container = document.createElement('div');

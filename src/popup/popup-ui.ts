@@ -221,7 +221,7 @@ render(
 
 render(
 	html`
-        <div style="position: absolute; top: 5px; left: 5px; display: flex; height: 50px">
+        <div style="display: flex; height: 50px; width: 100%; padding-left: 5px; margin-top: 5px;">
             <button class="btn btn-default" id="btn-backHomeTODO"
                     style="width: auto; padding: 3px; color: white; display: flex;">
                 <img src="../icons/ic-arrow-right.svg" alt="" class="back-btn">
@@ -229,9 +229,12 @@ render(
             </button>
         </div>
 
-        <br><br>
+        <div id="todo-table" style="width: 100%;"></div>
 
-        <div id="todo-table" style="max-height: 281px; overflow-y: auto; width: 100%;"></div>
+        <button id="btn-addTodoCurrent" type="button" class="btn btn-outline-primary"
+                style="flex: 1; white-space: nowrap; margin: -7px 7px 7px; width: 95%;">
+            ${ t("popup_todo_addThisSite") }
+        </button>
 	`, document.getElementById('todo')!
 );
 

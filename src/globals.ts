@@ -94,6 +94,7 @@ export const translations = {
 		popup_todo_action_done: 'Zrobione',
 		popup_todo_action_moveUp: 'Przesuń w gore',
 		popup_todo_action_moveDown: 'Przesuń w dol',
+		popup_todo_addThisSite: 'Dodaj tą stronę',
 
 		popup_virtual_start: 'START',
 
@@ -231,6 +232,7 @@ export const translations = {
 		popup_todo_action_done: 'Done',
 		popup_todo_action_moveUp: 'Move up',
 		popup_todo_action_moveDown: 'Move down',
+		popup_todo_addThisSite: 'Add this site',
 
 		popup_virtual_start: 'START',
 
