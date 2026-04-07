@@ -8,7 +8,7 @@ html {
 }
 
 body, #home, #virtual, #virtual-running, #todo, #options, #confirmation {
-    width: 300px;
+    width: 301px;
     overflow-y: auto;
     height: 330px;
     background: #181a1b !important;
@@ -19,13 +19,13 @@ body, #home, #virtual, #virtual-running, #todo, #options, #confirmation {
     align-items: center;
 }
 
-#virtual, #virtual-running, #todo, #options, #confirmation {
+#virtual, #virtual-running, #options, #confirmation {
     width: 331px;
     position: relative;
-    left: 9px;
+    left: 7px;
 }
 
-#virtual, #virtual-running, #todo, #confirmation { padding: 10px; }
+#virtual, #virtual-running, #confirmation { padding: 10px; }
 
 #home h2 {
     margin-top: 7px;
@@ -38,6 +38,12 @@ body button h2, body button h3 {
     color: #d1cdc7;
     font-size: 2.5rem;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+select {
+    position: relative;
+    right: 4px;
+    bottom: 6px;
 }
 
 body button h3 {

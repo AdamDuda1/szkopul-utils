@@ -248,7 +248,7 @@ render(
         </div>
 
         <br><br>
-
+        
         <p class="bg-danger" style="margin: 7px; border-radius: 7px; padding: 5px; color: white;
         background: #8f1400 !important; font-size: 12px; position: absolute; z-index: 9; top: 40px;
         display: none;" id="refresh-pls-options">

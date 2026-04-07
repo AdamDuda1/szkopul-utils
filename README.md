@@ -45,6 +45,10 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 
 ## TODO:
 
+- utils row is added to the settings tab in problemset problem view (add to contests table) (and should not)
+
+- add contestLinksOnHomePageLinkToProblems() with menus in oioioi-nav and so on
+
 - ADD TASKS OUTSIDE OF SZKOPUL TO THE TODO LIST!!!!!!!!!!!
 
 - link  to search task in problemset 
