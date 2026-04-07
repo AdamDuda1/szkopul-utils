@@ -11,6 +11,7 @@ let optionsObject: optionsTemplate;
 export async function init() {
 	optionsObject = await getOptions();
 	setLang(optionsObject.lang);
+	return optionsObject;
 }
 
 export async function afterRender() {
@@ -21,6 +22,15 @@ export async function afterRender() {
 }
 
 function loadOptions() {
+	// HOME PAGE QUICK OPTIONS
+	{
+		(document.getElementById('hideScoresQuickOption') as HTMLInputElement).checked = optionsObject.hideScores;
+		(document.getElementById('hideScoresQuickOption') as HTMLInputElement).addEventListener('change', () => {
+			optionsObject!.hideScores = (document.getElementById('hideScoresQuickOption') as HTMLInputElement).checked as boolean;
+			saveOptions(optionsObject!).then(() => document.getElementById('refresh-pls-home')!.style.display = 'flex');
+		});
+	}
+
 	// OPTIONS => FIXES AND FEATURES
 	{
 		(document.getElementById('hideScoresOption') as HTMLInputElement).checked = optionsObject.hideScores;
@@ -118,18 +128,18 @@ async function renderTODOTable() {
 				</td>
 				<td class="text-center" style="padding: 8px;">
 					<div class="todo-actions-cell">
-						<button type="button" class="btn btn-outline-success btn-xs" data-todo-complete="${ encodeURIComponent(item.id) }" title="Done">
+						<button type="button" class="btn btn-outline-success btn-xs" data-todo-complete="${ encodeURIComponent(item.id) }" title="${ t('popup_todo_action_done') }">
 							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2" viewBox="0 0 16 16">
 								<path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0"/>
 							</svg>
 						</button>
 						<div class="todo-move-buttons">
-							<button type="button" class="btn btn-outline-secondary btn-xs" data-todo-move="up" data-todo-id="${ encodeURIComponent(item.id) }" title="Move up" style="border: 0;">
+							<button type="button" class="btn btn-outline-secondary btn-xs" data-todo-move="up" data-todo-id="${ encodeURIComponent(item.id) }" title="${ t('popup_todo_action_moveUp') }" style="border: 0;">
 								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-up" viewBox="0 0 16 16">
 									<path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
 								</svg>
 							</button>
-							<button type="button" class="btn btn-outline-secondary btn-xs" data-todo-move="down" data-todo-id="${ encodeURIComponent(item.id) }" title="Move down" style="border: 0;">
+							<button type="button" class="btn btn-outline-secondary btn-xs" data-todo-move="down" data-todo-id="${ encodeURIComponent(item.id) }" title="${ t('popup_todo_action_moveDown') }" style="border: 0;">
 								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
 									<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
 								</svg>
@@ -142,10 +152,10 @@ async function renderTODOTable() {
 	}).join('');
 
 	container.innerHTML = `
-		<div class="table-responsive-md" style="background: #181a1b; color: #d1cdc7; margin-top: 6px;">
-			<table class="table button-flat" style="font-size: 12px; margin-bottom: 0; width: 100%;">
+		<div class="table-responsive-md" style="background: #181a1b; color: #d1cdc7">
+			<table class="table button-flat">
 				<thead>
-				<tr style="border-bottom: 2px solid #383d3f;">
+				<tr style="border-bottom: 2px solid rgb(222, 226, 230); 383d3f;">
 					<th class="col-md-auto">${ t('popup_todo_col_task') }</th>
 					<th class="col-sm-4">${ t('popup_todo_col_actions') }</th>
 				</tr>
@@ -261,18 +271,18 @@ function setSzkopulStatusState(state: 'online' | 'offline' | 'unknown') {
 
 	if (state === 'online') {
 		dot.style.background = '#1fb86a';
-		stateEl.textContent = 'ONLINE';
+		stateEl.textContent = t('popup_status_online');
 		return;
 	}
 
 	if (state === 'offline') {
 		dot.style.background = '#dc3545';
-		stateEl.textContent = 'OFFLINE';
+		stateEl.textContent = t('popup_status_offline');
 		return;
 	}
 
 	dot.style.background = '#f0ad4e';
-	stateEl.textContent = 'UNKNOWN';
+	stateEl.textContent = t('popup_status_unknown');
 }
 
 function stopSzkopulStatusTicker() {
@@ -287,7 +297,7 @@ function startSzkopulStatusTicker(fromMs: number, isUp: boolean) {
 
 	const update = () => {
 		const duration = Date.now() - fromMs;
-		upForEl.textContent = `${ formatStatusDuration(duration) }${ isUp ? '' : ' (down)' }`;
+		upForEl.textContent = `${ formatStatusDuration(duration) }${ isUp ? '' : t('popup_status_downSuffix') }`;
 	};
 
 	update();
@@ -304,12 +314,12 @@ async function syncSzkopulStatus() {
 		stopSzkopulStatusTicker();
 		setSzkopulStatusState('unknown');
 		upForEl.textContent = '--';
-		metaEl.textContent = 'API unavailable';
+		metaEl.textContent = t('popup_status_apiUnavailable');
 	};
 
 	setSzkopulStatusState('unknown');
 	upForEl.textContent = '...';
-	metaEl.textContent = 'Loading...';
+	metaEl.textContent = t('popup_status_loading');
 
 	try {
 		const response = await fetch('https://czywyjebalohomika.xyz/api/status', {cache: 'no-store'});
@@ -336,7 +346,8 @@ async function syncSzkopulStatus() {
 		}
 
 		setSzkopulStatusState(data.isUp ? 'online' : 'offline');
-		metaEl.textContent = `${ Math.max(0, data.downtimeCount) } crash${ data.downtimeCount === 1 ? '' : 'es' }`;
+		const crashCount = Math.max(0, data.downtimeCount);
+		metaEl.textContent = `${ crashCount } ${ crashCount === 1 ? t('popup_status_crash_singular') : t('popup_status_crash_plural') }`;
 		startSzkopulStatusTicker(fromTime, data.isUp);
 	} catch {
 		setUnavailable();

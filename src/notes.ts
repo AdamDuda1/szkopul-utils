@@ -1,5 +1,6 @@
 import { html, render } from 'lit';
 import browser from 'webextension-polyfill';
+import { t } from './globals';
 
 export async function saveNotes(notes: string, id: string) {
 	const key = 'notes-' + id;
@@ -20,15 +21,15 @@ export async function getNotes(id: string) {
 }
 
 function renderNotes(host: HTMLDivElement, id: string, name: string, displayName: boolean = false) {
-	const header = displayName ? html`<h2>Notatki do \'${ name }\'</h2>` : '';
+	const header = displayName ? html`<h2>${ t('notes_title') } '${ name }'</h2>` : '';
 	render(
 		html`
             ${ header }
-            <textarea class="form-control" rows="3" id="notes-area"
-                      placeholder="Twoje notatki do tego zadania..."></textarea>
+			<textarea class="form-control" rows="3" id="notes-area"
+			          placeholder="${ t('notes_placeholder') }"></textarea>
             <div style="width: 100%; display: flex; justify-content: space-between;">
-                <span style="font-size: 11px; margin-left: 5px; color: gray;">ctrl+z działa!</span>
-                <button type="button" class="btn btn-success" style="margin-top: 7px;" id="notes-save">Zapisz</button>
+				<span style="font-size: 11px; margin-left: 5px; color: gray;">${ t('notes_hint_undo') }</span>
+				<button type="button" class="btn btn-success" style="margin-top: 7px;" id="notes-save">${ t('notes_save') }</button>
             </div>
 		`, host
 	);
@@ -47,10 +48,10 @@ function renderNotes(host: HTMLDivElement, id: string, name: string, displayName
 	saveButton.addEventListener('click', () => {
 		const btn = saveButton;
 
-		saveNotes(area.value, id).then((r) => {
-			if (r) btn.innerHTML = 'Zapisano!';
-			else btn.innerHTML = 'Wyczyszczono!';
-			setTimeout(() => btn.innerHTML = 'Zapisz', 1000);
+			saveNotes(area.value, id).then((r) => {
+				if (r) btn.innerHTML = t('notes_saved');
+				else btn.innerHTML = t('notes_cleared');
+				setTimeout(() => btn.innerHTML = t('notes_save'), 1000);
 		});
 	});
 
@@ -60,9 +61,9 @@ function renderNotes(host: HTMLDivElement, id: string, name: string, displayName
 			const btn = saveButton;
 
 			saveNotes(area.value, id).then((r) => {
-				if (r) btn.innerHTML = 'Zapisano!';
-				else btn.innerHTML = 'Wyczyszczono!';
-				setTimeout(() => btn.innerHTML = 'Zapisz', 1000);
+				if (r) btn.innerHTML = t('notes_saved');
+				else btn.innerHTML = t('notes_cleared');
+				setTimeout(() => btn.innerHTML = t('notes_save'), 1000);
 			});
 		}
 	});

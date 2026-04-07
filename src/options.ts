@@ -14,6 +14,7 @@ export type optionsTemplate = {
 	preferredLanguage: programmingLanguage,
 	inlineProblemStatements: boolean,
 	statementsOnSamePage: boolean,
+	whatsOnHomeOption: 'qs' | 'status',
 }
 
 const DEFAULT_OPTIONS: optionsTemplate = {
@@ -23,7 +24,8 @@ const DEFAULT_OPTIONS: optionsTemplate = {
 	hideRulesTab: false,
 	preferredLanguage: '',
 	inlineProblemStatements: false,
-	statementsOnSamePage: false
+	statementsOnSamePage: false,
+	whatsOnHomeOption: 'qs',
 };
 
 export async function getOptions(): Promise<optionsTemplate> {

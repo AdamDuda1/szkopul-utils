@@ -1,4 +1,5 @@
 import { html, render } from 'lit';
+import { t } from './globals';
 import { programmingLanguage } from './options';
 import { emitTaskSolved } from './ui-elements';
 import browser from 'webextension-polyfill';
@@ -84,7 +85,7 @@ export function addUtilsFeedbackButton() {
                     data-target="#szkopul-contact-form"
                     onclick="event.stopPropagation(); window.open('https://github.com/AdamDuda1/szkopul-utils/issues/new', '_blank').focus();"
             >
-                Utils Feedback
+				${ t('misc_feedback_button') }
             </button>
 		`;
 		render(template, contactContainer);
@@ -115,9 +116,9 @@ export function statementsOnSamePage() {
 		panel.style.cssText = 'position:fixed;top:120px;right:-3px;border:1px solid white;z-index:2147483647;overflow:hidden;background:rgb(255,255,255);color:rgb(33,37,41);border-radius:8px 0 0 8px;padding:10px;box-shadow:0 0 400px 20px black !important;min-height:40vh;display:none';
 		panel.innerHTML = `
 			<div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:8px;">
-				<button type="button" class="btn btn-primary" id="utils-inline-open-tab">Open in new tab</button>
-				<button type="button" class="btn btn-success" id="utils-inline-submit">Submit</button>
-				<button type="button" class="btn btn-secondary" id="utils-inline-close">Close</button>
+				<button type="button" class="btn btn-primary" id="utils-inline-open-tab">${ t('misc_inline_open_new_tab') }</button>
+				<button type="button" class="btn btn-success" id="utils-inline-submit">${ t('misc_inline_submit') }</button>
+				<button type="button" class="btn btn-secondary" id="utils-inline-close">${ t('misc_inline_close') }</button>
 			</div>
 			<embed id="utils-inline-embed" src="" type="application/pdf" width="100%" height="500vh"/>
 		`;
@@ -209,7 +210,7 @@ export function inlineStatements() {
 		detailsCell.style.padding = '0 8px 6px 8px';
 		detailsCell.innerHTML = `
 			<details>
-				<summary style="cursor:pointer;color:#4a6fa5;font-size:13px;padding:4px 0;user-select:none;">Show statement</summary>
+				<summary style="cursor:pointer;color:#4a6fa5;font-size:13px;padding:4px 0;user-select:none;">${ t('misc_inline_show_statement') }</summary>
 				<div style="margin-top:6px;height:46vh;min-height:260px;max-height:80vh;border:1px solid #e9ecef;border-radius:6px;background:#fafbfc;overflow:auto;resize:vertical;">
 					<embed type="application/pdf" width="100%" height="100%" />
 				</div>
@@ -276,7 +277,7 @@ export function attachSubmitFormFixesAndListeners() {
 		const updateCounter = () => {
 			const value = getCodeValue();
 			const lines = value.length === 0 ? 0 : value.split(/\r\n|\r|\n/).length;
-			counter.textContent = `Chars: ${ value.length } | Lines: ${ lines }`;
+			counter.textContent = `${ t('misc_code_counter_chars') }: ${ value.length } | ${ t('misc_code_counter_lines') }: ${ lines }`;
 		};
 
 		(codeTextarea.closest('.form-group') ?? codeTextarea.parentElement)?.appendChild(counter);

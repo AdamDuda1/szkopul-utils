@@ -405,7 +405,7 @@ export async function appendProblemSetMenu(addToTODOAction: (id: string, name: s
 				if (scoresHidden && scoreTd != null)
 					cell.querySelector<HTMLAnchorElement>('.action-score')?.addEventListener('click', (event) => {
 						event.preventDefault();
-						if (confirm('Are you sure?')) {
+												if (confirm(t('ui_confirm_revealScore'))) {
 							alert(thisScore);
 						}
 					});
@@ -575,7 +575,7 @@ async function renderPinnedContests(container: HTMLDivElement) {
 	if (!body) return;
 
 	if (fallbackPins.length === 0) {
-		body.innerHTML = '<p class="pinned-empty">No pinned contests yet.</p>';
+		body.innerHTML = `<p class="pinned-empty">${ t('ui_pinned_empty') }</p>`;
 	} else {
 		body.innerHTML = '';
 		const list = document.createElement('tbody');
@@ -632,7 +632,7 @@ export function prependPinnedContestsDashboardCard() {
 		const header = document.createElement('div');
 		header.classList.add('card-header', 'dashboard-panel-head');
 		header.setAttribute('data-szkopul-pinned-header', '1');
-		header.innerHTML = '<h4 class="mb-0">Pinned contests</h4>';
+		header.innerHTML = `<h4 class="mb-0">${ t('ui_pinned_header') }</h4>`;
 
 		const container = document.createElement('div');
 		container.classList.add('card-body', 'dashboard-card-body');
@@ -708,7 +708,7 @@ export function appendHomeDashboardSummary() {
 
 	container.innerHTML = `
 		<div class="card-header dashboard-panel-head">
-			<h4 class="mb-0">Activity</h4>
+			<h4 class="mb-0">${ t('ui_activity_header') }</h4>
 		</div>
 		<div class="card-body dashboard-card-body">
 			<div class="stats-grid stats-grid-secondary">
@@ -853,10 +853,10 @@ export async function appendVirtualContestPanel() {
 		panel.id = panelId;
 		panel.style = `display: flex;flex-direction:column !important;position:fixed;top:150px;left:-3px;border:1px solid white;z-index:2147483647;width:250px;max-height:70vh;overflow-y:auto;background:rgb(255,255,255);color:rgb(33,37,41);border-radius:0 8px 8px 0;padding:10px;box-shadow:rgba(0,0,0,0.16) 0px 4px 14px;`;
 		panel.innerHTML = `
-			<div style="font-weight: 600; margin-bottom: 8px;">Virtual contest</div>
+			<div style="font-weight: 600; margin-bottom: 8px;">${ t('ui_virtual_panel_title') }</div>
 			<div id="szkopul-utils-virtual-panel-timer" style="font-size: 22px; margin-bottom: 8px;">00:00:00</div>
 			<div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">${ t('popup_virtual_scoreBy') }: ${ options.scoreBy === 'last' ? t('popup_virtual_scoreBy_last') : t('popup_virtual_scoreBy_best') }</div>
-			<div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">Tasks</div>
+			<div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">${ t('ui_virtual_panel_tasks') }</div>
 			<ul id="szkopul-utils-virtual-panel-tasks" style="padding-left: 18px; margin: 0;"></ul>
 		`;
 		document.body.appendChild(panel);
@@ -871,7 +871,7 @@ export async function appendVirtualContestPanel() {
 
 	if (tasks.length === 0) {
 		const li = document.createElement('li');
-		li.textContent = 'No tasks';
+		li.textContent = t('ui_virtual_panel_noTasks');
 		tasksList.appendChild(li);
 	} else {
 		for (const task of tasks) {
@@ -1009,7 +1009,7 @@ export function taskArchive() {
 			</svg>
 		`;
 		randomButton.addEventListener('click', () => {
-			if (taskUrls.length === 0) { alert('Oh, no! Brak zadań w tej grupie!'); return; }
+			if (taskUrls.length === 0) { alert(t('archive_noTasksInGroup')); return; }
 			const randomTask = taskUrls[Math.floor(Math.random() * taskUrls.length)];
 			window.open(randomTask, '_blank');
 		});

@@ -1,11 +1,13 @@
 import { html, render } from 'lit';
 import { t } from '../globals.js';
 import { afterRender, init } from './popup';
+import { getOptions, optionsTemplate } from '../options';
 
 const browserFunctions = true; // Set this to false to test UI locally
+let optionsObject: optionsTemplate;
 
 setTimeout(async () => {
-	if (browserFunctions) await init();
+	if (browserFunctions) optionsObject = await init();
 	renderPopup();
 	if (browserFunctions) await afterRender();
 }, 10);
@@ -79,32 +81,36 @@ render(
             <img src="../icons/ic-arrow-right.svg" alt="">
         </button>
 
-        <p class="bg-danger" style="margin: 7px; border-radius: 7px; color: black; padding: 5px; font-size: x-small;
-        display: none;" id="refresh-pls-home">
+        <p class="bg-danger" style="margin: 7px; border-radius: 7px; padding: 5px; color: white;
+        background: #8f1400 !important; font-size: 12px; display: none;" id="refresh-pls-home">
             ${ t('popup_home_refreshPls') }
         </p>
 
-        <!--        <div class="form-check form-switch" style="margin-top: 10px;">-->
-        <!--            <input class="form-check-input" type="checkbox" id="hideScoresQuickOption">-->
-        <!--            <label class="form-check-label" for="hideScoresQuickOption">-->
-        <!--                ${ t('popup_home_hideScores') }-->
-        <!--            </label>-->
-        <!--        </div>-->
-
-        <div style="position: absolute; left: 10px; right: 10px; bottom: 10px; text-align: center; background: #181a1b; border: 1px solid #383d3f; border-radius: 8px; padding: 6px 8px;">
-            <div style="display: flex; justify-content: center; align-items: center; gap: 6px; margin-bottom: 2px;">
+		${optionsObject.whatsOnHomeOption === 'qs' ? html`
+            <div class="form-check form-switch" style="margin-top: 10px; width: 80%; display: flex; justify-content: center; flex-direction: row-reverse; padding: 0;">
+                <input class="form-check-input" type="checkbox" id="hideScoresQuickOption"
+                       style="margin-left: 5px; position: relative; top: -1px;">
+                <label class="form-check-label" for="hideScoresQuickOption">
+                    ${ t('popup_home_hideScores') }
+                </label>
+            </div>
+		` : html`
+            <div style="position: absolute; left: 10px; right: 10px; bottom: 10px; text-align: center; background: #181a1b; border: 1px solid #383d3f; border-radius: 8px; padding: 6px 8px;">
+                <div style="display: flex; justify-content: center; align-items: center; gap: 6px; margin-bottom: 2px;">
                 <span id="szkopulStatusDot"
                       style="display: inline-block; width: 8px; height: 8px; border-radius: 999px; background: #f0ad4e;"></span>
-                <span id="szkopulStatusState" style="font-size: 11px; opacity: .9;">UNKNOWN</span>
+                              <span id="szkopulStatusState" style="font-size: 11px; opacity: .9;">${ t('popup_status_unknown') }</span>
+                </div>
+                <h6 style="margin: 2px;">${ t('popup_home_szkopulStatusUpFor') }</h6>
+                <h5 style="margin: 2px;" id="szkopulStatusUpFor">...</h5>
+                <h6 style="margin: 2px 2px 0;">${ t('popup_home_szkopulStatusRecordUptime') } <span
+                        id="szkopulStatusRecordUptime">...</span></h6>
+                <a style="margin: 2px; font-size: small; color: #0069d9 !important"
+                   href="https://czywyjebalohomika.xyz/"
+                   target="_blank" rel="noopener noreferrer">${ t('popup_home_szkopulStatusMore') }</a>
             </div>
-            <h6 style="margin: 2px;">${ t('popup_home_szkopulStatusUpFor') }</h6>
-            <h5 style="margin: 2px;" id="szkopulStatusUpFor">...</h5>
-            <h6 style="margin: 2px 2px 0;">${ t('popup_home_szkopulStatusRecordUptime') } <span
-                    id="szkopulStatusRecordUptime">...</span></h6>
-            <a style="margin: 2px; font-size: small; color: #0069d9 !important"
-               href="https://czywyjebalohomika.xyz/"
-               target="_blank" rel="noopener noreferrer">${ t('popup_home_szkopulStatusMore') }</a>
-        </div>
+		`
+		}
 	`, document.getElementById('home')!
 );
 
@@ -189,7 +195,7 @@ render(
             </div>
         </div>
 
-        <button type="button" style="margin: 10px;" class="btn btn-outline-success" id="btn-startVirtual"> START
+        <button type="button" style="margin: 10px;" class="btn btn-outline-success" id="btn-startVirtual"> ${ t('popup_virtual_start') }
         </button>
 
 	`, document.getElementById('virtual')!
@@ -243,8 +249,9 @@ render(
 
         <br><br>
 
-        <p class="bg-danger" style="margin: 7px; border-radius: 7px; color: black; padding: 5px; font-size: x-small;
-		position: absolute; z-index: 9; top: 40px; display: none;" id="refresh-pls-options">
+        <p class="bg-danger" style="margin: 7px; border-radius: 7px; padding: 5px; color: white;
+        background: #8f1400 !important; font-size: 12px; position: absolute; z-index: 9; top: 40px;
+        display: none;" id="refresh-pls-options">
             ${ t('popup_home_refreshPls') }
         </p>
 
@@ -282,12 +289,12 @@ render(
 
         <div style="display: flex; justify-content: space-between; width: 82%; margin-top: 7px; min-height: auto; align-items: center;">
             <label for="preferredLang">
-                Preferred language
-                <span class="info">Will be selected automatically</span>
+                ${ t('popup_options_preferredLanguage') }
+                <span class="info">${ t('popup_options_preferredLanguageInfo') }</span>
             </label>
             <select style="height: 25px; font-size: 17px; padding: 2px; width: auto;"
                     class="form-control" name="preferredLang" id="preferredLang">
-                <option value="">none</option>
+                <option value="">${ t('popup_options_preferredLanguageNone') }</option>
                 <option value="C">C</option>
                 <option value="C++">C++</option>
                 <option value="Pascal">Pascal</option>
@@ -296,16 +303,16 @@ render(
             </select>
         </div>
 
-        <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between"
-             style="min-height: auto;">
-            <label for="hideTimerOption" class="mb-0 form-check-label">
-                Automatically submit
-                <span class="info">solutions when pasted or uploaded code is in the preferred language (works only with 'toggle editor' off)</span>
-            </label>
-            <div class="form-check form-switch m-0">
-                <input class="form-check-input" type="checkbox" id="hideTimerOption">
-            </div>
-        </div>
+<!--        <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between"-->
+<!--             style="min-height: auto;">-->
+<!--            <label for="hideTimerOption" class="mb-0 form-check-label">-->
+<!--                Automatically submit-->
+<!--                <span class="info">solutions when pasted or uploaded code is in the preferred language (works only with 'toggle editor' off)</span>-->
+<!--            </label>-->
+<!--            <div class="form-check form-switch m-0">-->
+<!--                <input class="form-check-input" type="checkbox" id="hideTimerOption">-->
+<!--            </div>-->
+<!--        </div>-->
 
         <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between"
              style="min-height: auto;">
@@ -333,13 +340,11 @@ render(
 
 
         <div style="display: flex; justify-content: space-between; width: 82%; margin-top: 7px; min-height: auto; align-items: center;">
-            <label for="whatsOnHomeOption">
-                On home
-            </label>
+            <label for="whatsOnHomeOption">${ t('popup_options_whatsOnHome') }</label>
             <select style="height: 25px; font-size: 17px; padding: 2px; width: auto;"
                     class="form-control" name="whatsOnHomeOption" id="whatsOnHomeOption">
-                <option value="ss">Szkopuł status</option>
-                <option value="qs">quick settings</option>
+                <option value="ss">${ t('popup_options_whatsOnHome_status') }</option>
+                <option value="qs">${ t('popup_options_whatsOnHome_quickSettings') }</option>
             </select>
         </div>
 
