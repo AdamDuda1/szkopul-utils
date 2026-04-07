@@ -513,11 +513,8 @@ export async function pinContestButtonInContest() {
 
 		savePinnedContests(pinnedContests);
 		pinButton(btnDiv, thisContest);
-		const container = document.getElementById('szkopul-utils-pinned-contests') as HTMLDivElement;
-		if (container) {
-			renderPinnedContests(container);
-			pinContestButtons();
-		}
+		renderAllPinnedContestsCards();
+		pinContestButtons();
 		updateAllPinButtons();
 	});
 
@@ -560,11 +557,8 @@ export async function pinContestButtons() {
 
 			savePinnedContests(pinnedContests);
 			pinButton(btnDiv, thisContest);
-			const container = document.getElementById('szkopul-utils-pinned-contests') as HTMLDivElement;
-			if (container) {
-				renderPinnedContests(container);
-				pinContestButtons();
-			}
+			renderAllPinnedContestsCards();
+			pinContestButtons();
 			updateAllPinButtons();
 		});
 
@@ -597,6 +591,12 @@ async function renderPinnedContests(container: HTMLDivElement) {
 	}
 }
 
+function renderAllPinnedContestsCards() {
+	document.querySelectorAll<HTMLDivElement>('[data-szkopul-pinned-contests="1"]').forEach((container) => {
+		void renderPinnedContests(container);
+	});
+}
+
 function updateAllPinButtons() {
 	document.querySelectorAll<HTMLDivElement>('[data-pin-button-href]').forEach(btn => {
 		const href = btn.getAttribute('data-pin-button-href');
@@ -608,39 +608,41 @@ function updateAllPinButtons() {
 }
 
 export function prependPinnedContestsDashboardCard() {
-	if (document.getElementById('szkopul-utils-pinned-contests')) return;
-
 	const dashboardPanels = Array.from(document.querySelectorAll<HTMLElement>('.dashboard-panel'));
-	const rightPanel = dashboardPanels.find((panel) => panel.querySelector('a[href="/contest/"]'));
-	if (!rightPanel) return;
+	const contestPanels = dashboardPanels.filter((panel) => panel.querySelector('a[href="/contest/"]'));
+	if (contestPanels.length === 0) return;
 
 	if (!document.getElementById('szkopul-utils-pinned-contests-style')) {
 		const style = document.createElement('style');
 		style.id = 'szkopul-utils-pinned-contests-style';
 		style.classList.add('card-body', 'dashboard-card-body');
 		style.textContent = `
-			#szkopul-utils-pinned-contests { margin-bottom: 12px; padding-bottom: 8px; }
-			#szkopul-utils-pinned-contests .dashboard-card-body { padding-top: 10px; }
-			#szkopul-utils-pinned-contests ul { margin: 0; padding-left: 18px; }
-			#szkopul-utils-pinned-contests li { margin-bottom: 4px; }
-			#szkopul-utils-pinned-contests .pinned-empty { opacity: 0.75; margin: 0; }
+			[data-szkopul-pinned-contests="1"] { margin-bottom: 12px; padding-bottom: 8px; }
+			[data-szkopul-pinned-contests="1"] .dashboard-card-body { padding-top: 10px; }
+			[data-szkopul-pinned-contests="1"] ul { margin: 0; padding-left: 18px; }
+			[data-szkopul-pinned-contests="1"] li { margin-bottom: 4px; }
+			[data-szkopul-pinned-contests="1"] .pinned-empty { opacity: 0.75; margin: 0; }
 		`;
 		document.head.appendChild(style);
 	}
 
-	let header = document.createElement('div');
-	header.classList.add('card-header', 'dashboard-panel-head');
-	header.innerHTML = '<h4 class="mb-0">Pinned contests</h4>';
+	for (const panel of contestPanels) {
+		if (panel.querySelector('[data-szkopul-pinned-contests="1"]')) continue;
 
-	const container = document.createElement('div');
-	container.id = 'szkopul-utils-pinned-contests';
-	container.classList.add('card-body', 'dashboard-card-body');
-	container.innerHTML = '<table class="table break-all-words"></table>';
+		const header = document.createElement('div');
+		header.classList.add('card-header', 'dashboard-panel-head');
+		header.setAttribute('data-szkopul-pinned-header', '1');
+		header.innerHTML = '<h4 class="mb-0">Pinned contests</h4>';
 
-	renderPinnedContests(container);
+		const container = document.createElement('div');
+		container.classList.add('card-body', 'dashboard-card-body');
+		container.setAttribute('data-szkopul-pinned-contests', '1');
+		container.innerHTML = '<table class="table break-all-words"></table>';
 
-	rightPanel.prepend(container);
-	rightPanel.prepend(header);
+		void renderPinnedContests(container);
+		panel.prepend(container);
+		panel.prepend(header);
+	}
 }
 
 export function appendHomeDashboardSummary() {

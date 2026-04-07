@@ -249,8 +249,8 @@ render(
         </p>
 
         <span class="categ">
-		${ t('popup_options_c_func') }
-	</span>
+			${ t('popup_options_c_func') }
+		</span>
 
         <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between"
              style="min-height: auto;">
