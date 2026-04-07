@@ -1,6 +1,6 @@
 import { problemSetMenuSeeNote } from './notes';
 import { DEBUG, t, contest, task } from './globals';
-import { getRandomTODOItem, getTODO } from './todo';
+import { getRandomTODOItem, getTODO, addToTODOAction } from './todo';
 import { addVirtualTask, getVirtualOptions, getVirtualTasks, removeVirtualTask, saveVirtualOptions } from './virtual';
 import { getOptions, getPinnedContests, optionsTemplate, savePinnedContests } from './options';
 import browser from 'webextension-polyfill';
@@ -424,6 +424,80 @@ export async function appendProblemSetMenu(addToTODOAction: (id: string, name: s
 			validRows = true;
 		}
 	}
+}
+
+export async function appendProblemTitleQuickButtons(addToTODOAction: (id: string, name: string, btn?: HTMLElement | null) => void | Promise<void>) {
+	const titleRow = document.querySelector<HTMLElement>('.problem-title.text-center.content-row');
+	const title = titleRow?.querySelector<HTMLElement>('h1');
+	if (!titleRow || !title || titleRow.querySelector('[data-utils-problem-quick-buttons="1"]')) return;
+
+	const problemId = decodeURIComponent(window.location.pathname.match(/\/problemset\/problem\/([^/]+)/)?.[1] ?? '');
+	if (!problemId) return;
+
+	const problemName = title.innerText.trim() || problemId;
+	virtualTasks = await getVirtualTasks();
+	todoTaskIds = new Set((await getTODO()).map((item) => item.id));
+
+	title.style.display = 'inline-flex';
+	title.style.alignItems = 'center';
+	title.style.gap = '8px';
+
+	const buttonsWrap = document.createElement('span');
+	buttonsWrap.setAttribute('data-utils-problem-quick-buttons', '1');
+	buttonsWrap.style.display = 'inline-flex';
+	buttonsWrap.style.gap = '7px';
+	buttonsWrap.style.alignItems = 'center';
+	buttonsWrap.style.position = 'relative';
+	buttonsWrap.style.top = '1px';
+
+	const mkBtn = () => {
+		const btn = document.createElement('span');
+		btn.style.display = 'inline-flex';
+		btn.style.cursor = 'pointer';
+		btn.style.color = 'gray';
+		btn.style.scale = '1.7';
+		btn.style.margin = '6px';
+		// btn.addEventListener('mouseenter', () => btn.style.color = 'orange');
+		// btn.addEventListener('mouseleave', () => btn.style.color = 'gray');
+		return btn;
+	};
+
+	const todoBtn = mkBtn();
+	const virtualBtn = mkBtn();
+
+	const renderTodoBtn = () => {
+		const inTodo = todoTaskIds.has(problemId);
+		todoBtn.title = inTodo ? t('menu_removeFromTODO') : t('menu_addToTODO');
+		todoBtn.innerHTML = !inTodo
+			? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-checklist" viewBox="0 0 16 16"> <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"/> <path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0M7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0"/> </svg>'
+			: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-checklist" viewBox="0 0 16 16"> <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"/> <path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0M7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0"/> <line x1="0" y1="0" x2="16" y2="16" stroke="currentColor" stroke-width="1"/> </svg>';
+	};
+
+	const renderVirtualBtn = () => {
+		const inVirtual = virtualTasks.some((item) => item.id === problemId);
+		virtualBtn.title = inVirtual ? t('menu_removeFromVirtual') : t('menu_addToVirtual');
+		virtualBtn.innerHTML = !inVirtual
+			? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-stopwatch" viewBox="0 0 16 16"> <path d="M8.5 5.6a.5.5 0 1 0-1 0v2.9h-3a.5.5 0 0 0 0 1H8a.5.5 0 0 0 .5-.5z"/> <path d="M6.5 1A.5.5 0 0 1 7 .5h2a.5.5 0 0 1 0 1v.57c1.36.196 2.594.78 3.584 1.64l.012-.013.354-.354-.354-.353a.5.5 0 0 1 .707-.708l1.414 1.415a.5.5 0 1 1-.707.707l-.353-.354-.354.354-.013.012A7 7 0 1 1 7 2.071V1.5a.5.5 0 0 1-.5-.5M8 3a6 6 0 1 0 .001 12A6 6 0 0 0 8 3"/> </svg>'
+			: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-stopwatch-fill" viewBox="0 0 16 16"> <path d="M6.5 0a.5.5 0 0 0 0 1H7v1.07A7.001 7.001 0 0 0 8 16a7 7 0 0 0 5.29-11.584l.013-.012.354-.354.353.354a.5.5 0 1 0 .707-.707l-1.414-1.415a.5.5 0 1 0-.707.707l.354.354-.354.354-.012.012A6.97 6.97 0 0 0 9 2.071V1h.5a.5.5 0 0 0 0-1zm2 5.6V9a.5.5 0 0 1-.5.5H4.5a.5.5 0 0 1 0-1h3V5.6a.5.5 0 1 1 1 0"/> </svg>';
+	};
+
+	todoBtn.addEventListener('click', async () => {
+		await addToTODOAction(problemId, problemName, todoBtn);
+		todoTaskIds = new Set((await getTODO()).map((item) => item.id));
+		renderTodoBtn();
+	});
+
+	virtualBtn.addEventListener('click', async () => {
+		if (virtualTasks.some((item) => item.id === problemId)) await removeVirtualTask(problemId);
+		else await addVirtualTask(problemId, problemName);
+		virtualTasks = await getVirtualTasks();
+		renderVirtualBtn();
+	});
+
+	renderTodoBtn();
+	renderVirtualBtn();
+	buttonsWrap.append(todoBtn, virtualBtn);
+	title.appendChild(buttonsWrap);
 }
 
 function formatRemaining(ms: number) {
@@ -982,7 +1056,10 @@ function openArchiveVirtualContestModal(tasks: task[]) {
 	document.addEventListener('keydown', onKeyDown);
 }
 
-export function taskArchive() {
+export async function taskArchive() {
+	virtualTasks = await getVirtualTasks();
+	todoTaskIds = new Set((await getTODO()).map((item) => item.id));
+
 	const headers = document.querySelectorAll<HTMLDivElement>('.problemgroup-heading');
 
 	let first: boolean = true;
@@ -1003,6 +1080,76 @@ export function taskArchive() {
 			tasks.push({id: decodeURIComponent(id), name: a.textContent?.trim() || decodeURIComponent(id)});
 		});
 		const taskUrls = tasks.map((item) => `https://szkopul.edu.pl/problemset/problem/${ encodeURIComponent(item.id) }/site/?key=statement`);
+
+		const taskRows = (header.nextElementSibling as HTMLElement | null)?.querySelectorAll<HTMLTableRowElement>('tr');
+		taskRows?.forEach((tr) => {
+			const taskAnchor = tr.querySelector<HTMLAnchorElement>('td a');
+			const actionsCell = tr.querySelector<HTMLTableCellElement>('td:first-child');
+			if (!taskAnchor || !actionsCell || actionsCell.querySelector('[data-utils-archive-task-buttons="1"]')) return;
+
+			const taskId = decodeURIComponent(taskAnchor.href.match(/\/problemset\/problem\/([^/]+)/)?.[1] ?? '');
+			if (!taskId) return;
+			const taskName = taskAnchor.textContent?.trim() || taskId;
+
+			const wrap = document.createElement('span');
+			wrap.setAttribute('data-utils-archive-task-buttons', '1');
+			wrap.style.display = 'inline-flex';
+			wrap.style.gap = '8px';
+			wrap.style.alignItems = 'center';
+			wrap.style.position = 'relative';
+			wrap.style.top = '3px';
+			wrap.style.left = '3px';
+
+			const mkBtn = () => {
+				const btn = document.createElement('span');
+				btn.style.display = 'inline-flex';
+				btn.style.cursor = 'pointer';
+				btn.style.color = 'gray';
+				btn.style.scale = '1.25';
+				return btn;
+			};
+
+			const todoBtn = mkBtn();
+			const virtualBtn = mkBtn();
+
+			const renderTodoBtn = () => {
+				const inTodo = todoTaskIds.has(taskId);
+				todoBtn.title = inTodo ? t('menu_removeFromTODO') : t('menu_addToTODO');
+				todoBtn.innerHTML = !inTodo
+					? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-checklist" viewBox="0 0 16 16"> <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"/> <path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0M7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0"/> </svg>'
+					: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-checklist" viewBox="0 0 16 16"> <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"/> <path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0M7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0"/> <line x1="0" y1="0" x2="16" y2="16" stroke="currentColor" stroke-width="1"/> </svg>';
+			};
+
+			const renderVirtualBtn = () => {
+				const inVirtual = virtualTasks.some((item) => item.id === taskId);
+				virtualBtn.title = inVirtual ? t('menu_removeFromVirtual') : t('menu_addToVirtual');
+				virtualBtn.innerHTML = !inVirtual
+					? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-stopwatch" viewBox="0 0 16 16"> <path d="M8.5 5.6a.5.5 0 1 0-1 0v2.9h-3a.5.5 0 0 0 0 1H8a.5.5 0 0 0 .5-.5z"/> <path d="M6.5 1A.5.5 0 0 1 7 .5h2a.5.5 0 0 1 0 1v.57c1.36.196 2.594.78 3.584 1.64l.012-.013.354-.354-.354-.353a.5.5 0 0 1 .707-.708l1.414 1.415a.5.5 0 1 1-.707.707l-.353-.354-.354.354-.013.012A7 7 0 1 1 7 2.071V1.5a.5.5 0 0 1-.5-.5M8 3a6 6 0 1 0 .001 12A6 6 0 0 0 8 3"/> </svg>'
+					: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-stopwatch-fill" viewBox="0 0 16 16"> <path d="M6.5 0a.5.5 0 0 0 0 1H7v1.07A7.001 7.001 0 0 0 8 16a7 7 0 0 0 5.29-11.584l.013-.012.354-.354.353.354a.5.5 0 1 0 .707-.707l-1.414-1.415a.5.5 0 1 0-.707.707l.354.354-.354.354-.012.012A6.97 6.97 0 0 0 9 2.071V1h.5a.5.5 0 0 0 0-1zm2 5.6V9a.5.5 0 0 1-.5.5H4.5a.5.5 0 0 1 0-1h3V5.6a.5.5 0 1 1 1 0"/> </svg>';
+			};
+
+			todoBtn.addEventListener('click', async (event) => {
+				event.preventDefault();
+				event.stopPropagation();
+				await addToTODOAction(taskId, taskName, todoBtn);
+				todoTaskIds = new Set((await getTODO()).map((item) => item.id));
+				renderTodoBtn();
+			});
+
+			virtualBtn.addEventListener('click', async (event) => {
+				event.preventDefault();
+				event.stopPropagation();
+				if (virtualTasks.some((item) => item.id === taskId)) await removeVirtualTask(taskId);
+				else await addVirtualTask(taskId, taskName);
+				virtualTasks = await getVirtualTasks();
+				renderVirtualBtn();
+			});
+
+			renderTodoBtn();
+			renderVirtualBtn();
+			wrap.append(todoBtn, virtualBtn);
+			actionsCell.appendChild(wrap);
+		});
 
 		const randomButton = document.createElement('button');
 		randomButton.classList.add('btn', 'btn-sm');
@@ -1038,3 +1185,4 @@ export function taskArchive() {
 		header.appendChild(contestButton);
 	});
 }
+

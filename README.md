@@ -47,20 +47,11 @@ I originally wanted to make the 'frontend' part of this extension in Angular, bu
 
 - utils row is added to the settings tab in problemset problem view (add to contests table) (and should not)
 
-- add contestLinksOnHomePageLinkToProblems() with menus in oioioi-nav and so on
-
-- ADD TASKS OUTSIDE OF SZKOPUL TO THE TODO LIST!!!!!!!!!!!
-
 - link  to search task in problemset 
 
-- dashboard doesnt display on mobile
-
-- ! emitTaskSolved('twoj-problem-id'); przy submit albo lepiej przy maxie za zadanie
-- menu w problem view
 - preferred language is on home page... ??????????????????????????? what did I mean =
 
 - (??) hide the midified tables (like problems in contest) untill thir html is not modified (display: none on init and then flex when loaded)
-- make the user be able to choose what is displayed on the home page of the popup (szkopul stats/quick score hiding setting)
 - **build the menu html on click so it loads faster and is up to date**
-- Add the same menu in the problem set to the top of the problem page
+- Add the same menu in the problem set to the top of the problem page???
 - **Add comments under tasks ?**

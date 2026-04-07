@@ -1,7 +1,7 @@
 import { attachSubmitFormFixesAndListeners, inlineStatements, languageSelectorFix, makeEnterSearchThings, mandatoryFixesAfterDOMLoad, mandatoryFixesOnStart, statementsOnSamePage } from './misc-fixes';
 import browser from 'webextension-polyfill';
 import { initNotes } from './notes';
-import { appendHomeDashboardSummary, appendProblemSetMenu, appendVirtualContestPanel, pinContestButtonInContest, pinContestButtons, prependPinnedContestsDashboardCard, taskArchive } from './ui-elements';
+import { appendHomeDashboardSummary, appendProblemSetMenu, appendProblemTitleQuickButtons, appendVirtualContestPanel, pinContestButtonInContest, pinContestButtons, prependPinnedContestsDashboardCard, taskArchive } from './ui-elements';
 import { hideInitReportBadges, hidePageContents, hideRulesTab, hideScores } from './ui-hiders';
 import { addToTODOAction } from './todo';
 import { setLang } from './globals';
@@ -30,6 +30,7 @@ const onLoad = () => {
 	void languageSelectorFix(optionsObject.preferredLanguage);
 
 	void appendProblemSetMenu(addToTODOAction);
+	void appendProblemTitleQuickButtons(addToTODOAction);
 	void appendVirtualContestPanel();
 	void makeEnterSearchThings();
 	void initNotes();
