@@ -13,6 +13,47 @@ export function mandatoryFixesAfterDOMLoad() {
 	addUtilsFeedbackButton();
 	openLinksInNewTab();
 	contestLinksOnHomePageLinkToProblems();
+	addRandomHttpErrorGif();
+}
+
+function addRandomHttpErrorGif() {
+	const gifUrls = [
+		'https://adamd.pl.eu.org/hamster/1.gif',
+		'https://adamd.pl.eu.org/hamster/2.gif',
+		'https://adamd.pl.eu.org/hamster/3.gif',
+		'https://adamd.pl.eu.org/hamster/4.gif',
+		'https://adamd.pl.eu.org/hamster/5.gif',
+		'https://adamd.pl.eu.org/hamster/6.gif',
+		'https://adamd.pl.eu.org/hamster/7.gif', // You shall not question this very professional
+		'https://adamd.pl.eu.org/hamster/8.gif', // infrastructure nor code.
+	];
+
+	const tryAppendGif = () => {
+		const message = document.querySelector<HTMLElement>('.text-center .django-http-error-message');
+		if (!message) return false;
+		if (document.getElementById('szkopul-utils-http-error-gif')) return true;
+
+		const gifUrl = gifUrls[Math.floor(Math.random() * gifUrls.length)];
+		const wrapper = document.createElement('div');
+		wrapper.id = 'szkopul-utils-http-error-gif';
+		wrapper.style.cssText = 'display:flex;justify-content:center;margin-top:12px;';
+
+		const img = document.createElement('img');
+		img.src = gifUrl;
+		img.style.cssText = 'width:min(420px,90vw);max-width:100%;';
+		wrapper.appendChild(img);
+
+		message.insertAdjacentElement('afterend', wrapper);
+		return true;
+	};
+
+	if (tryAppendGif()) return;
+
+	for (const delay of [ 300, 900, 2000 ]) {
+		window.setTimeout(() => {
+			void tryAppendGif();
+		}, delay);
+	}
 }
 
 function attachCSS(css: string) {
