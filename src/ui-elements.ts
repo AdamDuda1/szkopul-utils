@@ -255,12 +255,12 @@ function onTaskSolved(handler: (problemId: string, date: Date) => void) {
 function buildMenu(id: string, name: string, problemSet: boolean, revealScoreButton: boolean) {
 	return `
 		<div class="btn-group">
-            <button class="btn btn-outline-secondary dropdown-toggle add-to-contest-button pl-1 pr-2" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button class="btn btn-outline-secondary dropdown-toggle add-to-contest-button ps-1 pe-2" type="button" data-bs-toggle="dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span class="caret add-contest-caret"></span>
                 <span class="d-none loading-spinner job-active"><i class="fa-solid fa-rotate-right spinner"></i></span>
             </button>
             
-            <div class="dropdown-menu dropdown-menu-right" style="min-width: 300px;">
+            <div class="dropdown-menu dropdown-menu-end" style="min-width: 300px;">
                 <h5 class="dropdown-header">Szkopuł Utils</h5>
 				
 				<a class="dropdown-item action-todo" href="#">

@@ -37,7 +37,7 @@ Szkopuł Utils is a browser extension that provides various QOL improvements and
 
 # Contributing
 
-All PRs are welcome! Leave your suggestions, feature requests and bug reports in the [Issues](https://github.com/AdamDuda1/szkopul-utils/issues).
+All PRs are welcome; leave your suggestions, feature requests and bug reports in the [Issues](https://github.com/AdamDuda1/szkopul-utils/issues). Good luck finding your way around that codebase though...
 
 ## Note
 
