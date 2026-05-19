@@ -489,14 +489,13 @@ async function syncVirtualRunningPage() {
 		}
 	}, 1000);
 
-	let settings = '';
-	if (options.hideScores) settings += t('popup_home_hideScores') + ', ';
-	if (options.blockOtherSubpages) settings += t('popup_virtual_blockOtherSubpages') + ', ';
+	// build settings summary without "score by"
+	const settingsParts: string[] = [];
+	if (options.hideScores) settingsParts.push(t('popup_home_hideScores'));
+	if (options.blockOtherSubpages) settingsParts.push(t('popup_virtual_blockOtherSubpages'));
+	settingsParts.push(options.durationInputHours + 'h ' + options.durationInputMinutes + 'm');
 
-	settings += t('popup_virtual_scoreBy') + ': ' + (options.scoreBy == 'last' ? t('popup_virtual_scoreBy_last') : t('popup_virtual_scoreBy_best')) + ', ';
-	settings += options.durationInputHours + 'h ' + options.durationInputMinutes + 'm';
-
-	document.getElementById('virtual-running-settings')!.innerText = settings;
+	document.getElementById('virtual-running-settings')!.innerText = settingsParts.join(', ');
 }
 
 async function initVirtual() {
@@ -540,7 +539,6 @@ async function initVirtual() {
 	(document.getElementById('virtualSetupMinutes') as HTMLInputElement).value = options.durationInputMinutes.toString();
 	(document.getElementById('virtualHideScoresOption') as HTMLInputElement).checked = Boolean(options.hideScores);
 	(document.getElementById('virtualBlockOtherSubpagesOption') as HTMLInputElement).checked = Boolean(options.blockOtherSubpages);
-	(document.getElementById('virtualScoreByOption') as HTMLSelectElement).value = options.scoreBy;
 
 	document.getElementById('virtualSetupHours')!.addEventListener('input', e => {
 		getVirtualOptions().then(options => {
@@ -570,13 +568,7 @@ async function initVirtual() {
 		});
 	});
 
-	document.getElementById('virtualScoreByOption')!.addEventListener('change', e => {
-		getVirtualOptions().then(options => {
-			const value = (e.target as HTMLSelectElement).value;
-			options.scoreBy = value === 'last' ? 'last' : 'best';
-			saveVirtualOptions(options);
-		});
-	});
+	// "Score by" option removed; nothing to handle here
 
 	document.getElementById('btn-startVirtual')?.addEventListener('click', async () => {
 		const hours = Number((document.getElementById('virtualSetupHours') as HTMLInputElement | null)?.value ?? 0);

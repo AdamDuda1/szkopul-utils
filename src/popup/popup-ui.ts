@@ -145,16 +145,7 @@ render(
                 </div>
             </div>
 
-            <div style="display: flex; justify-content: space-between; width: 82%; margin-top: 7px; margin-left: auto; margin-right: auto;">
-                <label for="virtualScoreByOption">
-                    ${ t('popup_virtual_scoreBy') }
-                </label>
-                <select style="height: 25px; font-size: 17px; padding: 2px; width: auto;"
-                        class="form-control" name="virtualScoreByOption" id="virtualScoreByOption">
-                    <option value="best">${ t('popup_virtual_scoreBy_best') }</option>
-                    <option value="last">${ t('popup_virtual_scoreBy_last') }</option>
-                </select>
-            </div>
+            <!-- "Score by" option removed -->
         </details>
 
 
@@ -208,7 +199,7 @@ render(
         <div id="todo-table" style="width: 100%;"></div>
 
         <button id="btn-addTodoCurrent" type="button" class="btn btn-outline-primary"
-                style="flex: 1; white-space: nowrap; margin: -7px 7px 7px; width: 95%;">
+                style="flex: 1; white-space: nowrap; margin: -7px 7px 7px; width: 95%; max-height: 40px;">
             ${ t("popup_todo_addThisSite") }
         </button>
 	`, document.getElementById('todo')!

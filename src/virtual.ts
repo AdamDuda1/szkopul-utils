@@ -7,8 +7,7 @@ const KEY_VIRTUAL_OPTIONS = 'virtualOptions';
 export type virtualOptionsTemplate = {
 	hideScores: boolean,
 	blockOtherSubpages: boolean,
-	scoreBy: 'best' | 'last',
-	duration: number,
+ 	duration: number,
 	durationInputHours: number,
 	durationInputMinutes: number,
 	startTime: number,
@@ -19,7 +18,6 @@ export type virtualOptionsTemplate = {
 const DEFAULT_VIRTUAL_OPTIONS: virtualOptionsTemplate = {
 	hideScores: false,
 	blockOtherSubpages: false,
-	scoreBy: 'best',
 	duration: 0,
 	durationInputHours: 2,
 	durationInputMinutes: 30,
@@ -49,7 +47,6 @@ export async function getVirtualOptions(): Promise<virtualOptionsTemplate> {
 	const {[KEY_VIRTUAL_OPTIONS]: options} = await browser.storage.local.get(KEY_VIRTUAL_OPTIONS);
 	if (!options || Array.isArray(options) || typeof options !== 'object') return {...DEFAULT_VIRTUAL_OPTIONS};
 	const merged = {...DEFAULT_VIRTUAL_OPTIONS, ...(options as Partial<virtualOptionsTemplate>)};
-	if (merged.scoreBy !== 'best' && merged.scoreBy !== 'last') merged.scoreBy = 'best';
 	return merged;
 }
 

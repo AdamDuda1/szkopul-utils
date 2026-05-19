@@ -73,14 +73,6 @@ async function applyVirtualContestPageOptions() {
 		return;
 	}
 
-	if (options.scoreBy === 'last') {
-		const lastScoreText = document.querySelector('#submission-status-table tbody tr:first-child td:last-child')?.textContent?.trim();
-		if (lastScoreText) {
-			document.querySelectorAll<HTMLElement>('[id*="score"]').forEach((el) => {
-				el.textContent = lastScoreText;
-			});
-		}
-	}
 
 	if (options.hideScores) hideScores();
 

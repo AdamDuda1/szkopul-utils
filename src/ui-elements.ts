@@ -934,11 +934,10 @@ export async function appendVirtualContestPanel() {
 		panel.style = `display: flex;flex-direction:column !important;position:fixed;top:150px;left:-3px;border:1px solid white;z-index:2147483647;width:250px;max-height:70vh;overflow-y:auto;background:rgb(255,255,255);color:rgb(33,37,41);border-radius:0 8px 8px 0;padding:10px;box-shadow:rgba(0,0,0,0.16) 0px 4px 14px;`;
 		panel.innerHTML = `
 			<div style="font-weight: 600; margin-bottom: 8px;">${ t('ui_virtual_panel_title') }</div>
-			<div id="szkopul-utils-virtual-panel-timer" style="font-size: 22px; margin-bottom: 8px;">00:00:00</div>
-			<div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">${ t('popup_virtual_scoreBy') }: ${ options.scoreBy === 'last' ? t('popup_virtual_scoreBy_last') : t('popup_virtual_scoreBy_best') }</div>
-			<div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">${ t('ui_virtual_panel_tasks') }</div>
-			<ul id="szkopul-utils-virtual-panel-tasks" style="padding-left: 18px; margin: 0;"></ul>
-		`;
+				<div id="szkopul-utils-virtual-panel-timer" style="font-size: 22px; margin-bottom: 8px;">00:00:00</div>
+				<div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">${ t('ui_virtual_panel_tasks') }</div>
+				<ul id="szkopul-utils-virtual-panel-tasks" style="padding-left: 18px; margin: 0;"></ul>
+			`;
 		document.body.appendChild(panel);
 	}
 

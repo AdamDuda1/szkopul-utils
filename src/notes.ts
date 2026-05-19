@@ -29,7 +29,7 @@ function renderNotes(host: HTMLDivElement, id: string, name: string, displayName
 			          placeholder="${ t('notes_placeholder') }"></textarea>
             <div style="width: 100%; display: flex; justify-content: space-between;">
 				<span style="font-size: 11px; margin-left: 5px; color: gray;">${ t('notes_hint_undo') }</span>
-				<button type="button" class="btn btn-success" style="margin-top: 7px;" id="notes-save">${ t('notes_save') }</button>
+				<button type="button" class="btn btn-success" style="margin-top: 7px; margin-bottom: 100px;" id="notes-save">${ t('notes_save') }</button>
             </div>
 		`, host
 	);
