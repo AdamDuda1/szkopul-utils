@@ -86,31 +86,7 @@ render(
             ${ t('popup_home_refreshPls') }
         </p>
 
-		${optionsObject.whatsOnHomeOption === 'qs' ? html`
-            <div class="form-check form-switch" style="margin-top: 10px; width: 80%; display: flex; justify-content: center; flex-direction: row-reverse; padding: 0;">
-                <input class="form-check-input" type="checkbox" id="hideScoresQuickOption"
-                       style="margin-left: 5px; position: relative; top: -1px;">
-                <label class="form-check-label" for="hideScoresQuickOption">
-                    ${ t('popup_home_hideScores') }
-                </label>
-            </div>
-		` : html`
-            <div style="position: absolute; left: 10px; right: 10px; bottom: 10px; text-align: center; background: #181a1b; border: 1px solid #383d3f; border-radius: 8px; padding: 6px 8px;">
-                <div style="display: flex; justify-content: center; align-items: center; gap: 6px; margin-bottom: 2px;">
-                <span id="szkopulStatusDot"
-                      style="display: inline-block; width: 8px; height: 8px; border-radius: 999px; background: #f0ad4e;"></span>
-                              <span id="szkopulStatusState" style="font-size: 11px; opacity: .9;">${ t('popup_status_unknown') }</span>
-                </div>
-                <h6 style="margin: 2px;">${ t('popup_home_szkopulStatusUpFor') }</h6>
-                <h5 style="margin: 2px;" id="szkopulStatusUpFor">...</h5>
-                <h6 style="margin: 2px 2px 0;">${ t('popup_home_szkopulStatusRecordUptime') } <span
-                        id="szkopulStatusRecordUptime">...</span></h6>
-                <a style="margin: 2px; font-size: small; color: #0069d9 !important"
-                   href="https://czywyjebalohomika.xyz/"
-                   target="_blank" rel="noopener noreferrer">${ t('popup_home_szkopulStatusMore') }</a>
-            </div>
-		`
-		}
+        ${''}
 	`, document.getElementById('home')!
 );
 
@@ -342,6 +318,7 @@ render(
 	</span>
 
 
+        <!--
         <div style="display: flex; justify-content: space-between; width: 82%; margin-top: 7px; min-height: auto; align-items: center;">
             <label for="whatsOnHomeOption">${ t('popup_options_whatsOnHome') }</label>
             <select style="height: 25px; font-size: 17px; padding: 2px; width: auto;"
@@ -350,6 +327,7 @@ render(
                 <option value="qs">${ t('popup_options_whatsOnHome_quickSettings') }</option>
             </select>
         </div>
+        -->
 
         <div style="display: flex; justify-content: space-between; width: 82%; margin-top: 7px; min-height: auto;">
             <label for="lang">

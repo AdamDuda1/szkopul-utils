@@ -23,13 +23,13 @@ export async function afterRender() {
 
 function loadOptions() {
 	// HOME PAGE QUICK OPTIONS
-	{
-		(document.getElementById('hideScoresQuickOption') as HTMLInputElement).checked = optionsObject.hideScores;
-		(document.getElementById('hideScoresQuickOption') as HTMLInputElement).addEventListener('change', () => {
-			optionsObject!.hideScores = (document.getElementById('hideScoresQuickOption') as HTMLInputElement).checked as boolean;
-			saveOptions(optionsObject!).then(() => document.getElementById('refresh-pls-home')!.style.display = 'flex');
-		});
-	}
+	// {
+	// 	(document.getElementById('hideScoresQuickOption') as HTMLInputElement).checked = optionsObject.hideScores;
+	// 	(document.getElementById('hideScoresQuickOption') as HTMLInputElement).addEventListener('change', () => {
+	// 		optionsObject!.hideScores = (document.getElementById('hideScoresQuickOption') as HTMLInputElement).checked as boolean;
+	// 		saveOptions(optionsObject!).then(() => document.getElementById('refresh-pls-home')!.style.display = 'flex');
+	// 	});
+	// }
 
 	// OPTIONS => FIXES AND FEATURES
 	{
@@ -57,7 +57,6 @@ function loadOptions() {
 			saveOptions(optionsObject!).then(() => document.getElementById('refresh-pls-options')!.style.display = 'flex');
 		});
 
-		// TODO here autmatically submit
 
 		(document.getElementById('inlineProblemStatementsOption') as HTMLInputElement).checked = optionsObject.inlineProblemStatements;
 		(document.getElementById('inlineProblemStatementsOption') as HTMLInputElement).addEventListener('change', () => {
