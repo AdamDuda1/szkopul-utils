@@ -78,7 +78,7 @@ export function fixContactButton() {
         #szkopul-contact-form-open-div {
             position: absolute !important;
             left: 7px !important;
-            bottom: -60px !important;
+            bottom: 12px !important;
             width: auto !important;
 		    height: 35px;
         }
@@ -107,7 +107,7 @@ export function mandatoryCSSFixes() {
 		
 		.card-header.dashboard-panel-head { border-radius: 10px 10px 0 0; }
 
-		footer.footer.container-fluid { position: relative; top: 70px; }
+		foo ter.footer.container-fluid { position: relative; top: 70px; }
     `;
 
 	attachCSS(css);
