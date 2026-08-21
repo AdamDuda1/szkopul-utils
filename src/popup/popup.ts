@@ -70,6 +70,12 @@ function loadOptions() {
 			saveOptions(optionsObject!).then(() => document.getElementById('refresh-pls-options')!.style.display = 'flex');
 		});
 
+		(document.getElementById('showProblemSolveCountsOption') as HTMLInputElement).checked = optionsObject.showProblemSolveCounts;
+		(document.getElementById('showProblemSolveCountsOption') as HTMLInputElement).addEventListener('change', () => {
+			optionsObject!.showProblemSolveCounts = (document.getElementById('showProblemSolveCountsOption') as HTMLInputElement).checked as boolean;
+			saveOptions(optionsObject!).then(() => document.getElementById('refresh-pls-options')!.style.display = 'flex');
+		});
+
 	}
 
 	// OPTIONS => META-SETTINGS AND DATA

@@ -761,7 +761,7 @@ export function appendHomeDashboardSummary() {
 		style.textContent = `
 			#szkopul-utils-dashboard-summary { margin-top: 12px; border-top: 1px solid rgba(127, 127, 127, 0.35); }
 			#szkopul-utils-dashboard-summary .dashboard-card-body { display: flex; flex-direction: column; gap: 12px; }
-			#szkopul-utils-dashboard-summary .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px; }
+			#szkopul-utils-dashboard-summary .stats-grid { padding: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px; }
 			#szkopul-utils-dashboard-summary .stats-grid-horizontal { display: grid; grid-template-columns: 1fr; gap: 8px 10px; }
 			#szkopul-utils-dashboard-summary .stat-item { line-height: 1.2; }
 			#szkopul-utils-dashboard-summary .stat-item b { display: block; font-size: 18px; }

@@ -304,6 +304,17 @@ render(
             </div>
         </div>
 
+        <div class="form-check form-switch switch-full d-flex align-items-center justify-content-between"
+             style="min-height: auto;">
+            <label for="showProblemSolveCountsOption" class="mb-0 form-check-label">
+                ${ t('popup_options_showProblemSolveCounts') }
+                <span class="info">${ t('popup_options_showProblemSolveCountsInfo') }</span>
+            </label>
+            <div class="form-check form-switch m-0">
+                <input class="form-check-input" type="checkbox" id="showProblemSolveCountsOption">
+            </div>
+        </div>
+
         <span class="categ">
 		${ t('popup_options_c_meta') }
 	</span>

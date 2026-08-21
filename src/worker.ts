@@ -7,6 +7,7 @@ import { addToTODOAction } from './todo';
 import { setLang } from './globals';
 import { getVirtualOptions, getVirtualTasks, saveVirtualOptions } from './virtual';
 import { getOptions, optionsTemplate } from './options';
+import { appendContestProblemSolveCounts } from './problem-stats';
 
 const manifestVersion = browser.runtime.getManifest().version;
 console.log(`Thank you for using Szkopuł Utils (v${manifestVersion}), Dzięki! :)`);
@@ -61,6 +62,7 @@ function urlSpecificFixes() {
 	if (window.location.pathname.includes('/contest')) void pinContestButtons();
 	if (window.location.href.includes('/c/') && window.location.href.includes('/dashboard/')) void pinContestButtonInContest();
 	if (window.location.href.includes('task_archive')) void taskArchive();
+	if (optionsObject?.showProblemSolveCounts !== false) void appendContestProblemSolveCounts();
 }
 
 async function applyVirtualContestPageOptions() {

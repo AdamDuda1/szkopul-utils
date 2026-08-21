@@ -1,0 +1,106 @@
+name: Release
+
+# Tag a commit with the version from src/manifest.json (e.g. `git tag v1.6 && git push --tags`)
+# and this builds the extension, attaches the zip to a GitHub release and submits it to both stores.
+# Store submission is skipped automatically when the corresponding secrets aren't set.
+
+on:
+  push:
+    tags: [ 'v*' ]
+  workflow_dispatch:
+    inputs:
+      publish_chrome:
+        description: 'Publish to the Chrome Web Store'
+        type: boolean
+        default: true
+      publish_firefox:
+        description: 'Submit to Firefox Add-ons'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Read manifest version
+        id: manifest
+        run: echo "version=$(node -p "require('./src/manifest.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Check which stores are configured
+        id: stores
+        run: |
+          echo "chrome=${{ secrets.CHROME_CLIENT_ID != '' }}" >> "$GITHUB_OUTPUT"
+          echo "firefox=${{ secrets.AMO_JWT_ISSUER != '' }}" >> "$GITHUB_OUTPUT"
+
+      - name: Check the tag matches the manifest version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          tag="${GITHUB_REF#refs/tags/v}"
+          if [ "$tag" != "${{ steps.manifest.outputs.version }}" ]; then
+            echo "Tag v$tag does not match manifest version ${{ steps.manifest.outputs.version }}." >&2
+            exit 1
+          fi
+
+      - name: Build
+        run: npm run build
+
+      - name: Package
+        run: npm run package
+
+      - name: Package the source code for AMO review
+        run: git archive --format=zip --output "dist/szkopul-utils-${{ steps.manifest.outputs.version }}-source.zip" HEAD
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: szkopul-utils-${{ steps.manifest.outputs.version }}
+          path: dist/*.zip
+
+      - name: Publish to the Chrome Web Store
+        if: >-
+          steps.stores.outputs.chrome == 'true' &&
+          (github.event_name != 'workflow_dispatch' || inputs.publish_chrome)
+        env:
+          CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+        run: npx --yes chrome-webstore-upload-cli@3 --source "dist/szkopul-utils-${{ steps.manifest.outputs.version }}.zip"
+
+      - name: Submit to Firefox Add-ons
+        if: >-
+          steps.stores.outputs.firefox == 'true' &&
+          (github.event_name != 'workflow_dispatch' || inputs.publish_firefox)
+        env:
+          WEB_EXT_API_KEY: ${{ secrets.AMO_JWT_ISSUER }}
+          WEB_EXT_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: >-
+          npx web-ext sign
+          --channel listed
+          --approval-timeout 0
+          --source-dir src
+          --artifacts-dir dist
+          --upload-source-code "dist/szkopul-utils-${{ steps.manifest.outputs.version }}-source.zip"
+          --ignore-files "**/*.ts" "types/**" "src.zip" "src.crx" "src.pem"
+
+      - name: Attach the build to the GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.zip
+          generate_release_notes: true

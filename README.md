@@ -15,7 +15,7 @@ Szkopuł Utils is a browser extension that provides various QOL improvements and
 - Load the latest .crx file from the [Releases](https://github.com/AdamDuda1/szkopul-utils/releases) in developer mode.
 
 **Load locally:**
-- Compress the files in the `src` folder into a zip file (manifest.json must be directly in the zip's root). **Make sure to run `npm install` and `npm run build` to compile all the TS scripts before** (you might also need to install `esbuild` and `typescript` if you don't have that already)**!**
+- Run `npm install` and then `npm run release` - that compiles all the TS scripts and drops a ready zip in `dist/` (`npm run build` alone just compiles, if you'd rather zip the `src` folder yourself - manifest.json must be directly in the zip's root).
 - Load to Chrome with developer mode enabled or to Firefox Developer Edition (you may need to disable signed extensions in about:config (or no if mozilla is nice and approves the extension idk)).
 
 ## Full list of features:
@@ -25,6 +25,7 @@ Szkopuł Utils is a browser extension that provides various QOL improvements and
 - Task TODO list;
 - Random task pickers in the task archive (from contests, rounds, categories) and from TODO;
 - Inline task statements view and on-the-same-page statement view;
+- Solve counts in a contest's problems tab (how many people in the ranking got a full score / have any result), read from the contest ranking and cached for a day;
 - Preferred language and auto-submit
 - Score hiding (shows only initial testing reports);
 - Notes for tasks (saved in browser's storage);

@@ -1,0 +1,12 @@
+node_modules/
+.idea/
+
+dist/
+web-ext-artifacts/
+src/src.zip
+src.crx
+
+src.pem
+
+src/*.js
+src/popup/*.js

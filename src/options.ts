@@ -14,6 +14,7 @@ export type optionsTemplate = {
 	preferredLanguage: programmingLanguage,
 	inlineProblemStatements: boolean,
 	statementsOnSamePage: boolean,
+	showProblemSolveCounts: boolean,
 	whatsOnHomeOption: 'qs' | 'status',
 }
 
@@ -25,6 +26,7 @@ const DEFAULT_OPTIONS: optionsTemplate = {
 	preferredLanguage: '',
 	inlineProblemStatements: false,
 	statementsOnSamePage: false,
+	showProblemSolveCounts: true,
 	whatsOnHomeOption: 'qs',
 };
 

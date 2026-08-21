@@ -11,7 +11,9 @@
         "build:notes": "esbuild src/notes.ts --bundle --format=esm --outfile=src/notes.js",
         "build:popup-ui": "esbuild src/popup/popup-ui.ts --bundle --format=esm --outfile=src/popup/popup-ui.js",
         "build:popup": "esbuild src/popup/popup.ts --bundle --format=esm --outfile=src/popup/popup.js",
-        "build": "npm run build:ts && npm run build:options && npm run build:ui-elements && npm run build:ui-hiders && npm run build:misc-fixes && npm run build:todo && npm run build:virtual && npm run build:notes && npm run build:worker && npm run build:popup && npm run build:popup-ui"
+        "build": "npm run build:ts && npm run build:options && npm run build:ui-elements && npm run build:ui-hiders && npm run build:misc-fixes && npm run build:todo && npm run build:virtual && npm run build:notes && npm run build:worker && npm run build:popup && npm run build:popup-ui",
+        "package": "web-ext build --source-dir=src --artifacts-dir=dist --overwrite-dest --filename=\"szkopul-utils-{version}.zip\" --ignore-files \"**/*.ts\" \"types/**\" \"src.zip\" \"src.crx\" \"src.pem\"",
+        "release": "npm run build && npm run package"
     },
     "devDependencies": {
         "@types/cal-heatmap": "^4.0.0",
@@ -19,6 +21,7 @@
         "@types/firefox-webext-browser": "^143.0.0",
         "@types/webextension-polyfill": "^0.12.5",
         "esbuild": "^0.27.4",
+        "web-ext": "^8.3.0",
         "webextension-polyfill": "^0.12.0"
     },
     "dependencies": {
