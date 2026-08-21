@@ -1185,3 +1185,230 @@ export async function taskArchive() {
 	});
 }
 
+
+type searchHint = {
+	trigger?: string,
+	name?: string,
+	category?: string,
+	url?: string,
+};
+
+export function prependHomeProblemSearch() {
+	if (document.getElementById('szkopul-utils-home-search')) return;
+
+	const pageWrapper = document.querySelector<HTMLElement>('.body');
+	const body = document.querySelector<HTMLElement>('.container.body')
+		?? pageWrapper?.querySelector<HTMLElement>(':scope > .container')
+		?? pageWrapper;
+
+	if (!body) {
+		if (DEBUG) console.log('Szkopuł Utils: no page wrapper for the home search bar');
+		return;
+	}
+
+	if (!document.getElementById('szkopul-utils-home-search-style')) {
+		const style = document.createElement('style');
+		style.id = 'szkopul-utils-home-search-style';
+		style.textContent = `
+			#szkopul-utils-home-search { margin-bottom: 14px; }
+			#szkopul-utils-home-search form { position: relative; width: 100%; }
+			#szkopul-utils-home-search input[type="search"] { height: 46px; font-size: 16px; }
+			#szkopul-utils-home-search .home-search-hints {
+				position: absolute; z-index: 1050; top: calc(100% + 4px); left: 0; right: 0;
+				max-height: 320px; overflow-y: auto; scrollbar-width: thin;
+				border: 1px solid rgba(127, 127, 127, 0.35); border-radius: 4px;
+				background: var(--bs-body-bg, #fff); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+			}
+			#szkopul-utils-home-search .home-search-hint {
+				display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+				padding: 7px 12px; cursor: pointer;
+			}
+			#szkopul-utils-home-search .home-search-hint:hover,
+			#szkopul-utils-home-search .home-search-hint.active { background: rgba(127, 127, 127, 0.18); }
+			#szkopul-utils-home-search .home-search-hint .hint-category { opacity: 0.7; font-size: 12px; white-space: nowrap; }
+			#szkopul-utils-home-search .home-search-message { padding: 7px 12px; opacity: 0.75; }
+		`;
+		document.head.appendChild(style);
+	}
+
+	const column = document.createElement('div');
+	column.id = 'szkopul-utils-home-search';
+	column.className = 'col-12';
+	column.innerHTML = `
+		<form autocomplete="off">
+			<div class="input-group">
+				<input type="search" class="form-control" name="q" autocomplete="off"
+					placeholder="${ t('home_search_placeholder') }" aria-label="${ t('home_search_submit') }">
+				<span class="input-group-btn input-group-append">
+					<button class="btn btn-outline-secondary" type="submit" title="${ t('home_search_submit') }">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+							<path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+						</svg>
+					</button>
+				</span>
+			</div>
+			<div class="home-search-hints" hidden></div>
+		</form>
+	`;
+
+	let panelRow: HTMLElement | null = null;
+	for (let node = document.querySelector<HTMLElement>('.dashboard-panel'); node && node !== body; node = node.parentElement) {
+		if (node.classList.contains('row')) panelRow = node;
+	}
+
+	if (panelRow) {
+		const headingColumn = panelRow.querySelector<HTMLElement>(':scope > * > h1, :scope > * > h2')?.parentElement;
+		if (headingColumn) headingColumn.insertAdjacentElement('afterend', column);
+		else panelRow.prepend(column);
+	} else {
+		const row = document.createElement('div');
+		row.className = 'row content-row';
+		row.appendChild(column);
+
+		let inserted: HTMLElement = row;
+		if (!body.classList.contains('container')) {
+			inserted = document.createElement('div');
+			inserted.className = 'container';
+			inserted.appendChild(row);
+		}
+
+		const logoRow = body.querySelector<HTMLElement>('.szkopul-logo')?.closest<HTMLElement>('.content-row');
+		if (logoRow) logoRow.insertAdjacentElement('afterend', inserted);
+		else body.prepend(inserted);
+	}
+
+	const form = column.querySelector<HTMLFormElement>('form')!;
+	const input = column.querySelector<HTMLInputElement>('input[type="search"]')!;
+	const hintsBox = column.querySelector<HTMLDivElement>('.home-search-hints')!;
+
+	let hints: searchHint[] = [];
+	let activeIndex = -1;
+	let hintsRequest: AbortController | null = null;
+	let hintsTimeout = 0;
+
+	const searchProblemset = (query: string) => {
+		const trimmed = query.trim();
+		if (!trimmed) return;
+		window.location.href = `https://szkopul.edu.pl/problemset/?q=${ encodeURIComponent(trimmed) }&include_proposals=0`;
+	};
+
+	const hideHints = () => {
+		hintsBox.hidden = true;
+		hintsBox.innerHTML = '';
+		hints = [];
+		activeIndex = -1;
+	};
+
+	const setActive = (index: number) => {
+		const items = Array.from(hintsBox.querySelectorAll<HTMLDivElement>('.home-search-hint'));
+		activeIndex = index;
+		items.forEach((item, i) => item.classList.toggle('active', i === activeIndex));
+		if (activeIndex >= 0) items[activeIndex]?.scrollIntoView({block: 'nearest'});
+	};
+
+	const renderHints = () => {
+		hintsBox.innerHTML = '';
+		activeIndex = -1;
+
+		if (hints.length === 0) {
+			const message = document.createElement('div');
+			message.className = 'home-search-message';
+			message.textContent = t('home_search_noHints');
+			hintsBox.appendChild(message);
+			hintsBox.hidden = false;
+			return;
+		}
+
+		hints.forEach((hint, index) => {
+			const item = document.createElement('div');
+			item.className = 'home-search-hint';
+
+			const name = document.createElement('span');
+			name.textContent = hint.name ?? '';
+			const category = document.createElement('span');
+			category.className = 'hint-category';
+			category.textContent = hint.category ?? '';
+
+			item.appendChild(name);
+			item.appendChild(category);
+			item.addEventListener('mouseenter', () => setActive(index));
+			item.addEventListener('mousedown', (event) => {
+				event.preventDefault();
+				if (hint.url) window.location.href = hint.url;
+				else searchProblemset(hint.name ?? input.value);
+			});
+
+			hintsBox.appendChild(item);
+		});
+
+		hintsBox.hidden = false;
+	};
+
+	const fetchHints = async (query: string) => {
+		hintsRequest?.abort();
+		hintsRequest = new AbortController();
+
+		try {
+			const response = await fetch(`https://szkopul.edu.pl/get_search_hints/public/?q=${ encodeURIComponent(query) }`, {
+				credentials: 'same-origin',
+				signal: hintsRequest.signal
+			});
+			if (!response.ok) return;
+
+			const data = await response.json() as searchHint[];
+			if (input.value.trim() !== query) return;
+
+			hints = Array.isArray(data) ? data.slice(0, 8) : [];
+			renderHints();
+		} catch (error) {
+			if (DEBUG) console.log('Szkopuł Utils: search hints failed', error);
+		}
+	};
+
+	input.addEventListener('input', () => {
+		window.clearTimeout(hintsTimeout);
+		const query = input.value.trim();
+		if (query.length < 2) {
+			hintsRequest?.abort();
+			hideHints();
+			return;
+		}
+
+		hintsTimeout = window.setTimeout(() => void fetchHints(query), 200);
+	});
+
+	input.addEventListener('keydown', (event) => {
+		if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+			const items = hintsBox.querySelectorAll('.home-search-hint');
+			if (hintsBox.hidden || items.length === 0) return;
+
+			event.preventDefault();
+			const next = activeIndex + (event.key === 'ArrowDown' ? 1 : -1);
+			if (next >= items.length) setActive(-1);
+			else if (next < -1) setActive(items.length - 1);
+			else setActive(next);
+			return;
+		}
+
+		if (event.key === 'Escape') hideHints();
+	});
+
+	input.addEventListener('focus', () => {
+		if (hints.length > 0) hintsBox.hidden = false;
+	});
+
+	input.addEventListener('blur', () => {
+		window.setTimeout(() => { hintsBox.hidden = true; }, 120);
+	});
+
+	form.addEventListener('submit', (event) => {
+		event.preventDefault();
+		const activeHint = activeIndex >= 0 ? hints[activeIndex] : undefined;
+		if (activeHint?.url) {
+			window.location.href = activeHint.url;
+			return;
+		}
+
+		searchProblemset(input.value);
+	});
+}

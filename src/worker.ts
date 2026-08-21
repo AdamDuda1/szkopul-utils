@@ -1,7 +1,7 @@
 import { attachSubmitFormFixesAndListeners, inlineStatements, languageSelectorFix, makeEnterSearchThings, mandatoryFixesAfterDOMLoad, mandatoryFixesOnStart, statementsOnSamePage } from './misc-fixes';
 import browser from 'webextension-polyfill';
 import { initNotes } from './notes';
-import { appendHomeDashboardSummary, appendProblemSetMenu, appendProblemTitleQuickButtons, appendVirtualContestPanel, pinContestButtonInContest, pinContestButtons, prependPinnedContestsDashboardCard, taskArchive } from './ui-elements';
+import { appendHomeDashboardSummary, appendProblemSetMenu, appendProblemTitleQuickButtons, appendVirtualContestPanel, pinContestButtonInContest, pinContestButtons, prependHomeProblemSearch, prependPinnedContestsDashboardCard, taskArchive } from './ui-elements';
 import { hideInitReportBadges, hidePageContents, hideRulesTab, hideScores } from './ui-hiders';
 import { addToTODOAction } from './todo';
 import { setLang } from './globals';
@@ -54,6 +54,7 @@ else onLoad();
 function urlSpecificFixes() {
 	if (window.location.hostname !== 'szkopul.edu.pl') return;
 	if (!(window.location.pathname !== '/')) {
+		void prependHomeProblemSearch();
 		void prependPinnedContestsDashboardCard();
 		void appendHomeDashboardSummary();
 		void pinContestButtons();
@@ -62,7 +63,7 @@ function urlSpecificFixes() {
 	if (window.location.pathname.includes('/contest')) void pinContestButtons();
 	if (window.location.href.includes('/c/') && window.location.href.includes('/dashboard/')) void pinContestButtonInContest();
 	if (window.location.href.includes('task_archive')) void taskArchive();
-	if (optionsObject?.showProblemSolveCounts !== false) void appendContestProblemSolveCounts();
+	if (optionsObject?.showProblemSolveCounts) void appendContestProblemSolveCounts();
 }
 
 async function applyVirtualContestPageOptions() {
